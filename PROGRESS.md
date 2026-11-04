@@ -20,7 +20,6 @@ _(chưa có)_
 
 ## Blockers
 - T-02: user cần tạo Supabase project, điền `.mcp.json` + `backend/.env` (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, DATABASE_URL cổng 5432, JWT_SECRET ≥ 32 ký tự, ADMIN_EMAIL/ADMIN_PASSWORD) và `frontend/.env`
-_(chưa có)_
 
 ## Backlog kỹ thuật (để sau)
 - Script dọn file ảnh mồ côi (log `ORPHAN_PHOTO`) — D-25
