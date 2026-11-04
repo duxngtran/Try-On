@@ -10,8 +10,17 @@ const MSG = {
   INTERNAL_ERROR: 'Đã có lỗi xảy ra. Vui lòng thử lại sau.',
 };
 
+/** Mỗi trường chỉ giữ lỗi đầu tiên (FE hiện một lỗi dưới mỗi ô). */
 export function zodIssuesToDetails(error) {
-  return error.issues.map((i) => ({ field: i.path.join('.'), message: i.message }));
+  const seen = new Set();
+  const details = [];
+  for (const issue of error.issues) {
+    const field = issue.path.join('.');
+    if (seen.has(field)) continue;
+    seen.add(field);
+    details.push({ field, message: issue.message });
+  }
+  return details;
 }
 
 /** Chuyển mọi lỗi về `{ status, code, message, details? }`; lỗi không biết -> 500 INTERNAL_ERROR. */
