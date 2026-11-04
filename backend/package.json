@@ -1,0 +1,34 @@
+{
+  "name": "tryon-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env --watch src/server.js",
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "migrate": "node --env-file-if-exists=.env scripts/migrate.js",
+    "fixtures": "node scripts/generate-fixtures.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "helmet": "^8.3.0",
+    "pg": "^8.23.1",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
+    "supertest": "^7.3.1",
+    "vitest": "^5.1.0"
+  }
+}
