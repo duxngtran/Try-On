@@ -2,4 +2,4 @@ node_modules
 dist
 coverage
 package-lock.json
-backend/tests/fixtures/generated
+**/tests/fixtures/generated

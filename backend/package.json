@@ -14,8 +14,8 @@
     "lint": "eslint .",
     "migrate": "node --env-file-if-exists=.env scripts/migrate.js",
     "fixtures": "node scripts/generate-fixtures.js",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format": "prettier --write . --ignore-path ../.prettierignore",
+    "format:check": "prettier --check . --ignore-path ../.prettierignore"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
