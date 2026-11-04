@@ -1,4 +1,4 @@
-# Sprint 01 — Sprint backlog
+ [x] | [x] | [x] | [x] | [x] | [x] | [x] |# Sprint 01 — Sprint backlog
 
 > Epic 1: Thiết lập hồ sơ khách hàng · Stories: [US-01](US-01.md), [US-02](US-02.md) · Quyết định liên quan: D-01 → D-21 (`DECISIONS.md`)
 
@@ -115,9 +115,9 @@ Frontend **không** có biến Supabase nào (D-02).
 | T-04 | Scaffold `frontend/`: Vite + React + Tailwind v4 (`@tailwindcss/vite`) + React Router; cấu trúc `src/{features,components,pages,services,routes}`; layout rỗng, trang Home placeholder | — | T-01 | M | `npm run dev` hiển thị trang có class Tailwind; `npm run build` pass | [ ] |
 | T-05 | `services/apiClient`: base URL `VITE_API_URL`, gắn `Authorization: Bearer`, chuẩn hóa lỗi về `{ code, message }`, hook xử lý 401 tập trung (logic điều hướng cắm vào ở T-16) | US-01 | T-04 | S | Unit test: gắn header khi có token; 401 gọi handler đúng 1 lần | [ ] |
 | T-06 | `backend/.env.example`, `frontend/.env.example` (mục 4); cập nhật lệnh `dev/test/build/migrate/seed` vào `CLAUDE.md` | — | T-03, T-04 | S | Đủ biến mục 4, không chứa giá trị thật | [ ] |
-| T-07 | Thư mục `migrations/` + script `backend/scripts/migrate.js` (D-19, thiết kế ở `design/db/README.md` mục 7) | — | T-02, T-03 | S | Chạy 2 lần liên tiếp không lỗi, không chạy lại file đã áp dụng | [ ] |
+| T-07 | Thư mục `migrations/` + script `backend/scripts/migrate.js` (D-19, thiết kế ở `design/db/README.md` mục 7) | — | T-02, T-03 | S | Chạy 2 lần liên tiếp không lỗi, không chạy lại file đã áp dụng *(đã viết runner + unit test logic; chưa chạy với DB thật do thiếu `DATABASE_URL`)* | [ ] |
 | T-08 | Cấu hình test: Vitest + Supertest (BE), Vitest + Testing Library + jsdom (FE); script `npm test`; sinh **ảnh fixture** bằng sharp (`backend/tests/fixtures/`): JPG 1080×1920 có EXIF GPS + orientation, PNG, WEBP, 400×800, 1920×1080, cạnh 9000 px, file > 10 MB, `.exe` đổi đuôi `.jpg`, file JPEG hỏng | — | T-03, T-04 | M | `npm test` chạy được ở 2 thư mục; fixture tái tạo được bằng script | [ ] |
-| T-09 | Postman: workspace, collection `Try-on API` (folder `Auth`, `Profile`), environment `local` (`baseUrl`, `userToken`, `adminToken`, `email` ngẫu nhiên) | — | T-03 | S | Request `/api/health` có test pass | [ ] |
+| T-09 | Postman: workspace, collection `Try-on API` (folder `Auth`, `Profile`), environment `local` (`baseUrl`, `userToken`, `adminToken`, `email` ngẫu nhiên) | — | T-03 | S | Request `/api/health` có test pass *(đã tạo workspace `Try-on` `a351cb34-487c-4e4a-b6c8-1c616e8ddb50`, collection `478c6b9e-13c1-42f1-ad2b-724790e10e37`, env `local` `992b1ad8-9e5c-4786-a982-42b9fc044eac`; chưa chạy collection bằng runner)* | [ ] |
 
 ### 5.2 US-01 — Đăng ký & đăng nhập (branch `feature/US-01-auth`)
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Try-on** is a virtual try-on (GenAI) fashion e-commerce web app. The repo is at the planning stage: there is no application code yet, no build/lint/test commands, and it is not yet a git repository. The root `package.json` only pulls in `@supabase/supabase-js`. When you scaffold `frontend/` or `backend/`, add their commands to this file.
+**Try-on** is a virtual try-on (GenAI) fashion e-commerce web app. Sprint 1 setup (branch `chore/sprint-01-setup`) has scaffolded `backend/` (Express 5, ESM) and `frontend/` (Vite + React 19 + Tailwind v4); features (auth, profile) are not built yet. The root `package.json` only pulls in `@supabase/supabase-js`; each app has its own `package.json`.
 
 Project docs and agent prompts are written in Vietnamese.
 
@@ -60,6 +60,26 @@ sprint-xx/
 ```
 
 The design system lives at project level in `design/design-system.md` because every sprint shares it. agent-uiux only designs (step 4); agent-coder writes the UI code in step 5 unless the main agent explicitly asks agent-uiux to code it. Subagents cannot call each other: when one hits an ambiguity it reports the question back, and the main agent asks the right agent or the user.
+
+## Commands
+
+Run from the repo root; Node 24 is required. Copy `backend/.env.example` to `backend/.env` and `frontend/.env.example` to `frontend/.env` first (the backend refuses to start with missing or invalid env).
+
+| Task | Backend (`cd backend`) | Frontend (`cd frontend`) |
+|---|---|---|
+| Install | `npm install` | `npm install` |
+| Dev server | `npm run dev` (port 4000, `node --watch`) | `npm run dev` (port 5173) |
+| Test | `npm test` | `npm test` |
+| Run one test file | `npx vitest run tests/app.test.js` | `npx vitest run src/services/apiClient.test.js` |
+| Run one test by name | `npx vitest run -t "<name>"` | `npx vitest run -t "<name>"` |
+| Lint | `npm run lint` | `npm run lint` |
+| Format (Prettier, shared root `.prettierrc`) | `npm run format` / `npm run format:check` | `npm run format` / `npm run format:check` |
+| Build | n/a | `npm run build` |
+| Migrate (D-19) | `npm run migrate` (needs `DATABASE_URL`; applies `migrations/NNN_*.sql` in order, tracked in `schema_migrations`) | n/a |
+| Image test fixtures | `npm run fixtures` (writes `tests/fixtures/generated/`, gitignored) | n/a |
+| Seed admin / setup storage | `scripts/seed-admin.js`, `scripts/setup-storage.js` are added in US-01 / US-02 | n/a |
+
+Notes: Tailwind v4 is configured in CSS (`frontend/src/index.css`, `@theme` tokens from `design/design-system.md`), there is no `tailwind.config.js`. Vitest uses `vite.config.js` on the frontend and `vitest.config.js` on the backend. Postman workspace "Try-on", collection "Try-on API" and environment "local" are created through Postman MCP.
 
 ## Product notes
 

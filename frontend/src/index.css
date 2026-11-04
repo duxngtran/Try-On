@@ -1,0 +1,101 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Xóa palette mặc định để chỉ dùng token của dự án (design/design-system.md mục 9) */
+  --color-*: initial;
+
+  --color-canvas: #faf8f5;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f2eee8;
+  --color-line: #e3ddd4;
+  --color-line-strong: #8c857b;
+  --color-ink: #1a1a1a;
+  --color-ink-muted: #5c564e;
+  --color-ink-subtle: #6f685f;
+  --color-ink-inverse: #ffffff;
+  --color-accent: #8a6f5a;
+  --color-accent-strong: #6f5642;
+  --color-accent-soft: #f1e9e1;
+  --color-danger: #b4443c;
+  --color-danger-soft: #fbedeb;
+  --color-success: #2f6b4f;
+  --color-success-soft: #eaf3ee;
+  --color-warning: #8a5a00;
+  --color-warning-soft: #fff4db;
+  --color-disabled-bg: #ece7e0;
+  --color-disabled-ink: #8c857b;
+  --color-scrim: rgb(26 26 26 / 0.5);
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-display: 'Playfair Display', ui-serif, Georgia, serif;
+  --font-sans: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: 2rem;
+  --text-display--line-height: 2.5rem;
+  --text-title: 1.5rem;
+  --text-title--line-height: 2rem;
+  --text-heading: 1.125rem;
+  --text-heading--line-height: 1.625rem;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.25rem;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-card: 0 1px 2px rgb(26 26 26 / 0.06), 0 4px 12px rgb(26 26 26 / 0.04);
+  --shadow-pop: 0 8px 24px rgb(26 26 26 / 0.12);
+  --shadow-modal: 0 16px 48px rgb(26 26 26 / 0.18);
+
+  --ease-out-soft: cubic-bezier(0.2, 0, 0, 1);
+  --animate-shimmer: shimmer 1.5s linear infinite;
+  --animate-toast-in: toast-in 200ms var(--ease-out-soft);
+
+  @keyframes shimmer {
+    from {
+      background-position: -200% 0;
+    }
+    to {
+      background-position: 200% 0;
+    }
+  }
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+html {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

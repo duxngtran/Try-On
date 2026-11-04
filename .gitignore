@@ -8,3 +8,6 @@ coverage/
 .mcp.json
 .DS_Store
 *.log
+
+# fixture ảnh sinh bằng npm run fixtures
+backend/tests/fixtures/generated/
