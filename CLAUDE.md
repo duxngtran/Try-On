@@ -73,6 +73,7 @@ Run from the repo root; Node 24 is required. Copy `backend/.env.example` to `bac
 | Run one test file | `npx vitest run tests/app.test.js` | `npx vitest run src/services/apiClient.test.js` |
 | Run one test by name | `npx vitest run -t "<name>"` | `npx vitest run -t "<name>"` |
 | Lint | `npm run lint` | `npm run lint` |
+| Format (Prettier, shared root `.prettierrc`) | `npm run format` / `npm run format:check` | `npm run format` / `npm run format:check` |
 | Build | n/a | `npm run build` |
 | Migrate (D-19) | `npm run migrate` (needs `DATABASE_URL`; applies `migrations/NNN_*.sql` in order, tracked in `schema_migrations`) | n/a |
 | Image test fixtures | `npm run fixtures` (writes `tests/fixtures/generated/`, gitignored) | n/a |
