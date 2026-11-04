@@ -4,7 +4,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
-const OUT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../tests/fixtures/generated');
+const OUT_DIR = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../tests/fixtures/generated',
+);
 
 const blank = (width, height, rgb = { r: 200, g: 170, b: 150 }) =>
   sharp({ create: { width, height, channels: 3, background: rgb } });
@@ -41,7 +44,10 @@ export async function generateFixtures(outDir = OUT_DIR) {
   await add('too-long-edge-600x9000.jpg', await blank(600, 9000).jpeg().toBuffer());
   // Quá dung lượng: JPEG hợp lệ + đệm cho tới > 10 MB
   const valid = await blank(1080, 1920).jpeg().toBuffer();
-  await add('too-large-over-10mb.jpg', Buffer.concat([valid, Buffer.alloc(10 * 1024 * 1024 + 1024)]));
+  await add(
+    'too-large-over-10mb.jpg',
+    Buffer.concat([valid, Buffer.alloc(10 * 1024 * 1024 + 1024)]),
+  );
   // Sai loại: nội dung PE (.exe) đổi đuôi .jpg
   await add('fake-exe.jpg', Buffer.concat([Buffer.from('MZ'), Buffer.alloc(2048, 0x90)]));
   // JPEG hỏng: header đúng nhưng cắt cụt thân

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   /* Xóa palette mặc định để chỉ dùng token của dự án (design/design-system.md mục 9) */
@@ -29,8 +29,8 @@
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  --font-display: "Playfair Display", ui-serif, Georgia, serif;
-  --font-sans: "Manrope Variable", "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Playfair Display', ui-serif, Georgia, serif;
+  --font-sans: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
 
   --text-display: 2rem;
   --text-display--line-height: 2.5rem;

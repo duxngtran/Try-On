@@ -32,7 +32,9 @@ export const envSchema = z.object({
 export function parseEnv(source = process.env) {
   const result = envSchema.safeParse(source);
   if (!result.success) {
-    const lines = result.error.issues.map((i) => `  - ${i.path.join('.') || '(root)'}: ${i.message}`);
+    const lines = result.error.issues.map(
+      (i) => `  - ${i.path.join('.') || '(root)'}: ${i.message}`,
+    );
     throw new Error(`Cấu hình môi trường không hợp lệ:\n${lines.join('\n')}`);
   }
   return Object.freeze(result.data);

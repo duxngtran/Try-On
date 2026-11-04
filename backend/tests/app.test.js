@@ -83,7 +83,10 @@ describe('error handler', () => {
     }, false);
     const res = await request(a).get('/boom');
     expect(res.status).toBe(409);
-    expect(res.body.error).toEqual({ code: 'EMAIL_ALREADY_EXISTS', message: 'Email đã được đăng ký.' });
+    expect(res.body.error).toEqual({
+      code: 'EMAIL_ALREADY_EXISTS',
+      message: 'Email đã được đăng ký.',
+    });
   });
 
   it('ZodError -> 400 với details theo từng trường', async () => {

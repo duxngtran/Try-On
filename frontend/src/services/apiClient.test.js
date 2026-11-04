@@ -16,7 +16,11 @@ const errorBody = (code, message = 'Lỗi') => ({ success: false, error: { code,
 
 function setup({ token = 'jwt-123', status = 200, data = { success: true, data: {} } } = {}) {
   const onUnauthorized = vi.fn();
-  const client = createApiClient({ baseURL: 'http://api.test/api', getToken: () => token, onUnauthorized });
+  const client = createApiClient({
+    baseURL: 'http://api.test/api',
+    getToken: () => token,
+    onUnauthorized,
+  });
   client.defaults.adapter = adapterWith(status, data);
   return { client, onUnauthorized };
 }
@@ -42,19 +46,32 @@ describe('apiClient', () => {
   });
 
   it('401 (token hết hạn) gọi handler đúng 1 lần và reject ApiError chuẩn hóa', async () => {
-    const { client, onUnauthorized } = setup({ status: 401, data: errorBody('TOKEN_EXPIRED', 'Phiên hết hạn') });
-    await expect(client.get('/auth/me')).rejects.toMatchObject({ status: 401, code: 'TOKEN_EXPIRED' });
+    const { client, onUnauthorized } = setup({
+      status: 401,
+      data: errorBody('TOKEN_EXPIRED', 'Phiên hết hạn'),
+    });
+    await expect(client.get('/auth/me')).rejects.toMatchObject({
+      status: 401,
+      code: 'TOKEN_EXPIRED',
+    });
     expect(onUnauthorized).toHaveBeenCalledTimes(1);
   });
 
   it('401 INVALID_CREDENTIALS (đăng nhập sai) không bị coi là hết phiên', async () => {
-    const { client, onUnauthorized } = setup({ status: 401, data: errorBody('INVALID_CREDENTIALS') });
+    const { client, onUnauthorized } = setup({
+      status: 401,
+      data: errorBody('INVALID_CREDENTIALS'),
+    });
     await expect(client.post('/auth/login', {})).rejects.toBeInstanceOf(ApiError);
     expect(onUnauthorized).not.toHaveBeenCalled();
   });
 
   it('401 khi request không gửi token không kích hoạt handler', async () => {
-    const { client, onUnauthorized } = setup({ token: null, status: 401, data: errorBody('UNAUTHORIZED') });
+    const { client, onUnauthorized } = setup({
+      token: null,
+      status: 401,
+      data: errorBody('UNAUTHORIZED'),
+    });
     await expect(client.get('/x')).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
     expect(onUnauthorized).not.toHaveBeenCalled();
   });

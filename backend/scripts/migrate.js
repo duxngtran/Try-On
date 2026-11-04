@@ -4,7 +4,10 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadMigrationFiles, planMigrations } from './lib/migrations.js';
 
-const MIGRATIONS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../migrations');
+const MIGRATIONS_DIR = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../../migrations',
+);
 
 const CREATE_TRACKING_TABLE = `
   create table if not exists public.schema_migrations (
@@ -20,7 +23,9 @@ async function main() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error('Thiếu DATABASE_URL trong backend/.env');
   if (/:6543\b/.test(url)) {
-    console.warn('Cảnh báo: cổng 6543 là transaction pooler; DDL nên dùng direct/session connection (cổng 5432).');
+    console.warn(
+      'Cảnh báo: cổng 6543 là transaction pooler; DDL nên dùng direct/session connection (cổng 5432).',
+    );
   }
 
   const files = await loadMigrationFiles(MIGRATIONS_DIR);
@@ -39,15 +44,17 @@ async function main() {
       try {
         await client.query('begin');
         await client.query(file.sql);
-        await client.query('insert into public.schema_migrations (filename, checksum) values ($1, $2)', [
-          file.filename,
-          file.checksum,
-        ]);
+        await client.query(
+          'insert into public.schema_migrations (filename, checksum) values ($1, $2)',
+          [file.filename, file.checksum],
+        );
         await client.query('commit');
         console.log(`Đã áp dụng: ${file.filename}`);
       } catch (err) {
         await client.query('rollback');
-        throw new Error(`Migration ${file.filename} lỗi (đã rollback): ${err.message}`, { cause: err });
+        throw new Error(`Migration ${file.filename} lỗi (đã rollback): ${err.message}`, {
+          cause: err,
+        });
       }
     }
   } finally {

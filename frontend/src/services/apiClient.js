@@ -20,7 +20,8 @@ export function normalizeApiError(error) {
   if (error instanceof ApiError) return error;
   if (axios.isCancel(error)) return new ApiError({ status: 0, code: 'CANCELED', message: '' });
   const response = error?.response;
-  if (!response) return new ApiError({ status: 0, code: 'NETWORK_ERROR', message: NETWORK_MESSAGE });
+  if (!response)
+    return new ApiError({ status: 0, code: 'NETWORK_ERROR', message: NETWORK_MESSAGE });
   const apiError = response.data?.error;
   return new ApiError({
     status: response.status,
