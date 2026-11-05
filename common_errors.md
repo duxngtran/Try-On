@@ -13,6 +13,14 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 
 - **`useAuth` throw khi test render ngoài `AuthProvider`.** Throw là hành vi đúng. **Sửa:** render test trong provider (`frontend/src/test/renderApp.jsx`), không nới lỏng hook. (sprint-01)
 
+- **Mock trả dữ liệu "sạch" hơn DB thật nên unit test không bắt được lỗi:** Postgres trả `timestamptz` dạng `...893014+00:00`, contract cần `...893Z`. **Sửa:** chuẩn hóa bằng `new Date(value).toISOString()`, thêm test với chuỗi kiểu Postgres. (sprint-01)
+
+## Backend / API
+- **429 chỉ có `retryAfterSeconds` trong body, thiếu header `Retry-After`.** **Sửa:** đặt header ở error handler chung. (sprint-01)
+
+## Supabase / kết nối DB
+- **`getaddrinfo ENOTFOUND db.<ref>.supabase.co`:** host direct chỉ có IPv6, máy không có IPv6. **Sửa:** dùng Session pooler `aws-0-<region>.pooler.supabase.com:5432`, user `postgres.<ref>`; không dùng cổng 6543 cho migrate. (sprint-01)
+
 ## Frontend / điều hướng
 - **Handler 401 và route guard cùng gọi `navigate`** → ghi đè `location.state`, mất thông báo hết phiên. **Sửa:** provider chỉ xóa phiên và đặt `notice`, để guard điều hướng. (sprint-01)
 
