@@ -3,8 +3,8 @@
 ## Tổng quan
 | Sprint | Epic | Trạng thái | Bước hiện tại |
 |---|---|---|---|
-| sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Đang làm | Bước 5: US-01 đã merge; US-02 xong trên `feature/US-02-profile`, chờ merge (T-34) |
-| sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Chưa bắt đầu | — |
+| sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Xong | US-01 và US-02 đã merge vào `main` |
+| sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Đang làm | Bước 4: UI/UX (user chốt D-45, D-52 giữ nguyên) |
 | sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Chưa bắt đầu | — |
 | sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Chưa bắt đầu | — |
 
@@ -13,14 +13,22 @@
 - [x] Bước 2: Sprint backlog (`sprint-01/sprint-backlog.md`, 34 task) — xong, user xác nhận Q1–Q6 (D-17 → D-21, cập nhật D-06) (2026-11-04)
 - [x] Bước 3: Thiết kế nghiệp vụ (`design/flows/` 11 luồng, `design/api.md`, `design/db/`) — xong, user xác nhận (D-22 → D-33) (2026-11-04)
 - [x] Bước 4: UI/UX (`design/design-system.md` "Try-on Atelier v2", 6 file `sprint-01/screens/`) — xong, user xác nhận (D-34 → D-38) (2026-11-04)
-- [ ] Bước 5: Implement + test (unit + Postman) — 33/34 task xong, còn T-34 (merge US-02). Setup xong (T-02 đạt qua `list_tables`); US-01 (T-10 → T-22) đã merge; US-02 (T-23 → T-33) đã commit trên `feature/US-02-profile`: test BE 181/181, FE 153/153, newman `System` 2 request/5 assertion, `Auth` 26/66, `Profile` 126/244, đều 0 fail; kiểm tra Playwright trên Chrome thật đạt ở 360, 768, 1280 px (2026-11-05)
+- [x] Bước 5: Implement + test (unit + Postman) — 34/34 task xong. Setup xong (T-02 đạt qua `list_tables`); US-01 (T-10 → T-22) và US-02 (T-23 → T-34) đã merge; kết quả US-02 trước merge: test BE 181/181, FE 153/153, newman `System` 2 request/5 assertion, `Auth` 26/66, `Profile` 126/244, đều 0 fail; kiểm tra Playwright trên Chrome thật đạt ở 360, 768, 1280 px (2026-11-05)
+
+## Sprint 02 — chi tiết
+- [x] Bước 1: User stories (`sprint-02/US-03.md`, `sprint-02/US-04.md`) — xong (2026-11-05)
+- [x] Bước 2: Sprint backlog (`sprint-02/sprint-backlog.md`, 26 task T-35 → T-60) — xong (2026-11-05)
+- [x] Bước 3: Thiết kế nghiệp vụ (`sprint-02/design/`: 7 luồng, `api.md`, `db/`) — xong; SQL 003, 004 đã chạy thử trên PGlite, chưa áp dụng lên Supabase; D-41 → D-55 do user ủy quyền duyệt (2026-11-05)
+- [ ] Bước 4: UI/UX — chưa làm
+- [ ] Bước 5: Implement + test — chưa làm
 
 ## Merge log
 - 2026-11-04: `chore/sprint-01-setup` → `main` (merge commit `3a8d178`). Setup T-01, T-03→T-06, T-08 + Prettier, .gitattributes, README. Test BE 20/20, FE 8/8, lint, format:check, build đều pass. T-07, T-09 còn chờ Supabase.
 - 2026-11-05: `feature/US-01-auth` → `main` (merge commit `570a0ee`), user xác nhận. Trên `main`: test BE 78/78, FE 86/86, lint, build pass. Trước merge: newman `Auth` 26 request, 66 assertion, 0 fail (nâng rate limit cho server test); newman `System` 2 request, 5 assertion, 0 fail. Chưa kiểm thật: token hết hạn, hết khóa sau 15 phút, đăng ký đồng thời, rate limit 20/phút (chỉ có unit test hoặc chưa chạy).
+- 2026-11-05: `feature/US-02-profile` → `main` (merge commit `aeae7eb`), user gọi `/merge`. Trên `main`: test BE 181/181, FE 153/153, lint, build pass. Trước merge: newman `System` 2 request/5 assertion, `Auth` 26/66, `Profile` 126/244, đều 0 fail (chưa chạy lại newman sau merge).
 
 ## Blockers
-- T-34 (2026-11-05): lệnh merge `feature/US-02-profile` → `main` bị auto mode classifier của Claude Code từ chối ("Merge Without Review"). User đã đồng ý merge khi test đạt và test đã đạt, nhưng cần user tự merge hoặc cấp quyền. Sprint 1 chưa đóng cho tới khi merge xong và chạy `/wrap-up`
+- Chưa có
 
 ## Ghi chú Supabase
 - `DATABASE_URL` dùng Session pooler cổng 5432 vì host direct chỉ có IPv6 mà máy dev không có IPv6. User quyết định không đổi các secret đã gửi trong chat (2026-11-05)

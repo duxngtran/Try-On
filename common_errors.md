@@ -42,5 +42,8 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 - **`generate_screen_from_text` timeout với màn phức tạp; `list_screens` trả rỗng** kể cả sau khi sinh thành công. **Sửa:** không phụ thuộc mockup Stitch — file `.md` trong `sprint-xx/screens/` là nguồn chuẩn. (sprint-01)
 - **Stitch tự thêm tính năng ngoài phạm vi** (Quên mật khẩu, đăng nhập Google/Apple). **Sửa:** đối chiếu với DECISIONS.md, ghi chú bỏ. (sprint-01)
 
+## Quyền / phiên chạy song song
+- **Phiên nền chạy `git merge` bị bộ kiểm soát quyền từ chối ("Merge Without Review")** dù user đã đồng ý trong chat. **Sửa:** không nhờ phiên khác merge thay; báo user và để user gọi trực tiếp `/merge`. (sprint-01)
+
 ## UI / font
 - **Font không có glyph tiếng Việt** (Bodoni Moda). **Sửa:** chỉ chọn font có subset `vietnamese` (đang dùng Playfair Display + Manrope). (sprint-01)

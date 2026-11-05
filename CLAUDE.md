@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Try-on** is a virtual try-on (GenAI) fashion e-commerce web app. `backend/` is Express 5 (ESM) and `frontend/` is Vite + React 19 + Tailwind v4. Auth (US-01) is on `main`; see `PROGRESS.md` for the status of the profile feature (US-02) and later sprints. Main folders: `backend/src`, `backend/tests` (including `tests/postman`), `frontend/src`, `migrations/`, `design/`, `sprint-01/`. The root `package.json` only pulls in `@supabase/supabase-js`; each app has its own `package.json`.
+**Try-on** is a virtual try-on (GenAI) fashion e-commerce web app. `backend/` is Express 5 (ESM) and `frontend/` is Vite + React 19 + Tailwind v4. Auth (US-01) and profile (US-02) are on `main`; see `PROGRESS.md` for the status of later sprints. Main folders: `backend/src`, `backend/tests` (including `tests/postman`), `frontend/src`, `migrations/`, `design/`, `sprint-01/`. The root `package.json` only pulls in `@supabase/supabase-js`; each app has its own `package.json`.
 
 Project docs and agent prompts are written in Vietnamese.
 
