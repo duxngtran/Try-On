@@ -66,6 +66,10 @@ export function createErrorHandler({ isProduction, logger = console }) {
       // Không log body/headers (có thể chứa mật khẩu, token, số đo).
       logger.error(isProduction ? `${err?.name}: ${err?.message}` : err);
     }
+    const retryAfter = normalized.details?.retryAfterSeconds;
+    if (normalized.status === 429 && Number.isFinite(retryAfter)) {
+      res.set('Retry-After', String(retryAfter));
+    }
     return fail(res, normalized.status, normalized.code, normalized.message, normalized.details);
   };
 }

@@ -20,7 +20,8 @@ export function toPublicUser(row) {
     role: row.role,
     // US-02 (migration 002) sẽ thay bằng giá trị thật từ bảng profiles (D-24).
     profileCompleted: false,
-    createdAt: row.created_at,
+    // Postgres trả `...893014+00:00`; contract yêu cầu ISO 8601 UTC dạng `...893Z`.
+    createdAt: new Date(row.created_at).toISOString(),
   };
 }
 

@@ -3,12 +3,25 @@ import request from 'supertest';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { createTestApp, TEST_ENV } from './helpers/authTestKit.js';
+import { toPublicUser } from '../src/services/authService.js';
 
 const PASSWORD = 'abc12345';
 const register = (app, body) => request(app).post('/api/auth/register').send(body);
 const login = (app, body) => request(app).post('/api/auth/login').send(body);
 
 afterEach(() => vi.restoreAllMocks());
+
+describe('toPublicUser', () => {
+  it('createdAt luôn là ISO UTC có "Z" (Postgres trả microsecond + offset)', () => {
+    const user = toPublicUser({
+      id: 'x',
+      email: 'a@b.co',
+      role: 'user',
+      created_at: '2026-11-05T07:25:25.893014+00:00',
+    });
+    expect(user.createdAt).toBe('2026-11-05T07:25:25.893Z');
+  });
+});
 
 describe('POST /api/auth/register', () => {
   it('AC-01/AC-05: tạo user, hash bcrypt, trả JWT chỉ có sub/role/iat/exp, không lộ hash', async () => {
@@ -105,6 +118,7 @@ describe('POST /api/auth/login', () => {
     expect(locked.body.error.code).toBe('TOO_MANY_ATTEMPTS');
     expect(locked.body.error.details.retryAfterSeconds).toBeGreaterThan(14 * 60);
     expect(locked.body.error.message).toContain('15 phút');
+    expect(Number(locked.headers['retry-after'])).toBe(locked.body.error.details.retryAfterSeconds);
   });
 
   it('D-30: email không tồn tại cũng bị khóa sau 5 lần (không lộ email có đăng ký)', async () => {
