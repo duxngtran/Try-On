@@ -1,4 +1,5 @@
-const KEY = 'tryon.token';
+export const TOKEN_KEY = 'tryon.token';
+const KEY = TOKEN_KEY;
 
 // localStorage có thể ném lỗi (chế độ riêng tư, bị chặn) nên mọi truy cập đều bọc try/catch.
 export const tokenStorage = {
