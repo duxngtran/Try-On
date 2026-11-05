@@ -55,7 +55,7 @@ Ghi lại các quyết định nghiệp vụ & thuật toán. Khi một quyết 
 | D-49 | Thay ảnh: tăng `image_version`, xóa file cũ theo thứ tự upload → ghi DB → xóa cũ; đổi tên, giá, danh mục không tăng version | Giống D-24, D-25; khóa cache `userId + photoVersion + productId + imageVersion`; user ủy quyền duyệt | sprint-02 |
 | D-50 | Thêm và sửa sản phẩm dùng một request multipart, ghi nguyên tử qua hàm SQL | Không có trạng thái lưu một phần; user ủy quyền duyệt | sprint-02 |
 | D-51 | Rate limit 120 thêm/sửa / admin / giờ, đếm cả request bị từ chối; `DELETE` không tính | Bảo vệ CPU xử lý ảnh, theo cách đếm của D-31; user ủy quyền duyệt | sprint-02 |
-| D-52 | Không có tồn kho, size, màu, mô tả. Cần xem lại trước bước 4 vì ảnh hưởng form sản phẩm và giỏ hàng ở Epic 4 | PB chỉ nêu tên, giá, loại, ảnh; user ủy quyền duyệt | sprint-02 |
+| D-52 | Không có tồn kho, size, màu, mô tả. Epic 4 sẽ không chọn được size khi thêm vào giỏ nếu không đổi quyết định này | PB chỉ nêu tên, giá, loại, ảnh; user chốt (2026-11-05) | sprint-02 |
 | D-53 | Sprint này chỉ có API admin; API cho người mua thuộc Epic 3 | Chỉ thiết kế thứ sprint cần; user ủy quyền duyệt | sprint-02 |
 | D-54 | Tên danh mục 2–50 ký tự, chuẩn hóa NFC, không trùng khi bỏ qua hoa thường, tên đã xóa dùng lại được; tên sản phẩm 2–120 ký tự, được trùng | Tránh danh mục trùng; sản phẩm khác màu có thể cùng tên; user ủy quyền duyệt | sprint-02 |
 | D-55 | Sửa cùng lúc: ghi sau đè ghi trước | Chỉ có 1 tài khoản admin (D-32); user ủy quyền duyệt | sprint-02 |

@@ -4,7 +4,7 @@
 | Sprint | Epic | Trạng thái | Bước hiện tại |
 |---|---|---|---|
 | sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Xong | US-01 và US-02 đã merge vào `main` |
-| sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Đang làm | Bước 1–3 xong; chờ user xem lại D-45, D-52 và xác nhận trước bước 4 |
+| sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Đang làm | Bước 4: UI/UX (user chốt D-45, D-52 giữ nguyên) |
 | sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Chưa bắt đầu | — |
 | sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Chưa bắt đầu | — |
 
