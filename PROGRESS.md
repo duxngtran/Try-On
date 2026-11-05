@@ -4,7 +4,7 @@
 | Sprint | Epic | Trạng thái | Bước hiện tại |
 |---|---|---|---|
 | sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Xong | US-01 và US-02 đã merge vào `main` |
-| sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Đang làm | Bước 5: Implement + test, bắt đầu từ US-03 trên `feature/US-03-categories` |
+| sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Đang làm | Bước 5: US-03 đã merge; đang làm US-04 trên `feature/US-04-products` |
 | sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Chưa bắt đầu | — |
 | sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Chưa bắt đầu | — |
 
@@ -26,6 +26,7 @@
 - 2026-11-04: `chore/sprint-01-setup` → `main` (merge commit `3a8d178`). Setup T-01, T-03→T-06, T-08 + Prettier, .gitattributes, README. Test BE 20/20, FE 8/8, lint, format:check, build đều pass. T-07, T-09 còn chờ Supabase.
 - 2026-11-05: `feature/US-01-auth` → `main` (merge commit `570a0ee`), user xác nhận. Trên `main`: test BE 78/78, FE 86/86, lint, build pass. Trước merge: newman `Auth` 26 request, 66 assertion, 0 fail (nâng rate limit cho server test); newman `System` 2 request, 5 assertion, 0 fail. Chưa kiểm thật: token hết hạn, hết khóa sau 15 phút, đăng ký đồng thời, rate limit 20/phút (chỉ có unit test hoặc chưa chạy).
 - 2026-11-05: `feature/US-02-profile` → `main` (merge commit `aeae7eb`), user gọi `/merge`. Trên `main`: test BE 181/181, FE 153/153, lint, build pass. Trước merge: newman `System` 2 request/5 assertion, `Auth` 26/66, `Profile` 126/244, đều 0 fail (chưa chạy lại newman sau merge).
+- 2026-11-05: `feature/US-03-categories` → `main`, user cho phép merge khi test đạt. Trước merge: test BE 221/221, FE 186/186, lint, format:check, build pass; newman `System` 2/5, `Auth` 26/66, `Profile` 126/244, `Categories` 34/68 (request/assertion), đều 0 fail. Migration 003, 004 đã áp dụng trên Supabase dev. Chưa kiểm: AC-05, AC-06, AC-07 với sản phẩm thật và AC-08 (chuyển T-54, T-58 của US-04); trình duyệt thật (T-59).
 
 ## Blockers
 - Chưa có

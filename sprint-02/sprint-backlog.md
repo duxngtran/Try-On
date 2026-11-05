@@ -78,7 +78,7 @@ Khi chạy API test, nâng `PRODUCT_WRITES_PER_HOUR` riêng cho tiến trình se
 | T-41 | FE trang **Danh mục**: danh sách kèm số sản phẩm, thêm, đổi tên, xóa có xác nhận, chặn sớm khi còn sản phẩm; xử lý lỗi E1–E8; schema zod giống BE (D-21). Liên kết sang danh sách đã lọc được thêm ở T-55 | T-38, T-40 | M | AC-01 → AC-04, AC-07 (danh mục trống) trên UI, ≥ 360 px | [x] |
 | T-42 | Test FE: schema dùng chung bảng case với T-36; 409 `CATEGORY_HAS_PRODUCTS` từ server hiện đúng số lượng; 404 thì tải lại danh sách | T-41 | S | Pass | [x] |
 | T-43 | API test `categories.collection.json`, thêm vào `run.js`: AC-02 → AC-04, AC-07 (danh mục trống), AC-09, AC-10. Chưa có API tạo sản phẩm nên AC-05, AC-06 kiểm ở T-58. Tên có hậu tố ngẫu nhiên; collection tự xóa danh mục đã tạo, không đụng 3 danh mục seed | T-38 | M | `npm run test:postman` pass trên Supabase dev; chạy lại lần 2 vẫn pass | [x] |
-| T-44 | Review + user xác nhận → `/merge`, ghi `PROGRESS.md` | T-39, T-42, T-43 | S | `main` có US-03, test pass sau merge | [ ] |
+| T-44 | Review + user xác nhận → `/merge`, ghi `PROGRESS.md` | T-39, T-42, T-43 | S | `main` có US-03, test pass sau merge | [x] |
 
 ### 5.2 US-04 — Sản phẩm (branch `feature/US-04-products`, tạo sau T-44)
 
