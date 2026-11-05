@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router';
 import { Layout } from '../components/Layout.jsx';
+import { RouteFocus } from '../components/RouteFocus.jsx';
 import { GuestOnly, RequireAdmin, RequireAuth, SessionGate } from '../features/auth/guards.jsx';
 import { LoginPage } from '../features/auth/LoginPage.jsx';
 import { RegisterPage } from '../features/auth/RegisterPage.jsx';
@@ -28,6 +29,7 @@ export function AppRoutes() {
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
+      <RouteFocus />
     </SessionGate>
   );
 }

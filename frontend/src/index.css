@@ -57,6 +57,7 @@
   --ease-out-soft: cubic-bezier(0.2, 0, 0, 1);
   --animate-shimmer: shimmer 1.5s linear infinite;
   --animate-toast-in: toast-in 200ms var(--ease-out-soft);
+  --animate-menu-in: menu-in 120ms var(--ease-out-soft);
 
   @keyframes shimmer {
     from {
@@ -64,6 +65,16 @@
     }
     to {
       background-position: 200% 0;
+    }
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
     }
   }
   @keyframes toast-in {
@@ -87,6 +98,12 @@ html {
 :focus-visible {
   outline: 2px solid var(--color-ink);
   outline-offset: 2px;
+}
+
+/* h1/main chỉ nhận focus bằng code (RouteFocus), không tương tác nên không cần vòng focus */
+h1[tabindex='-1']:focus,
+main[tabindex='-1']:focus {
+  outline: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

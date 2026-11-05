@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { useAuth } from '../features/auth/authContext.js';
 import { AccountMenu } from './AccountMenu.jsx';
@@ -64,18 +63,6 @@ function HeaderActions() {
 /** Khung chung: skip link, header theo vai, vùng nội dung (header-navigation.md). */
 export function Layout() {
   const { status, user } = useAuth();
-  const { pathname } = useLocation();
-  const mainRef = useRef(null);
-  const firstRender = useRef(true);
-
-  // Sau mỗi lần đổi route chuyển focus vào vùng nội dung (không làm ở lần render đầu)
-  useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-    mainRef.current?.focus({ preventScroll: true });
-  }, [pathname]);
 
   const logoTarget = status === 'authenticated' && user.role === 'admin' ? '/admin' : '/';
 
@@ -101,7 +88,6 @@ export function Layout() {
       </header>
       <main
         id="main"
-        ref={mainRef}
         tabIndex={-1}
         className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 outline-none md:px-6 lg:px-8"
       >
