@@ -6,6 +6,9 @@ import { LoginPage } from '../features/auth/LoginPage.jsx';
 import { RegisterPage } from '../features/auth/RegisterPage.jsx';
 import { AdminLayout } from '../features/admin/AdminLayout.jsx';
 import { CategoriesPage } from '../features/admin/CategoriesPage.jsx';
+import { ProductEditPage } from '../features/admin/ProductEditPage.jsx';
+import { ProductNewPage } from '../features/admin/ProductNewPage.jsx';
+import { ProductsPage } from '../features/admin/ProductsPage.jsx';
 import { AdminPage } from '../pages/AdminPage.jsx';
 import { HomePage } from '../pages/HomePage.jsx';
 import { NotFoundPage } from '../pages/NotFoundPage.jsx';
@@ -29,6 +32,9 @@ export function AppRoutes() {
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/admin/categories" element={<CategoriesPage />} />
+              <Route path="/admin/products" element={<ProductsPage />} />
+              <Route path="/admin/products/new" element={<ProductNewPage />} />
+              <Route path="/admin/products/:id/edit" element={<ProductEditPage />} />
             </Route>
           </Route>
           <Route path="*" element={<NotFoundPage />} />
