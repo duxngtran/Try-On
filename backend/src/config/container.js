@@ -3,11 +3,15 @@ import { createLoginLock } from '../services/loginLock.js';
 import { createTokenService } from '../services/tokenService.js';
 import { createCategoryService } from '../services/categoryService.js';
 import { createProfileService } from '../services/profileService.js';
+import { createProductService } from '../services/productService.js';
+import { createProductImageStorage } from '../services/productImageStorage.js';
 import { createPhotoStorage } from '../services/storage.js';
 import { createAuthenticate } from '../middlewares/auth.js';
 import { createAuthRateLimiter } from '../middlewares/authRateLimit.js';
 import { createPhotoUploadRateLimiter } from '../middlewares/photoUploadRateLimit.js';
 import { createUploadPhoto } from '../middlewares/uploadPhoto.js';
+import { createUploadProductImage } from '../middlewares/uploadProductImage.js';
+import { createProductWriteRateLimiter } from '../middlewares/productWriteRateLimit.js';
 
 /**
  * Lắp các dependency của auth + hồ sơ (một chỗ duy nhất). Test truyền repository/storage giả.
@@ -16,6 +20,9 @@ import { createUploadPhoto } from '../middlewares/uploadPhoto.js';
  *   userRepository: object,
  *   profileRepository: object,
  *   categoryRepository?: object,
+ *   productRepository?: object,
+ *   productImageStorage?: object,
+ *   processProductImage?: (buffer: Buffer) => Promise<Buffer>,
  *   photoStorage?: object,
  *   supabase?: import('@supabase/supabase-js').SupabaseClient,
  *   processPhoto?: (buffer: Buffer) => Promise<Buffer>,
@@ -29,6 +36,9 @@ export async function buildServices(
     userRepository,
     profileRepository,
     categoryRepository,
+    productRepository,
+    productImageStorage,
+    processProductImage,
     photoStorage,
     supabase,
     processPhoto,
@@ -64,12 +74,33 @@ export async function buildServices(
       signedUrlTtlSeconds: env.SIGNED_URL_TTL_SECONDS,
     });
 
+  const imageStorage =
+    productImageStorage ??
+    (productRepository &&
+      createProductImageStorage({
+        client: supabase,
+        bucket: env.PRODUCT_IMAGE_BUCKET,
+        cacheSeconds: env.PRODUCT_IMAGE_CACHE_SECONDS,
+      }));
+
   return {
     authService,
     authenticate: createAuthenticate({ tokenService, userRepository }),
     authRateLimiter: createAuthRateLimiter({ limitPerMinute: env.AUTH_RATE_LIMIT_PER_MIN }),
     categories: categoryRepository && {
       categoryService: createCategoryService({ categoryRepository }),
+    },
+    products: productRepository && {
+      productService: createProductService({
+        productRepository,
+        imageStorage,
+        processImage: processProductImage,
+        logger,
+      }),
+      uploadProductImage: createUploadProductImage({ maxMb: env.PRODUCT_IMAGE_MAX_MB }),
+      productWriteRateLimiter: createProductWriteRateLimiter({
+        limitPerHour: env.PRODUCT_WRITES_PER_HOUR,
+      }),
     },
     profile: {
       profileService: createProfileService({
