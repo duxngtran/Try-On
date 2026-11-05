@@ -1980,7 +1980,17 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.variables.set('goneUrl', pm.environment.get('photoA1Url') + '&cb=' + Date.now());"
+                  "// D-39: Supabase CDN vẫn phục vụ signed URL cũ tới ~45s sau khi xoá file; poll tới khi bị từ chối (4xx) hoặc hết 90s.",
+                  "const base = pm.environment.get('photoA1Url');",
+                  "const deadline = Date.now() + 90000;",
+                  "const poll = () => {",
+                  "  pm.sendRequest(base + '&cb=' + Date.now(), (err, res) => {",
+                  "    if ((res && res.code >= 400 && res.code < 500) || Date.now() > deadline) return;",
+                  "    setTimeout(poll, 3000);",
+                  "  });",
+                  "};",
+                  "poll();",
+                  "pm.variables.set('goneUrl', base + '&cb=' + Date.now());"
                 ]
               }
             },
@@ -2572,7 +2582,17 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.variables.set('goneUrl', pm.environment.get('photoA2Url') + '&cb=' + Date.now());"
+                  "// D-39: Supabase CDN vẫn phục vụ signed URL cũ tới ~45s sau khi xoá file; poll tới khi bị từ chối (4xx) hoặc hết 90s.",
+                  "const base = pm.environment.get('photoA2Url');",
+                  "const deadline = Date.now() + 90000;",
+                  "const poll = () => {",
+                  "  pm.sendRequest(base + '&cb=' + Date.now(), (err, res) => {",
+                  "    if ((res && res.code >= 400 && res.code < 500) || Date.now() > deadline) return;",
+                  "    setTimeout(poll, 3000);",
+                  "  });",
+                  "};",
+                  "poll();",
+                  "pm.variables.set('goneUrl', base + '&cb=' + Date.now());"
                 ]
               }
             },
@@ -2710,7 +2730,17 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.variables.set('goneUrl', pm.environment.get('photoB1Url') + '&cb=' + Date.now());"
+                  "// D-39: Supabase CDN vẫn phục vụ signed URL cũ tới ~45s sau khi xoá file; poll tới khi bị từ chối (4xx) hoặc hết 90s.",
+                  "const base = pm.environment.get('photoB1Url');",
+                  "const deadline = Date.now() + 90000;",
+                  "const poll = () => {",
+                  "  pm.sendRequest(base + '&cb=' + Date.now(), (err, res) => {",
+                  "    if ((res && res.code >= 400 && res.code < 500) || Date.now() > deadline) return;",
+                  "    setTimeout(poll, 3000);",
+                  "  });",
+                  "};",
+                  "poll();",
+                  "pm.variables.set('goneUrl', base + '&cb=' + Date.now());"
                 ]
               }
             },
