@@ -38,7 +38,8 @@ export function renderApp(path, { token, routes = {} } = {}) {
   const calls = [];
   apiClient.defaults.adapter = async (config) => {
     const key = `${config.method.toUpperCase()} ${config.url}`;
-    const body = config.data ? JSON.parse(config.data) : undefined;
+    // FormData (upload ảnh) không phải JSON: ghi lại nguyên đối tượng.
+    const body = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
     calls.push({ key, body });
     const handler = routes[key];
     if (!handler) throw new Error(`Chưa giả lập ${key}`);

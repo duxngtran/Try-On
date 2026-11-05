@@ -11,6 +11,7 @@ import { createContext, useContext } from 'react';
  *   logout: () => void,
  *   retryRestore: () => void,
  *   discardSession: () => void,
+ *   setProfileCompleted: (profileCompleted: boolean) => void,
  * }} AuthValue
  */
 
