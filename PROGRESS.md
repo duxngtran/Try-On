@@ -13,7 +13,7 @@
 - [x] Bước 2: Sprint backlog (`sprint-01/sprint-backlog.md`, 34 task) — xong, user xác nhận Q1–Q6 (D-17 → D-21, cập nhật D-06) (2026-11-04)
 - [x] Bước 3: Thiết kế nghiệp vụ (`design/flows/` 11 luồng, `design/api.md`, `design/db/`) — xong, user xác nhận (D-22 → D-33) (2026-11-04)
 - [x] Bước 4: UI/UX (`design/design-system.md` "Try-on Atelier v2", 6 file `sprint-01/screens/`) — xong, user xác nhận (D-34 → D-38) (2026-11-04)
-- [ ] Bước 5: Implement + test (unit + Postman) — setup (T-01, T-03→T-06, T-08) xong; T-07 (migrate) và T-09 (chạy Postman) chờ Supabase của user; US-01 đang làm trên `feature/US-01-auth`: backend đã commit (`cc5c1ce`); frontend T-17 → T-20 đã code, test FE 81/81 pass nhưng chưa commit và chưa kiểm với backend + DB thật (2026-11-05); T-21, T-22 chờ T-02; US-02 chưa bắt đầu
+- [ ] Bước 5: Implement + test (unit + Postman) — setup (T-01, T-03→T-06, T-08) xong; T-07 (migrate) và T-09 (chạy Postman) chờ Supabase của user; US-01 đang làm trên `feature/US-01-auth`: backend đã commit (`cc5c1ce`); frontend T-17 → T-20 đã commit (`b88fdf8`), test FE 81/81 pass nhưng T-17 → T-19 chưa kiểm với backend + DB thật (2026-11-05); T-21, T-22 chờ T-02; US-02 chưa bắt đầu
 
 ## Merge log
 - 2026-11-04: `chore/sprint-01-setup` → `main` (merge commit `3a8d178`). Setup T-01, T-03→T-06, T-08 + Prettier, .gitattributes, README. Test BE 20/20, FE 8/8, lint, format:check, build đều pass. T-07, T-09 còn chờ Supabase.
