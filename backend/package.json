@@ -15,6 +15,7 @@
     "lint": "eslint .",
     "seed:admin": "node --env-file-if-exists=.env scripts/seed-admin.js",
     "setup:storage": "node --env-file-if-exists=.env scripts/setup-storage.js",
+    "verify:products": "node --env-file-if-exists=.env scripts/verify-products-live.js",
     "migrate": "node --env-file-if-exists=.env scripts/migrate.js",
     "fixtures": "node scripts/generate-fixtures.js",
     "format": "prettier --write . --ignore-path ../.prettierignore",
