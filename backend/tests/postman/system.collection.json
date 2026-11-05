@@ -1,0 +1,52 @@
+{
+  "info": {
+    "name": "Try-on API - System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('response format {success:true,data}', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.success).to.eql(true);",
+              "  pm.expect(body.data.status).to.eql('ok');",
+              "});",
+              "pm.test('có security header (helmet)', function () {",
+              "  pm.expect(pm.response.headers.has('X-Content-Type-Options')).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/health" }
+    },
+    {
+      "name": "Route không tồn tại (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 404', function () { pm.response.to.have.status(404); });",
+              "pm.test('format lỗi chuẩn', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.success).to.eql(false);",
+              "  pm.expect(body.error.code).to.eql('NOT_FOUND');",
+              "  pm.expect(body.error).to.not.have.property('stack');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/khong-ton-tai" }
+    }
+  ]
+}
