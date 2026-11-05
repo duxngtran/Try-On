@@ -6,7 +6,7 @@ import { authApi } from '../features/auth/authApi.js';
 import { useAuth } from '../features/auth/authContext.js';
 import { usePageTitle } from '../hooks/usePageTitle.js';
 
-// `to` có mặt = trang đã có, card bấm được; không có = "Sắp ra mắt" (Sản phẩm bật ở US-04, Đơn hàng ở Epic 4).
+// `to` có mặt = trang đã có, card bấm được; không có = "Sắp ra mắt" (Đơn hàng ở Epic 4).
 const SECTIONS = [
   {
     icon: Tags,
@@ -14,7 +14,12 @@ const SECTIONS = [
     text: 'Thêm, đổi tên, xóa danh mục sản phẩm.',
     to: '/admin/categories',
   },
-  { icon: Boxes, title: 'Sản phẩm', text: 'Thêm, sửa, xóa sản phẩm và ảnh.' },
+  {
+    icon: Boxes,
+    title: 'Sản phẩm',
+    text: 'Thêm, sửa, xóa sản phẩm và ảnh.',
+    to: '/admin/products',
+  },
   { icon: ClipboardList, title: 'Đơn hàng', text: 'Theo dõi đơn hàng của khách.' },
 ];
 

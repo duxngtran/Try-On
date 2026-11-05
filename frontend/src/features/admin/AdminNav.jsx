@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router';
 import { Boxes, ClipboardList, LayoutDashboard, Tags } from 'lucide-react';
 
-// `soon`: chưa có trang. Sản phẩm bật ở US-04; Đơn hàng ở Epic 4.
+// `soon`: chưa có trang (Đơn hàng ở Epic 4).
 export const ADMIN_NAV_ITEMS = [
   { to: '/admin', label: 'Tổng quan', icon: LayoutDashboard, end: true },
   { to: '/admin/categories', label: 'Danh mục', icon: Tags },
-  { to: '/admin/products', label: 'Sản phẩm', icon: Boxes, soon: true },
+  { to: '/admin/products', label: 'Sản phẩm', icon: Boxes },
   { to: '/admin/orders', label: 'Đơn hàng', icon: ClipboardList, soon: true, sidebarOnly: true },
 ];
 
