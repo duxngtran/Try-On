@@ -3,7 +3,7 @@
 ## Tổng quan
 | Sprint | Epic | Trạng thái | Bước hiện tại |
 |---|---|---|---|
-| sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Đang làm | Bước 5: US-01 đã merge; US-02 trên `feature/US-02-profile` chưa code |
+| sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Đang làm | Bước 5: US-01 đã merge; US-02 trên `feature/US-02-profile`, backend xong, chưa làm frontend |
 | sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Chưa bắt đầu | — |
 | sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Chưa bắt đầu | — |
 | sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Chưa bắt đầu | — |
@@ -13,7 +13,7 @@
 - [x] Bước 2: Sprint backlog (`sprint-01/sprint-backlog.md`, 34 task) — xong, user xác nhận Q1–Q6 (D-17 → D-21, cập nhật D-06) (2026-11-04)
 - [x] Bước 3: Thiết kế nghiệp vụ (`design/flows/` 11 luồng, `design/api.md`, `design/db/`) — xong, user xác nhận (D-22 → D-33) (2026-11-04)
 - [x] Bước 4: UI/UX (`design/design-system.md` "Try-on Atelier v2", 6 file `sprint-01/screens/`) — xong, user xác nhận (D-34 → D-38) (2026-11-04)
-- [ ] Bước 5: Implement + test (unit + Postman) — 21/34 task xong. Setup xong trừ T-02 (còn kiểm `list_tables` qua MCP); US-01 (T-10 → T-22) xong và đã merge, user đã duyệt giao diện (2026-11-05); US-02 (T-23 → T-34) chưa bắt đầu code, branch `feature/US-02-profile` đã tạo
+- [ ] Bước 5: Implement + test (unit + Postman) — 27/34 task xong. Setup xong trừ T-02 (còn kiểm `list_tables` qua MCP); US-01 (T-10 → T-22) xong và đã merge, user đã duyệt giao diện (2026-11-05); US-02 trên `feature/US-02-profile`: backend T-23 → T-28 xong, chưa commit (test BE 181/181; migration 002 và bucket private đã áp dụng trên Supabase dev; đã chạy thử luồng hồ sơ thật) (2026-11-05); frontend T-29 → T-32, Postman T-33, merge T-34 chưa làm
 
 ## Merge log
 - 2026-11-04: `chore/sprint-01-setup` → `main` (merge commit `3a8d178`). Setup T-01, T-03→T-06, T-08 + Prettier, .gitattributes, README. Test BE 20/20, FE 8/8, lint, format:check, build đều pass. T-07, T-09 còn chờ Supabase.
