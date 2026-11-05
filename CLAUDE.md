@@ -79,8 +79,9 @@ Run from the repo root; Node 24 is required. Copy `backend/.env.example` to `bac
 | Image test fixtures | `npm run fixtures` (writes `tests/fixtures/generated/`, gitignored) | n/a |
 | Seed admin (D-32) | `npm run seed:admin` (needs `ADMIN_EMAIL`, `ADMIN_PASSWORD`) | n/a |
 | Setup Storage bucket (D-26) | `npm run setup:storage` (creates/repairs private bucket `profile-photos`, idempotent) | n/a |
+| API tests on Supabase dev (D-40) | `npm run test:postman` (starts the server, runs newman on `tests/postman/*.collection.json`; port 4000 must be free) | n/a |
 
-Notes: Tailwind v4 is configured in CSS (`frontend/src/index.css`, `@theme` tokens from `design/design-system.md`), there is no `tailwind.config.js`. Vitest uses `vite.config.js` on the frontend and `vitest.config.js` on the backend. Postman workspace "Try-on", collection "Try-on API" and environment "local" are created through Postman MCP.
+Notes: Tailwind v4 is configured in CSS (`frontend/src/index.css`, `@theme` tokens from `design/design-system.md`), there is no `tailwind.config.js`. Vitest uses `vite.config.js` on the frontend and `vitest.config.js` on the backend. Postman workspace "Try-on", collection "Try-on API" and environment "local" are created through Postman MCP. Postman MCP cannot run collections or attach files to form-data requests, so the source of truth for API tests is `backend/tests/postman/`; import those files into the Postman app by hand if needed (D-40).
 
 ## Product notes
 

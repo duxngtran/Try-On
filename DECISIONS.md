@@ -42,3 +42,4 @@ Ghi lại các quyết định nghiệp vụ & thuật toán. Khi một quyết 
 | D-36 | Có trang 404; `/login` hiện thông báo qua `location.state.notice` (`session-expired` / `signed-out`); đăng ký lỗi 409 thì điền sẵn email ở `/login` qua `state.email` | UX rõ ràng, chi phí thấp | sprint-01 |
 | D-37 | Ảnh minh họa đúng/sai khi chụp dùng silhouette SVG đơn giản (user có thể thay ảnh thật sau) | Chưa có asset | sprint-01 |
 | D-38 | Admin vào `/profile` được chuyển về `/admin` (không hiện trang 403) | Theo flow guard, D-28 | sprint-01 |
+| D-40 | Nguồn chuẩn của API test là `backend/tests/postman/` (collection + `npm run test:postman`), không phải Postman cloud; folder `Auth` trên cloud giữ nguyên, folder `Profile` trên cloud để trống, cần thì import thủ công | Postman MCP không chạy được collection và không gắn được file vào request form-data; user đồng ý | sprint-01 |

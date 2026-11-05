@@ -19,6 +19,8 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 - **Fixture WEBP động có các khung giống hệt nhau bị encoder gộp thành ảnh tĩnh,** nên test không kiểm được gì. **Sửa:** dùng các khung khác màu, truyền `loop`/`delay` cho `.webp()`. (sprint-01)
 - **Script kiểm tra thật bị 429 ngoài dự kiến:** rate limit upload đếm cả request bị từ chối (D-31). **Sửa:** tính đủ mọi request, dùng user mới nếu vượt 10/giờ. (sprint-01)
 
+- **`setTimeout` với delay lớn hơn 2^31−1 ms chạy ngay lập tức,** làm tải lại liên tục khi tính delay từ `expiresAt` xa. **Sửa:** chặn trần delay. (sprint-01)
+
 ## Backend / API
 - **429 chỉ có `retryAfterSeconds` trong body, thiếu header `Retry-After`.** **Sửa:** đặt header ở error handler chung. (sprint-01)
 
