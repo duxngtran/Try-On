@@ -152,7 +152,7 @@ Frontend **không** có biến Supabase nào (D-02).
 | T-31 | FE xóa ảnh (Should): hộp thoại xác nhận, cập nhật trạng thái | T-30 | S | AC-12 trên UI | [x] |
 | T-32 | Test FE: parse số đo (`52,5` → 52.5, `52.55`, rỗng, chữ); kiểm tra sơ bộ ảnh; làm mới signed URL khi ảnh lỗi | T-29 → T-31 | S | Pass | [x] |
 | T-33 | Postman folder `Profile`: get hồ sơ trống; lưu số đo (ok, biên sai); upload chưa consent; consent; upload từng fixture (đúng mã lỗi); upload hợp lệ → `profileCompleted`; mở URL public của file → bị từ chối; thay ảnh; xóa ảnh; không token → 401 | T-27, T-09 | M | Toàn bộ test pass | [x] |
-| T-34 | Review + user xác nhận → `/merge` vào `main`, ghi `PROGRESS.md`; main agent chạy `/wrap-up` | T-28, T-32, T-33 | S | `main` có US-02, toàn bộ test sprint pass | [ ] |
+| T-34 | Review + user xác nhận → `/merge` vào `main`, ghi `PROGRESS.md`; main agent chạy `/wrap-up` | T-28, T-32, T-33 | S | `main` có US-02, toàn bộ test sprint pass | [x] |
 
 **Tổng:** 34 task — Setup 9, US-01 13, US-02 12.
 
