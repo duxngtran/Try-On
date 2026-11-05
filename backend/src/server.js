@@ -1,7 +1,9 @@
 import { getEnv } from './config/env.js';
+import { getSupabase } from './config/supabase.js';
 import { createApp } from './app.js';
-import { buildAuthServices } from './config/container.js';
+import { buildServices } from './config/container.js';
 import { createUserRepository } from './repositories/userRepository.js';
+import { createProfileRepository } from './repositories/profileRepository.js';
 
 let env;
 try {
@@ -11,8 +13,11 @@ try {
   process.exit(1);
 }
 
-const services = await buildAuthServices(env, {
-  userRepository: createUserRepository(),
+const supabase = getSupabase();
+const services = await buildServices(env, {
+  userRepository: createUserRepository(supabase),
+  profileRepository: createProfileRepository(supabase),
+  supabase,
   startSweeper: true,
 });
 const app = createApp({

@@ -77,7 +77,8 @@ Run from the repo root; Node 24 is required. Copy `backend/.env.example` to `bac
 | Build | n/a | `npm run build` |
 | Migrate (D-19) | `npm run migrate` (needs `DATABASE_URL`; applies `migrations/NNN_*.sql` in order, tracked in `schema_migrations`) | n/a |
 | Image test fixtures | `npm run fixtures` (writes `tests/fixtures/generated/`, gitignored) | n/a |
-| Seed admin / setup storage | `scripts/seed-admin.js`, `scripts/setup-storage.js` are added in US-01 / US-02 | n/a |
+| Seed admin (D-32) | `npm run seed:admin` (needs `ADMIN_EMAIL`, `ADMIN_PASSWORD`) | n/a |
+| Setup Storage bucket (D-26) | `npm run setup:storage` (creates/repairs private bucket `profile-photos`, idempotent) | n/a |
 
 Notes: Tailwind v4 is configured in CSS (`frontend/src/index.css`, `@theme` tokens from `design/design-system.md`), there is no `tailwind.config.js`. Vitest uses `vite.config.js` on the frontend and `vitest.config.js` on the backend. Postman workspace "Try-on", collection "Try-on API" and environment "local" are created through Postman MCP.
 

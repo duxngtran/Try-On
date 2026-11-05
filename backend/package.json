@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "seed:admin": "node --env-file-if-exists=.env scripts/seed-admin.js",
+    "setup:storage": "node --env-file-if-exists=.env scripts/setup-storage.js",
     "migrate": "node --env-file-if-exists=.env scripts/migrate.js",
     "fixtures": "node scripts/generate-fixtures.js",
     "format": "prettier --write . --ignore-path ../.prettierignore",
@@ -24,8 +25,10 @@
     "cors": "^2.8.6",
     "express": "^5.3.0",
     "express-rate-limit": "^8.7.3",
+    "file-type": "^22.3.0",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^2.5.0",
     "pg": "^8.23.1",
     "sharp": "^0.35.5",
     "zod": "^4.6.7"
