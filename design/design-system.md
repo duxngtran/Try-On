@@ -146,6 +146,19 @@ Mỗi component dưới đây là nguồn chuẩn cho agent-coder; đặt tại 
 - **Badge trạng thái**: chip `caption`, nền `*-soft`, có icon (vd. "Đã đầy đủ" success, "Còn thiếu" warning).
 - **Link**: `accent-strong`, gạch chân, hover `ink`.
 
+### 7.11 Thành phần cho trang quản trị (thêm ở Sprint 02)
+
+> Không thêm token màu/font/radius/shadow mới; chỉ ghép từ token sẵn có. Chi tiết dùng ở `sprint-02/screens/`.
+
+- **AdminNav**: ≥ lg là sidebar `w-56` (mục: Tổng quan, Danh mục, Sản phẩm, Đơn hàng [disabled, badge "SẮP RA MẮT"]); < lg là thanh tab ngang dưới header (`overflow-x-auto`, mỗi mục cao 44px, không có "Đơn hàng"). Mục hiện tại: `aria-current="page"` + gạch chân 2px `ink` (tab) / nền `surface-muted` + chữ 600 (sidebar). Nhận diện theo tiền tố route (`/admin/products/new` vẫn sáng "Sản phẩm").
+- **Select** (`<select>` gốc): cùng khung với Input (cao 48px mobile / 44px lg, viền `line-strong`, radius `md`, chữ `body`), icon `ChevronDown` 20px bên phải (`aria-hidden`, `pointer-events-none`), trạng thái hover/focus/error/disabled như 7.2. Dùng `<select>` gốc để có picker native trên mobile.
+- **Ô giá (MoneyField)**: là Input 7.2 với adornment phải "₫", `inputmode="numeric"`, `autocomplete="off"`, hiển thị `199.000` khi blur.
+- **Danh sách dữ liệu (DataList)**: `<ul>` các dòng trong một card (viền `line`, radius `lg`, dòng cách nhau `divide-line`). < md: mỗi dòng là khối dọc; ≥ md: dòng là lưới cột kèm hàng tiêu đề cột (`caption`, `ink-muted`, `aria-hidden`). Dòng vừa thêm/sửa được tô nền `accent-soft` 2 giây rồi mờ dần (opacity, tắt khi reduced-motion; không dùng màu làm thông tin duy nhất vì đã có toast).
+- **Ảnh sản phẩm (flat lay)**: khung **1:1** (`aspect-square`), `object-contain` trên `surface-muted`, radius `lg` (khung lớn) / `md` (thumbnail 56–64px). Khác khung 3:4 của ảnh người dùng vì flat lay có tỉ lệ từ 1:3 đến 3:1 và không được cắt. Ảnh lỗi tải: nền `surface-muted` + icon `ImageOff` 24px, `alt` giữ nguyên.
+- **Phân trang**: `<nav aria-label="Phân trang">` gồm nút secondary "Trước" / "Sau" (cao 44px, có icon `ChevronLeft`/`ChevronRight`), giữa là "Trang 2 / 5" (`small`, `aria-live="polite"`). Nút disabled ở trang đầu/cuối.
+- **Dropzone dạng nút chọn ảnh vuông** (biến thể 7.5 cho ảnh sản phẩm): cùng cấu trúc, khung 1:1 thay vì 3:4, `max-w-xs`.
+- **Toast** (7.4) dùng ở cả trang quản trị: đặt provider ở cấp layout dùng chung thay vì riêng trang Hồ sơ.
+
 ## 8. Accessibility (tối thiểu WCAG 2.1 AA)
 
 1. **Tương phản**: chữ thường ≥ 4,5:1, chữ lớn (≥ 24px hoặc ≥ 18,66px đậm) và thành phần UI (viền input, icon quan trọng) ≥ 3:1 — dùng đúng các token ở mục 1 (đã tính sẵn).
