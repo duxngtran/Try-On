@@ -9,7 +9,7 @@ import { parseEnv } from 'node:util';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const backendDir = path.resolve(here, '../..');
 const fixturesDir = path.join(backendDir, 'tests/fixtures/generated');
-const collections = ['system', 'auth', 'profile', 'categories'];
+const collections = ['system', 'auth', 'profile', 'categories', 'products'];
 
 const env = parseEnv(readFileSync(path.join(backendDir, '.env'), 'utf8'));
 const baseUrl = `http://localhost:${env.PORT || 4000}/api`;
@@ -43,6 +43,8 @@ function runCollection(name) {
     '--env-var',
     `baseUrl=${baseUrl}`,
     '--env-var',
+    `SUPABASE_URL=${env.SUPABASE_URL}`,
+    '--env-var',
     `"ADMIN_EMAIL=${env.ADMIN_EMAIL}"`,
     '--env-var',
     `"ADMIN_PASSWORD=${env.ADMIN_PASSWORD}"`,
@@ -70,10 +72,11 @@ if (await isUp()) {
   process.exit(1);
 }
 
-// Cả bộ gửi hơn 20 request auth mỗi phút, nên nâng rate limit riêng cho tiến trình này.
+// Cả bộ gửi hơn 20 request auth mỗi phút và nhiều request ghi sản phẩm mỗi giờ (cộng dồn qua các lần chạy),
+// nên nâng rate limit riêng cho tiến trình này.
 const server = spawn(process.execPath, ['--env-file-if-exists=.env', 'src/server.js'], {
   cwd: backendDir,
-  env: { ...process.env, AUTH_RATE_LIMIT_PER_MIN: '500' },
+  env: { ...process.env, AUTH_RATE_LIMIT_PER_MIN: '500', PRODUCT_WRITES_PER_HOUR: '5000' },
   stdio: 'ignore',
 });
 

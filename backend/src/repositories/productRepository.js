@@ -3,6 +3,8 @@ import { getSupabase } from '../config/supabase.js';
 const COLUMNS =
   'id, name, price_vnd, image_path, image_version, created_at, updated_at, category:categories(id, name)';
 
+const RANGE_NOT_SATISFIABLE = 'PGRST103';
+
 function unwrap({ data, error }) {
   if (error) throw error;
   return data;
@@ -31,8 +33,20 @@ export function createProductRepository(client = getSupabase()) {
         .range(from, from + limit - 1);
       if (categoryId) query = query.eq('category_id', categoryId);
       const { data, error, count } = await query;
+      // PostgREST trả 416 (PGRST103) khi `offset` vượt quá tổng số dòng; contract yêu cầu `items: []`, không lỗi.
+      if (error?.code === RANGE_NOT_SATISFIABLE) {
+        return { rows: [], total: await this.countActive(categoryId) };
+      }
       if (error) throw error;
       return { rows: data ?? [], total: count ?? 0 };
+    },
+
+    async countActive(categoryId) {
+      let query = products().select('id', { count: 'exact', head: true }).is('deleted_at', null);
+      if (categoryId) query = query.eq('category_id', categoryId);
+      const { count, error } = await query;
+      if (error) throw error;
+      return count ?? 0;
     },
 
     /** Trả null nếu không có hoặc đã xóa mềm. */
