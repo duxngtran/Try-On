@@ -19,6 +19,20 @@ describe('script sinh ảnh fixture', () => {
     expect(rotated.orientation).toBe(6);
   });
 
+  it('fixture sản phẩm: kích thước biên, PNG có alpha, JPG có GPS', async () => {
+    const dims = async (name) => {
+      const m = await sharp(files[name]).metadata();
+      return [m.width, m.height];
+    };
+    expect(await dims('product-512x512.jpg')).toEqual([512, 512]);
+    expect(await dims('product-512x1536.jpg')).toEqual([512, 1536]);
+    expect(await dims('product-600x2000.jpg')).toEqual([600, 2000]);
+    expect(await dims('product-3000x3000-alpha.png')).toEqual([3000, 3000]);
+    expect((await sharp(files['product-3000x3000-alpha.png']).metadata()).hasAlpha).toBe(true);
+    expect((await sharp(files['product-800x800-gps.jpg']).metadata()).exif).toBeDefined();
+    expect((await sharp(files['product-800x800.webp']).metadata()).format).toBe('webp');
+  });
+
   it('có ảnh cạnh 9000 px và file > 10 MB', async () => {
     const meta = await sharp(files['too-long-edge-600x9000.jpg']).metadata();
     expect(meta.height).toBe(9000);

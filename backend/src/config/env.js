@@ -20,6 +20,10 @@ export const envSchema = z.object({
   PHOTO_MAX_MB: positiveInt(10),
   PHOTO_UPLOADS_PER_HOUR: positiveInt(10),
   SIGNED_URL_TTL_SECONDS: positiveInt(900),
+  PRODUCT_IMAGE_BUCKET: z.string().min(1).default('product-images'),
+  PRODUCT_IMAGE_MAX_MB: positiveInt(10),
+  PRODUCT_IMAGE_CACHE_SECONDS: positiveInt(604800),
+  PRODUCT_WRITES_PER_HOUR: positiveInt(120),
   // Chỉ script seed admin dùng.
   ADMIN_EMAIL: z.string().optional(),
   ADMIN_PASSWORD: z.string().optional(),

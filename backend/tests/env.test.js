@@ -17,6 +17,20 @@ describe('parseEnv', () => {
     expect(env.BCRYPT_COST).toBe(10);
   });
 
+  it('biến ảnh sản phẩm: thiếu thì dùng mặc định, sai kiểu thì không khởi động (T-45)', () => {
+    const env = parseEnv(valid);
+    expect([
+      env.PRODUCT_IMAGE_BUCKET,
+      env.PRODUCT_IMAGE_MAX_MB,
+      env.PRODUCT_IMAGE_CACHE_SECONDS,
+      env.PRODUCT_WRITES_PER_HOUR,
+    ]).toEqual(['product-images', 10, 604800, 120]);
+    expect(() => parseEnv({ ...valid, PRODUCT_WRITES_PER_HOUR: 'nhieu' })).toThrow(
+      /PRODUCT_WRITES_PER_HOUR/,
+    );
+    expect(() => parseEnv({ ...valid, PRODUCT_IMAGE_MAX_MB: '0' })).toThrow(/PRODUCT_IMAGE_MAX_MB/);
+  });
+
   it('JWT_SECRET ngắn hơn 32 ký tự bị từ chối', () => {
     expect(() => parseEnv({ ...valid, JWT_SECRET: 'x'.repeat(31) })).toThrow(/JWT_SECRET/);
   });

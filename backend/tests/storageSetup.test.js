@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { buildBucketOptions, ensureProfilePhotoBucket } from '../src/services/storageSetup.js';
+import {
+  buildBucketOptions,
+  ensureProductImageBucket,
+  ensureProfilePhotoBucket,
+} from '../src/services/storageSetup.js';
 
 const MB = 1024 * 1024;
 
@@ -53,6 +57,18 @@ describe('ensureProfilePhotoBucket (D-26, AC-10)', () => {
     const { client, calls } = fakeClient({ ...good, public: true });
     expect(await ensureProfilePhotoBucket(client, config)).toBe('updated');
     expect(calls[0][2].public).toBe(false);
+  });
+
+  it('bucket sản phẩm: chưa có -> tạo public; lệch -> đặt lại public; đúng -> không làm gì (D-46)', async () => {
+    const productConfig = { name: 'product-images', maxMb: 10 };
+    const created = fakeClient(null);
+    expect(await ensureProductImageBucket(created.client, productConfig)).toBe('created');
+    expect(created.calls[0][2]).toMatchObject({ public: true, allowedMimeTypes: ['image/jpeg'] });
+    const wrong = fakeClient({ ...good, public: false });
+    expect(await ensureProductImageBucket(wrong.client, productConfig)).toBe('updated');
+    expect(wrong.calls[0][2].public).toBe(true);
+    const right = fakeClient({ ...good, public: true });
+    expect(await ensureProductImageBucket(right.client, productConfig)).toBe('unchanged');
   });
 
   it('lỗi khác 404 (vd. sai key) -> ném lỗi, không tạo bucket', async () => {

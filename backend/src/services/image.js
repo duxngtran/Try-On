@@ -2,20 +2,39 @@ import { fileTypeFromBuffer } from 'file-type';
 import sharp from 'sharp';
 import { AppError } from '../utils/AppError.js';
 
+const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_LONG_EDGE = 8000;
+const OUTPUT_LONG_EDGE = 2048;
+
+/**
+ * Bộ quy tắc theo loại ảnh. Tỉ lệ so sánh bằng số nguyên (x10) để tránh sai số dấu phẩy động.
+ * `ratio.kind`: 'portrait' = cao/rộng trong [min ; max] (ảnh người); 'any' = cạnh dài/cạnh ngắn <= max.
+ */
 export const IMAGE_RULES = Object.freeze({
-  allowedMimes: ['image/jpeg', 'image/png', 'image/webp'],
-  minWidth: 512,
-  minHeight: 1024,
-  maxLongEdge: 8000,
-  // Tỉ lệ cao/rộng trong [1,3 ; 2,5]; so sánh bằng số nguyên (x10) để tránh sai số dấu phẩy động.
-  minRatioTimes10: 13,
-  maxRatioTimes10: 25,
-  outputLongEdge: 2048,
-  jpegQuality: 85,
+  allowedMimes: ALLOWED_MIMES,
+  maxLongEdge: MAX_LONG_EDGE,
+  outputLongEdge: OUTPUT_LONG_EDGE,
+  profile: Object.freeze({
+    minWidth: 512,
+    minHeight: 1024,
+    ratio: { kind: 'portrait', minTimes10: 13, maxTimes10: 25 },
+    jpeg: { quality: 85 },
+    tooSmall: 'Ảnh cần tối thiểu 512 × 1024 px.',
+    badRatio: 'Vui lòng dùng ảnh dọc chụp toàn thân.',
+  }),
+  // D-48: flat lay, không bắt buộc dọc hay ngang; giữ chi tiết họa tiết (chroma 4:4:4).
+  product: Object.freeze({
+    minWidth: 512,
+    minHeight: 512,
+    ratio: { kind: 'any', maxTimes10: 30 },
+    jpeg: { quality: 90, chromaSubsampling: '4:4:4' },
+    tooSmall: 'Ảnh sản phẩm cần tối thiểu 512 × 512 px.',
+    badRatio: 'Ảnh quá dài hoặc quá hẹp, cạnh dài tối đa gấp 3 lần cạnh ngắn.',
+  }),
 });
 
 // Chặn ảnh "bom": quá 8000x8000 điểm ảnh thì sharp từ chối giải mã.
-const LIMIT_INPUT_PIXELS = IMAGE_RULES.maxLongEdge * IMAGE_RULES.maxLongEdge;
+const LIMIT_INPUT_PIXELS = MAX_LONG_EDGE * MAX_LONG_EDGE;
 
 const invalidType = () =>
   new AppError(400, 'INVALID_FILE_TYPE', 'Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP.');
@@ -46,46 +65,60 @@ async function readOrientedSize(buffer) {
 }
 
 /** Kiểm tra kích thước/tỉ lệ theo thứ tự ưu tiên mã lỗi của contract. */
-function assertDimensions({ width, height }) {
-  const r = IMAGE_RULES;
-  if (Math.max(width, height) > r.maxLongEdge) {
+function assertDimensions({ width, height }, rules) {
+  if (Math.max(width, height) > MAX_LONG_EDGE) {
     throw new AppError(400, 'IMAGE_TOO_LARGE', 'Ảnh quá lớn, cạnh dài tối đa 8000 px.');
   }
-  if (width < r.minWidth || height < r.minHeight) {
-    throw new AppError(400, 'IMAGE_TOO_SMALL', 'Ảnh cần tối thiểu 512 × 1024 px.');
+  if (width < rules.minWidth || height < rules.minHeight) {
+    throw new AppError(400, 'IMAGE_TOO_SMALL', rules.tooSmall);
   }
-  if (height * 10 < width * r.minRatioTimes10 || height * 10 > width * r.maxRatioTimes10) {
-    throw new AppError(400, 'INVALID_ASPECT_RATIO', 'Vui lòng dùng ảnh dọc chụp toàn thân.');
-  }
+  const { ratio } = rules;
+  const bad =
+    ratio.kind === 'portrait'
+      ? height * 10 < width * ratio.minTimes10 || height * 10 > width * ratio.maxTimes10
+      : Math.max(width, height) * 10 > Math.min(width, height) * ratio.maxTimes10;
+  if (bad) throw new AppError(400, 'INVALID_ASPECT_RATIO', rules.badRatio);
 }
 
 /**
- * Kiểm tra ảnh người dùng gửi và chuẩn hóa thành JPEG sạch metadata (D-11, D-12).
- * Luồng: design/flows/profile-photo-upload.md. Định dạng xác định bằng magic bytes, bỏ qua MIME/tên file của client.
- * @param {Buffer} input
- * @returns {Promise<Buffer>} JPEG đã xoay theo EXIF, không còn EXIF/GPS, cạnh dài tối đa 2048 px.
- * @throws {AppError} INVALID_FILE_TYPE | INVALID_IMAGE | IMAGE_TOO_LARGE | IMAGE_TOO_SMALL | INVALID_ASPECT_RATIO
+ * Kiểm tra ảnh rồi chuẩn hóa thành JPEG sạch metadata. Định dạng xác định bằng magic bytes,
+ * bỏ qua MIME/tên file của client.
  */
-export async function processProfilePhoto(input) {
+async function processImage(input, rules) {
   const type = await fileTypeFromBuffer(input);
-  if (!type || !IMAGE_RULES.allowedMimes.includes(type.mime)) throw invalidType();
+  if (!type || !ALLOWED_MIMES.includes(type.mime)) throw invalidType();
 
-  assertDimensions(await readOrientedSize(input));
+  assertDimensions(await readOrientedSize(input), rules);
 
   try {
     return await sharp(input, { limitInputPixels: LIMIT_INPUT_PIXELS, failOn: 'error' })
       .rotate()
       .resize({
-        width: IMAGE_RULES.outputLongEdge,
-        height: IMAGE_RULES.outputLongEdge,
+        width: OUTPUT_LONG_EDGE,
+        height: OUTPUT_LONG_EDGE,
         fit: 'inside',
         withoutEnlargement: true,
       })
       .flatten({ background: '#ffffff' })
-      // Không gọi withMetadata/keepMetadata: sharp mặc định bỏ toàn bộ metadata (EXIF, GPS, ICC).
-      .jpeg({ quality: IMAGE_RULES.jpegQuality })
+      // Không gọi withMetadata/keepMetadata: sharp mặc định bỏ toàn bộ metadata (EXIF, GPS, ICC) và xuất sRGB.
+      .jpeg(rules.jpeg)
       .toBuffer();
   } catch {
     throw invalidImage();
   }
 }
+
+/**
+ * Ảnh người dùng gửi (D-11, D-12). Luồng: design/flows/profile-photo-upload.md.
+ * @param {Buffer} input
+ * @returns {Promise<Buffer>} JPEG đã xoay theo EXIF, không còn EXIF/GPS, cạnh dài tối đa 2048 px.
+ * @throws {AppError} INVALID_FILE_TYPE | INVALID_IMAGE | IMAGE_TOO_LARGE | IMAGE_TOO_SMALL | INVALID_ASPECT_RATIO
+ */
+export const processProfilePhoto = (input) => processImage(input, IMAGE_RULES.profile);
+
+/**
+ * Ảnh flat lay của sản phẩm (D-48, US-04 §6.2). Cùng mã lỗi với ảnh hồ sơ, message riêng.
+ * @param {Buffer} input
+ * @returns {Promise<Buffer>} JPEG q90 4:4:4, nền trắng nếu có alpha, cạnh dài tối đa 2048 px, không metadata.
+ */
+export const processProductImage = (input) => processImage(input, IMAGE_RULES.product);

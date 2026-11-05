@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import sharp from 'sharp';
 import { generateFixtures } from '../scripts/generate-fixtures.js';
-import { processProfilePhoto } from '../src/services/image.js';
+import { processProductImage, processProfilePhoto } from '../src/services/image.js';
 
 let files;
 const load = (name) => readFile(files[name]);
@@ -134,5 +134,75 @@ describe('processProfilePhoto: đầu ra (D-12)', () => {
       .raw()
       .toBuffer({ resolveWithObject: true });
     expect([data[0], data[1], data[2]].every((v) => v >= 250)).toBe(true);
+  });
+});
+
+describe('processProductImage (D-48, AC-02, AC-03)', () => {
+  const productCode = async (buffer) => {
+    try {
+      await processProductImage(buffer);
+    } catch (err) {
+      return err.code;
+    }
+    return 'OK';
+  };
+
+  it.each([
+    [512, 512, 'OK'], // đúng ngưỡng tối thiểu
+    [511, 800, 'IMAGE_TOO_SMALL'],
+    [800, 511, 'IMAGE_TOO_SMALL'],
+    [512, 1536, 'OK'], // tỉ lệ đúng 3
+    [1536, 512, 'OK'], // ngang cũng được
+    [512, 1537, 'INVALID_ASPECT_RATIO'],
+    [2000, 600, 'INVALID_ASPECT_RATIO'],
+    [8000, 2667, 'OK'], // cạnh dài đúng 8000, tỉ lệ < 3
+    [8001, 3000, 'IMAGE_TOO_LARGE'],
+  ])('%i x %i -> %s', async (w, h, expected) => {
+    expect(await productCode(await solid(w, h))).toBe(expected);
+  });
+
+  it.each([
+    ['fake-exe.jpg', 'INVALID_FILE_TYPE'],
+    ['corrupt.jpg', 'INVALID_IMAGE'],
+    ['too-small-400x800.jpg', 'IMAGE_TOO_SMALL'],
+    ['too-long-edge-600x9000.jpg', 'IMAGE_TOO_LARGE'],
+    ['product-600x2000.jpg', 'INVALID_ASPECT_RATIO'],
+    ['product-800x800.webp', 'OK'],
+  ])('fixture %s -> %s', async (name, expected) => {
+    expect(await productCode(await load(name))).toBe(expected);
+  });
+
+  it('message riêng cho sản phẩm nhưng cùng mã lỗi', async () => {
+    const err = await processProductImage(await solid(400, 800)).catch((e) => e);
+    expect(err.message).toBe('Ảnh sản phẩm cần tối thiểu 512 × 512 px.');
+  });
+
+  it('xoay EXIF đổi chiều tính tỉ lệ: lưu 1536x512 + orientation 6 là ảnh 512x1536 (hợp lệ)', async () => {
+    const out = await processProductImage(await solid(1536, 512, 6));
+    const meta = await sharp(out).metadata();
+    expect([meta.width, meta.height]).toEqual([512, 1536]);
+  });
+
+  it('PNG 3000x3000 trong suốt có EXIF -> JPEG 2048, nền trắng, không metadata, 4:4:4', async () => {
+    const input = await load('product-3000x3000-alpha.png');
+    expect((await sharp(input).metadata()).exif).toBeDefined();
+    const out = await processProductImage(input);
+    const meta = await sharp(out).metadata();
+    expect(meta.format).toBe('jpeg');
+    expect([meta.width, meta.height]).toEqual([2048, 2048]);
+    expect(meta.exif).toBeUndefined();
+    expect(meta.icc).toBeUndefined();
+    expect(meta.chromaSubsampling).toBe('4:4:4');
+    const { data, info } = await sharp(out).raw().toBuffer({ resolveWithObject: true });
+    expect([data[0], data[1], data[2]].every((v) => v >= 250)).toBe(true); // góc từng trong suốt nay trắng
+    const mid = ((info.height >> 1) * info.width + (info.width >> 1)) * info.channels;
+    expect(data[mid]).toBeGreaterThan(150); // khối đỏ ở giữa còn nguyên
+    expect(data[mid + 1]).toBeLessThan(80);
+  });
+
+  it('không giữ GPS của JPG gốc', async () => {
+    const out = await processProductImage(await load('product-800x800-gps.jpg'));
+    expect((await sharp(out).metadata()).exif).toBeUndefined();
+    expect(out.includes(Buffer.from('GPS'))).toBe(false);
   });
 });
