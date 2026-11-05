@@ -98,7 +98,7 @@ Khi chạy API test, nâng `PRODUCT_WRITES_PER_HOUR` riêng cho tiến trình se
 | T-56 | FE form **Thêm/Sửa**: parse giá, kiểm tra sơ bộ ảnh, xem trước, hướng dẫn flat lay, thanh tiến trình, chỉ gửi trường đã đổi, cảnh báo rời form, giữ dữ liệu khi lỗi mạng, E4, E12, E18 | T-55 | L | AC-01, AC-03 → AC-09 trên UI | [x] |
 | T-57 | Test FE: parse giá (`199.000`, `199,000`, `199 000`, `199.5`, `1.99`, `1.000.000`, rỗng); kiểm tra sơ bộ ảnh; chỉ gửi trường đã đổi | T-56 | S | Pass; schema dùng chung bảng case với T-50 | [x] |
 | T-58 | API test `products.collection.json`, thêm vào `run.js`: AC-01 → AC-07, AC-09 → AC-12, AC-14 của US-04; AC-05 → AC-07 của US-03 với sản phẩm thật. Kiểm tra URL ảnh mở được không cần token; ghi vào bucket không có key bị từ chối | T-52, T-47 | M | `npm run test:postman` pass cả bộ; không dùng URL public để kết luận file đã xóa (xem ghi chú) | [x] |
-| T-59 | Kiểm tra trên trình duyệt thật ở 360, 768, 1280 px: toàn bộ luồng danh mục → sản phẩm → xóa | T-56 | S | Không lỗi console, ảnh hiển thị, không tràn ngang | [ ] |
+| T-59 | Kiểm tra trên trình duyệt thật ở 360, 768, 1280 px: toàn bộ luồng danh mục → sản phẩm → xóa | T-56 | S | Không lỗi console, ảnh hiển thị, không tràn ngang | [x] |
 | T-60 | Review + user xác nhận → `/merge`, ghi `PROGRESS.md`; main agent chạy `/wrap-up` | T-53, T-54, T-57, T-58, T-59 | S | `main` có US-04, toàn bộ test sprint pass | [ ] |
 
 **Tổng:** 26 task — US-03 10, US-04 16.

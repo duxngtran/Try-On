@@ -10,7 +10,7 @@ export const ADMIN_NAV_ITEMS = [
 ];
 
 const ITEM =
-  'flex h-11 shrink-0 items-center gap-2 px-3 text-small font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink';
+  'flex h-11 shrink-0 items-center gap-2 whitespace-nowrap px-3 text-small font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink';
 const linkClass = ({ isActive }) =>
   [
     ITEM,
