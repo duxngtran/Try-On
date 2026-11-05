@@ -13,7 +13,7 @@ Ghi lại các quyết định nghiệp vụ & thuật toán. Khi một quyết 
 | D-07 | Có role `user`/`admin` ngay sprint 01; admin chỉ tạo bằng seed từ env, không tự đăng ký | Chuẩn bị cho Epic 2/4 | sprint-01 |
 | D-08 | Đăng ký chỉ cần email + mật khẩu; không thu thập họ tên/SĐT (để Epic 4), không thu thập giới tính/size | Tối thiểu dữ liệu cá nhân | sprint-01 |
 | D-09 | `profileCompleted` = có ảnh + chiều cao + cân nặng; là điều kiện vào Phòng thử đồ (US-05) | Try-on cần ảnh mẫu | sprint-01 |
-| D-10 | Consent bắt buộc trước lần tải ảnh đầu tiên (lưu thời điểm); không có chức năng rút consent/xóa tài khoản — xóa ảnh là cách dừng sử dụng | Quyền riêng tư ở mức MVP | sprint-01 |
+| D-10 | Consent bắt buộc trước lần tải ảnh đầu tiên (lưu thời điểm). Sprint-03 thêm consent riêng cho việc gửi ảnh tới dịch vụ AI, có nút rút (D-93). Chưa có chức năng xóa tài khoản | Quyền riêng tư ở mức MVP; consent cũ không nêu đủ bên nhận và thời gian lưu | sprint-01, sửa ở sprint-03 |
 | D-11 | Ảnh: JPG/PNG/WEBP (không HEIC), ≤10 MB, ≥512×1024 px, cạnh dài ≤8000 px, ảnh dọc tỉ lệ cao/rộng 1,3–2,5; chỉ kiểm tra kỹ thuật, không tự động kiểm tra "chuẩn toàn thân" (xem lại ở Epic 3) | Phù hợp đầu vào model try-on (~768×1024) | sprint-01 |
 | D-12 | Backend xử lý ảnh: kiểm tra magic bytes, xoay theo EXIF rồi xóa EXIF, resize cạnh dài 2048 px, lưu JPEG, tên ngẫu nhiên; 1 ảnh/user, ảnh cũ xóa vĩnh viễn khi thay; trả về qua signed URL 15 phút | Bảo mật + quyền riêng tư | sprint-01 |
 | D-13 | Chiều cao số nguyên 100–250 cm; cân nặng 30–250 kg, tối đa 1 chữ số thập phân; chỉ đơn vị cm/kg | Khoảng người trưởng thành | sprint-01 |
@@ -74,3 +74,29 @@ Ghi lại các quyết định nghiệp vụ & thuật toán. Khi một quyết 
 | D-68 | Ngưỡng ảnh sản phẩm: cạnh ngắn ≥ 512 (không bắt buộc 512 × 512), cạnh dài/cạnh ngắn ≤ 3 so sánh bằng số nguyên; ảnh hồ sơ giữ JPEG q85; message riêng cho sản phẩm, mã lỗi dùng chung | Làm rõ D-48, không đổi hành vi ảnh hồ sơ; agent-coder chọn, user cho phép merge khi test đạt | sprint-02 |
 | D-69 | Dòng bị xóa ở danh sách sản phẩm bỏ ngay khỏi UI rồi tải lại ngầm; xóa xong tải lại cả danh mục để số đếm đúng | Nhất quán với D-64; agent-coder chọn, user cho phép merge khi test đạt | sprint-02 |
 | D-70 | Giữ icon `Boxes` cho "Sản phẩm" ở `AdminNav` và card `/admin` (screens ghi `Shirt` cho card) | Nhất quán giữa nav và card; agent-coder chọn, user cho phép merge khi test đạt | sprint-02 |
+| D-71 | Điều kiện sinh ảnh = `profileCompleted` + consent gửi ảnh hiệu lực, kiểm ở mỗi lần tạo job | D-09 chưa nói tới consent; user duyệt | sprint-03 |
+| D-72 | Không tự chọn danh mục đầu tiên khi vào phòng | PB nói "khi tôi chọn"; tránh tốn lượt; user duyệt | sprint-03 |
+| D-73 | Ẩn danh mục không có sản phẩm, vẫn có trạng thái rỗng nếu trống giữa chừng | Không dẫn người mua vào ngõ cụt; user duyệt | sprint-03 |
+| D-74 | "Ngay" nghĩa là: ảnh cache ≤ 1 giây; ảnh chưa có phản hồi ≤ 200 ms kèm ảnh trải phẳng; nhắc ở 15 giây; báo lỗi ở 60 giây. Ngưỡng là ước lượng, chưa đo | PB mâu thuẫn với độ trễ GenAI; user duyệt | sprint-03 |
+| D-75 | Job bất đồng bộ, mỗi khóa cache tối đa 1 job đang chạy | Tránh sinh trùng, không giữ request HTTP lâu; user duyệt | sprint-03 |
+| D-76 | Tự thử lại 1 lần với lỗi tạm thời; không thử lại lỗi an toàn, tư thế, đầu vào; ghi nhớ kết quả bị chặn theo khóa | Không tốn tiền vào yêu cầu chắc chắn lỗi; user duyệt | sprint-03 |
+| D-77 | Tính lượt khi sinh thành công, giữ chỗ lúc đang chạy | Công bằng, không vượt ngân sách khi song song; user duyệt | sprint-03 |
+| D-78 | Bucket private riêng cho ảnh try-on, signed URL 15 phút, JPEG không metadata | Theo D-03, D-12; user duyệt | sprint-03 |
+| D-79 | Thay/xóa ảnh hồ sơ hoặc rút consent: xóa thật mọi ảnh try-on, không sinh lại hàng loạt; kết quả về muộn bị bỏ | Ảnh cũ không dùng lại vì version chỉ tăng; kiểm soát chi phí; user duyệt | sprint-03 |
+| D-80 | Thay ảnh hoặc xóa mềm sản phẩm: xóa ảnh try-on liên quan, giữ dòng và ảnh gốc | Tối thiểu dữ liệu nhạy cảm; user duyệt | sprint-03 |
+| D-81 | Xóa ảnh try-on sau 90 ngày không được xem. Ngưỡng là ước lượng | Không giữ dữ liệu nhạy cảm vô thời hạn; user duyệt | sprint-03 |
+| D-82 | Không gửi số đo, email, `userId` cho dịch vụ AI; bản tạm chỉ nằm trong bộ nhớ | Tối thiểu dữ liệu; user duyệt | sprint-03 |
+| D-83 | Nhãn "Ảnh do AI tạo, chỉ để tham khảo, không thể hiện độ vừa vặn" | Tránh hiểu nhầm; model không nhận số đo; user duyệt | sprint-03 |
+| D-84 | Có nút quay lại, không vòng danh sách | Rõ đầu và cuối danh sách; user duyệt | sprint-03 |
+| D-85 | Generate trước đúng 1 sản phẩm, sau khi ảnh hiện tại sẵn sàng và dừng ≥ 1 giây; dừng generate trước khi còn ≤ 3 lượt. Ngưỡng là ước lượng | Cân bằng độ trễ và chi phí; user duyệt | sprint-03 |
+| D-86 | Chờ dừng 400 ms mới tạo job; job đã gửi coi như không hủy được, kết quả vẫn lưu và tính lượt. Ngưỡng là ước lượng; chưa thấy API hủy của FASHN | Không tốn lượt khi vuốt nhanh; user duyệt | sprint-03 |
+| D-87 | Sản phẩm bị xóa giữa chừng: báo và có nút chuyển tiếp, không tự chuyển, không tự sinh | Tránh tốn lượt ngoài ý muốn; user duyệt | sprint-03 |
+| D-88 | Rate limit 30 yêu cầu tạo job/người/phút, tách khỏi đọc trạng thái. Ngưỡng là ước lượng | Chống spam, không chặn nhầm lúc theo dõi job; user duyệt | sprint-03 |
+| D-89 | Đổi model thì xóa cache bằng lệnh, không đổi khóa D-49 | Giữ đúng khóa đã chốt; user duyệt | sprint-03 |
+| D-90 | Tối đa 2 job/người mua, job hiển thị ưu tiên hơn generate trước | Kiểm soát chi phí, ưu tiên ảnh đang xem; user duyệt | sprint-03 |
+| D-91 | Dùng FASHN Try-On v1.6 ($0.075/ảnh theo công bố) qua lớp adapter đổi được; chốt tạm cho tới khi pilot 10–20 ảnh. Giá và độ trễ chưa tự đo | Hỗ trợ flat lay, lỗi không trừ credit. Pilot gửi ảnh người thật nên cần user cho phép riêng; user duyệt theo khuyến nghị (Q1) | sprint-03 |
+| D-92 | Giữ D-45 và D-52, dùng `category: auto`. Nếu nhận sai trên 10% mẫu pilot thì thêm trường tùy chọn ở sản phẩm | User duyệt theo khuyến nghị (Q2) | sprint-03 |
+| D-93 | Consent riêng ở phòng thử đồ cho việc gửi ảnh tới dịch vụ AI, gồm tự khai đủ 18 tuổi và nút rút. Ảnh có consent cũ giữ nguyên nhưng không gửi đi tới khi đồng ý bản mới. Rút consent thì xóa ảnh try-on, giữ ảnh hồ sơ | Consent cũ thiếu bên nhận, xử lý ở nước ngoài, thời gian lưu, ảnh kết quả, tuổi; user duyệt theo khuyến nghị (Q3) | sprint-03 |
+| D-94 | Giới hạn 20 ảnh/ngày, 100 ảnh/tháng mỗi người; ngân sách $50/tháng toàn hệ thống, cảnh báo ở 80%, dừng cứng ở 100%. Ảnh đã cache vẫn xem được khi hết lượt | Tối đa $7.50/người/tháng theo giá công bố; user duyệt theo khuyến nghị (Q4) | sprint-03 |
+| D-95 | Giữ D-09 (số đo là điều kiện vào phòng) trong sprint này, xem lại ở Epic 4 dù model không dùng số đo | User duyệt theo khuyến nghị (Q5) | sprint-03 |
+| D-96 | Giả định chưa ra mắt thật. Trước khi ra mắt phải có người chuyên môn pháp lý xem, gồm hồ sơ đánh giá tác động theo Luật 91/2025/QH15 Điều 20 (chưa đối chiếu văn bản gốc) | User chưa trả lời; chọn phương án không kích hoạt nghĩa vụ chuyển dữ liệu thật | sprint-03 |

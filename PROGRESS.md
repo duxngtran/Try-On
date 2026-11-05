@@ -5,7 +5,7 @@
 |---|---|---|---|
 | sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Xong | US-01 và US-02 đã merge vào `main` |
 | sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Xong | US-03 và US-04 đã merge vào `main` |
-| sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Đang làm | Bước 1 xong trên `docs/sprint-03-design`; chờ user chốt Q1–Q5 và D-71 → D-90 trước bước 2 |
+| sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Đang làm | Bước 1 xong, user chốt Q1–Q5 và D-71 → D-90; đang làm bước 2–3 |
 | sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Chưa bắt đầu | — |
 
 ## Sprint 01 — chi tiết
