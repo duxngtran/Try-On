@@ -1,9 +1,12 @@
 import { Router } from 'express';
 import { health } from '../controllers/healthController.js';
 import { adminPing, createAuthController } from '../controllers/authController.js';
+import { createCategoryController } from '../controllers/categoryController.js';
 import { createProfileController, requirePhotoConsent } from '../controllers/profileController.js';
 import { requireRole } from '../middlewares/auth.js';
 import { validateBody } from '../middlewares/validate.js';
+import { validateUuidParam } from '../middlewares/validateUuidParam.js';
+import { categoryBodySchema } from '../validation/categorySchemas.js';
 import { loginSchema, registerSchema } from '../validation/authSchemas.js';
 import { consentSchema, measurementsSchema } from '../validation/profileSchemas.js';
 
@@ -12,6 +15,9 @@ import { consentSchema, measurementsSchema } from '../validation/profileSchemas.
  *   authService: ReturnType<import('../services/authService.js').createAuthService>,
  *   authenticate: import('express').RequestHandler,
  *   authRateLimiter: import('express').RequestHandler,
+ *   categories?: {
+ *     categoryService: ReturnType<import('../services/categoryService.js').createCategoryService>,
+ *   },
  *   profile?: {
  *     profileService: ReturnType<import('../services/profileService.js').createProfileService>,
  *     uploadPhoto: import('express').RequestHandler,
@@ -24,7 +30,7 @@ export function createApiRouter(services) {
   router.get('/health', health);
   if (!services) return router;
 
-  const { authService, authenticate, authRateLimiter, profile } = services;
+  const { authService, authenticate, authRateLimiter, categories, profile } = services;
   const auth = createAuthController(authService);
 
   router.post('/auth/register', authRateLimiter, validateBody(registerSchema), auth.register);
@@ -32,6 +38,29 @@ export function createApiRouter(services) {
   router.get('/auth/me', authenticate, auth.me);
 
   router.get('/admin/ping', authenticate, requireRole('admin'), adminPing);
+
+  if (categories) {
+    // Thứ tự kiểm tra: 401 -> 403 -> 404 id -> body (api.md mục 1).
+    const controller = createCategoryController(categories.categoryService);
+    const adminOnly = [authenticate, requireRole('admin')];
+    const categoryId = validateUuidParam('Không tìm thấy danh mục.');
+
+    router.get('/admin/categories', ...adminOnly, controller.list);
+    router.post(
+      '/admin/categories',
+      ...adminOnly,
+      validateBody(categoryBodySchema),
+      controller.create,
+    );
+    router.patch(
+      '/admin/categories/:id',
+      ...adminOnly,
+      categoryId,
+      validateBody(categoryBodySchema),
+      controller.rename,
+    );
+    router.delete('/admin/categories/:id', ...adminOnly, categoryId, controller.remove);
+  }
 
   if (profile) {
     // Chỉ role user (D-28); không route nào nhận id user — luôn là hồ sơ của `sub` (AC-11).
