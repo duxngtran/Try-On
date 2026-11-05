@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { USER, fail, ok, renderApp } from '../../test/renderApp.jsx';
+import { apiClient } from '../../services/apiClient.js';
 
 // jsdom không tải ảnh thật: giả lập bước đọc kích thước.
 vi.mock('./imageLoader.js', () => ({
@@ -248,5 +249,62 @@ describe('Trang hồ sơ: xóa ảnh (AC-12)', () => {
     expect(await screen.findByText('Đã xong 1/2 bước')).toBeInTheDocument();
     expect(screen.queryByAltText('Ảnh toàn thân của bạn')).not.toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+});
+
+describe('Modal qua hộp thoại xóa ảnh: focus và đóng', () => {
+  const withPhoto = makeProfile({
+    heightCm: 165,
+    weightKg: 50,
+    photo: photo(),
+    consent: consented,
+    profileCompleted: true,
+    missing: [],
+  });
+  const openDialog = async (routes = {}) => {
+    const view = renderProfile({ 'GET /profile': ok({ profile: withPhoto }), ...routes });
+    const opener = await screen.findByRole('button', { name: 'Xóa ảnh' });
+    await view.user.click(opener);
+    return { ...view, opener, dialog: screen.getByRole('dialog', { name: 'Xóa ảnh?' }) };
+  };
+
+  it('Tab và Shift+Tab xoay vòng trong hộp thoại, không thoát ra trang nền', async () => {
+    const { user, dialog } = await openDialog();
+    const cancel = within(dialog).getByRole('button', { name: 'Hủy' });
+    const confirm = within(dialog).getByRole('button', { name: 'Xóa ảnh' });
+    expect(cancel).toHaveFocus();
+    await user.tab();
+    expect(confirm).toHaveFocus();
+    await user.tab();
+    expect(cancel).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(confirm).toHaveFocus();
+  });
+
+  it('Esc đóng hộp thoại và trả focus về nút đã mở', async () => {
+    const { user, opener } = await openDialog();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(opener).toHaveFocus();
+  });
+
+  it('đang xóa (busy) thì Esc và chạm nền không đóng được', async () => {
+    let release;
+    const gate = new Promise((resolve) => {
+      release = resolve;
+    });
+    const { user, dialog } = await openDialog();
+    const adapter = apiClient.defaults.adapter;
+    apiClient.defaults.adapter = async (config) => {
+      if (config.method === 'delete') await gate;
+      return adapter(config);
+    };
+    await user.click(within(dialog).getByRole('button', { name: 'Xóa ảnh' }));
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Hủy' })).toBeDisabled());
+
+    await user.keyboard('{Escape}');
+    await user.click(document.querySelector('.bg-scrim'));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    release();
   });
 });
