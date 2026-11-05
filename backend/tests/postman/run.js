@@ -9,7 +9,7 @@ import { parseEnv } from 'node:util';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const backendDir = path.resolve(here, '../..');
 const fixturesDir = path.join(backendDir, 'tests/fixtures/generated');
-const collections = ['system', 'auth', 'profile'];
+const collections = ['system', 'auth', 'profile', 'categories'];
 
 const env = parseEnv(readFileSync(path.join(backendDir, '.env'), 'utf8'));
 const baseUrl = `http://localhost:${env.PORT || 4000}/api`;
