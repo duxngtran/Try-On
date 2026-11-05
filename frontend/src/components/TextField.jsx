@@ -4,12 +4,14 @@ import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 /**
  * Ô nhập có label, hint và lỗi gắn aria-describedby (design-system 7.2).
  * `type="password"` tự có nút hiện/ẩn. `describedBy` thêm id của vùng mô tả khác (vd. checklist).
+ * `suffix` là đơn vị hiển thị bên phải ô (vd. "cm"), chỉ trang trí vì label/hint đã nêu đơn vị.
  */
 export function TextField({
   label,
   error,
   hint,
   describedBy,
+  suffix,
   type = 'text',
   className = '',
   ref,
@@ -40,10 +42,18 @@ export function TextField({
             error
               ? 'border-2 border-danger'
               : 'border border-line-strong hover:border-ink-muted focus:border-ink',
-            isPassword ? 'pr-12' : '',
+            isPassword || suffix ? 'pr-12' : '',
           ].join(' ')}
           {...inputProps}
         />
+        {suffix && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-body text-ink-muted"
+          >
+            {suffix}
+          </span>
+        )}
         {isPassword && (
           <button
             type="button"

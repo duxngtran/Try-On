@@ -1,0 +1,2947 @@
+{
+  "info": {
+    "name": "Profile",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Setup - register user A",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);",
+                  "pm.environment.set('emailA', 'pm-prof-' + id + '-a@example.com'); pm.environment.set('emailB', 'pm-prof-' + id + '-b@example.com'); pm.environment.set('emailC', 'pm-prof-' + id + '-c@example.com'); pm.environment.set('password', 'Test1234x');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json(); pm.expect(b.data.token).to.be.a('string');",
+                  "pm.environment.set('tokenA', b.data.token); pm.environment.set('idA', b.data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailA}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Setup - register user B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json(); pm.expect(b.data.token).to.be.a('string');",
+                  "pm.environment.set('tokenB', b.data.token); pm.environment.set('idB', b.data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailB}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Setup - register user C (rate-limit user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json(); pm.expect(b.data.token).to.be.a('string');",
+                  "pm.environment.set('tokenC', b.data.token); pm.environment.set('idC', b.data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailC}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Setup - login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('adminToken', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{ADMIN_EMAIL}}\",\n  \"password\": \"{{ADMIN_PASSWORD}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "401 no token - GET profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "401 no token - PUT profile/measurements",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "401 no token - POST profile/photo-consent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo-consent",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo-consent"]
+            }
+          }
+        },
+        {
+          "name": "401 no token - PUT profile/photo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "401 no token - DELETE profile/photo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "401 junk token - GET profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer not.a.jwt"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "403 admin - GET profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format FORBIDDEN', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FORBIDDEN'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('message', () => pm.expect(b.error.message).to.eql('Bạn không có quyền truy cập.'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "403 admin - PUT measurements",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format FORBIDDEN', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FORBIDDEN'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('message', () => pm.expect(b.error.message).to.eql('Bạn không có quyền truy cập.'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165,\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "403 admin - POST photo-consent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format FORBIDDEN', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FORBIDDEN'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('message', () => pm.expect(b.error.message).to.eql('Bạn không có quyền truy cập.'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo-consent",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo-consent"]
+            }
+          }
+        },
+        {
+          "name": "403 admin - PUT photo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format FORBIDDEN', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FORBIDDEN'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('message', () => pm.expect(b.error.message).to.eql('Bạn không có quyền truy cập.'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-1080x1920.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "403 admin - DELETE photo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format FORBIDDEN', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FORBIDDEN'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('message', () => pm.expect(b.error.message).to.eql('Bạn không có quyền truy cập.'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-01 GET profile - empty after register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('empty profile', () => { pm.expect(p.heightCm).to.eql(null); pm.expect(p.weightKg).to.eql(null); pm.expect(p.photo).to.eql(null); pm.expect(p.consent.accepted).to.eql(false); pm.expect(p.profileCompleted).to.eql(false); pm.expect(p.missing).to.have.members(['photo','measurements']); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 PUT measurements - height 90",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('details has heightCm', () => pm.expect(b.error.details.map(x => x.field)).to.include('heightCm'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 90,\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 PUT measurements - height 251",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('details has heightCm', () => pm.expect(b.error.details.map(x => x.field)).to.include('heightCm'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 251,\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 PUT measurements - height 165.5 (not integer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('details has heightCm', () => pm.expect(b.error.details.map(x => x.field)).to.include('heightCm'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165.5,\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 PUT measurements - height as string \"165\"",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('details has heightCm', () => pm.expect(b.error.details.map(x => x.field)).to.include('heightCm'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": \"165\",\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 PUT measurements - weight 25",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('details has weightKg', () => pm.expect(b.error.details.map(x => x.field)).to.include('weightKg'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165,\n  \"weightKg\": 25\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 PUT measurements - weight 250.1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('details has weightKg', () => pm.expect(b.error.details.map(x => x.field)).to.include('weightKg'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165,\n  \"weightKg\": 250.1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 PUT measurements - weight 52.55 (2 decimals)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('details has weightKg', () => pm.expect(b.error.details.map(x => x.field)).to.include('weightKg'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165,\n  \"weightKg\": 52.55\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 PUT measurements - weight \"52,5\" string",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('details has weightKg', () => pm.expect(b.error.details.map(x => x.field)).to.include('weightKg'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165,\n  \"weightKg\": \"52,5\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 PUT measurements - missing weight",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('details has weightKg', () => pm.expect(b.error.details.map(x => x.field)).to.include('weightKg'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 GET profile - still empty after rejected measurements",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('unchanged', () => { pm.expect(p.heightCm).to.eql(null); pm.expect(p.weightKg).to.eql(null); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "AC-02 PUT photo - 400 CONSENT_REQUIRED before consent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format CONSENT_REQUIRED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('CONSENT_REQUIRED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-1080x1920.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "Consent - 400 accepted:false",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo-consent",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo-consent"]
+            }
+          }
+        },
+        {
+          "name": "Consent - 400 accepted:\"true\" (string)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": \"true\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo-consent",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo-consent"]
+            }
+          }
+        },
+        {
+          "name": "Consent - 200 accepted:true",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('consent accepted', () => { pm.expect(p.consent.accepted).to.eql(true); pm.expect(p.consent.acceptedAt).to.be.a('string'); pm.expect(p.consent.version).to.be.a('number'); });",
+                  "pm.environment.set('consentAt', p.consent.acceptedAt);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo-consent",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo-consent"]
+            }
+          }
+        },
+        {
+          "name": "Consent - idempotent (acceptedAt unchanged)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('acceptedAt unchanged', () => pm.expect(p.consent.acceptedAt).to.eql(pm.environment.get('consentAt')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo-consent",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo-consent"]
+            }
+          }
+        },
+        {
+          "name": "AC-07 PUT measurements - 165 / 52.5",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('saved', () => { pm.expect(p.heightCm).to.eql(165); pm.expect(p.weightKg).to.eql(52.5); });",
+                  "pm.test('no photo yet: not completed, missing photo', () => { pm.expect(p.profileCompleted).to.eql(false); pm.expect(p.missing).to.eql(['photo']); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165,\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 PUT measurements - rejected after valid save (height 90)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('details has heightCm', () => pm.expect(b.error.details.map(x => x.field)).to.include('heightCm'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 90,\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 GET profile - old values kept after rejection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('165 / 52.5 intact', () => { pm.expect(p.heightCm).to.eql(165); pm.expect(p.weightKg).to.eql(52.5); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "Boundary PUT measurements - 100 / 30 accepted",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('saved', () => { pm.expect(p.heightCm).to.eql(100); pm.expect(p.weightKg).to.eql(30); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 100,\n  \"weightKg\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "Boundary PUT measurements - 250 / 250 accepted",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('saved', () => { pm.expect(p.heightCm).to.eql(250); pm.expect(p.weightKg).to.eql(250); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 250,\n  \"weightKg\": 250\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-07 PUT measurements - 170 / 60 (user A final)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('saved', () => { pm.expect(p.heightCm).to.eql(170); pm.expect(p.weightKg).to.eql(60); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 170,\n  \"weightKg\": 60\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-06 PUT photo - fake-exe.jpg -> INVALID_FILE_TYPE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format INVALID_FILE_TYPE', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('INVALID_FILE_TYPE'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "fake-exe.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-06 PUT photo - over 10MB -> FILE_TOO_LARGE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 413', () => pm.response.to.have.status(413));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format FILE_TOO_LARGE', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FILE_TOO_LARGE'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "too-large-over-10mb.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-06 PUT photo - 400x800 -> IMAGE_TOO_SMALL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format IMAGE_TOO_SMALL', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('IMAGE_TOO_SMALL'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "too-small-400x800.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-06 PUT photo - landscape 1920x1080 -> INVALID_ASPECT_RATIO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format INVALID_ASPECT_RATIO', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('INVALID_ASPECT_RATIO'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "landscape-1920x1080.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-06 PUT photo - corrupt.jpg -> INVALID_IMAGE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format INVALID_IMAGE', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('INVALID_IMAGE'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "corrupt.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-06 PUT photo - 600x9000 -> IMAGE_TOO_LARGE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format IMAGE_TOO_LARGE', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('IMAGE_TOO_LARGE'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "too-long-edge-600x9000.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-06 GET profile - no photo stored after all rejections",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('photo still null, not completed', () => { pm.expect(p.photo).to.eql(null); pm.expect(p.profileCompleted).to.eql(false); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "AC-03 PUT photo - valid JPEG with GPS EXIF (user A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('photo present, url signed from private bucket', () => { pm.expect(p.photo).to.be.an('object'); pm.expect(p.photo.url).to.be.a('string').and.match(/\\/object\\/sign\\/profile-photos\\/.+token=/); pm.expect(p.photo.version).to.be.a('number').and.at.least(1); });",
+                  "pm.environment.set('photoA1Url', p.photo.url); pm.environment.set('photoA1Version', p.photo.version);",
+                  "pm.sendRequest({ url: p.photo.url, method: 'GET' }, (err, r) => {",
+                  "  pm.test('fetch ok (no network error)', () => pm.expect(err).to.eql(null));",
+                  "  if (!err) { pm.test('signed URL serves a JPEG with no EXIF/GPS (gps.jpg)', () => { pm.expect(r.code).to.eql(200); pm.expect(r.headers.get('Content-Type')).to.match(/image\\/jpeg/); const buf = r.stream; pm.expect(buf[0]).to.eql(0xff); pm.expect(buf[1]).to.eql(0xd8); const s = buf.toString('latin1'); pm.expect(s.includes('Exif')).to.eql(false); pm.expect(s.includes('GPS')).to.eql(false); }); }",
+                  "});",
+                  "pm.test('AC-09 profileCompleted true, missing empty', () => { pm.expect(p.profileCompleted).to.eql(true); pm.expect(p.missing).to.eql([]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-1080x1920-gps.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-09 GET auth/me - profileCompleted true",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('profileCompleted true', () => pm.expect(pm.response.json().data.user.profileCompleted).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "AC-03 GET profile - photo persists with fresh signed URL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('same version, completed', () => { pm.expect(p.photo.version).to.eql(pm.environment.get('photoA1Version')); pm.expect(p.profileCompleted).to.eql(true); });",
+                  "pm.test('expiresAt in the future', () => pm.expect(new Date(p.photo.expiresAt).getTime()).to.be.above(Date.now()));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "AC-10 public URL of the file -> rejected",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const u = pm.environment.get('photoA1Url'); pm.variables.set('publicUrlA', u.split('?')[0].replace('/object/sign/', '/object/public/'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('public path is not served', () => pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404]));",
+                  "pm.test('no image bytes returned', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.match(/image\\//));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicUrlA}}"
+          }
+        },
+        {
+          "name": "AC-10 signed URL with tampered token -> rejected",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const u = pm.environment.get('photoA1Url'); pm.variables.set('tamperedUrlA', u.replace(/token=[^&]+/, 'token=' + 'x'.repeat(20)));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('tampered token rejected (4xx)', () => pm.expect(pm.response.code).to.be.within(400, 499));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{tamperedUrlA}}"
+          }
+        },
+        {
+          "name": "AC-10 signed URL (valid) -> 200 image/jpeg",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 jpeg', () => { pm.response.to.have.status(200); pm.expect(pm.response.headers.get('Content-Type')).to.match(/image\\/jpeg/); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{photoA1Url}}"
+          }
+        },
+        {
+          "name": "AC-04 PUT photo - replace with PNG (user A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('photo present, url signed from private bucket', () => { pm.expect(p.photo).to.be.an('object'); pm.expect(p.photo.url).to.be.a('string').and.match(/\\/object\\/sign\\/profile-photos\\/.+token=/); pm.expect(p.photo.version).to.be.a('number').and.at.least(1); });",
+                  "pm.environment.set('photoA2Url', p.photo.url); pm.environment.set('photoA2Version', p.photo.version);",
+                  "pm.sendRequest({ url: p.photo.url, method: 'GET' }, (err, r) => {",
+                  "  pm.test('fetch ok (no network error)', () => pm.expect(err).to.eql(null));",
+                  "  if (!err) { pm.test('signed URL serves a JPEG with no EXIF/GPS (png)', () => { pm.expect(r.code).to.eql(200); pm.expect(r.headers.get('Content-Type')).to.match(/image\\/jpeg/); const buf = r.stream; pm.expect(buf[0]).to.eql(0xff); pm.expect(buf[1]).to.eql(0xd8); const s = buf.toString('latin1'); pm.expect(s.includes('Exif')).to.eql(false); pm.expect(s.includes('GPS')).to.eql(false); }); }",
+                  "});",
+                  "pm.test('version incremented by 1', () => pm.expect(p.photo.version).to.eql(pm.environment.get('photoA1Version') + 1));",
+                  "pm.test('new url differs from old', () => pm.expect(p.photo.url).to.not.eql(pm.environment.get('photoA1Url')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-1080x1920.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-04 old photo file deleted from Storage (old signed URL)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// D-39: Supabase CDN vẫn phục vụ signed URL cũ tới ~45s sau khi xoá file; poll tới khi bị từ chối (4xx) hoặc hết 90s.",
+                  "const base = pm.environment.get('photoA1Url');",
+                  "const deadline = Date.now() + 90000;",
+                  "const poll = () => {",
+                  "  pm.sendRequest(base + '&cb=' + Date.now(), (err, res) => {",
+                  "    if ((res && res.code >= 400 && res.code < 500) || Date.now() > deadline) return;",
+                  "    setTimeout(poll, 3000);",
+                  "  });",
+                  "};",
+                  "poll();",
+                  "pm.variables.set('goneUrl', base + '&cb=' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('old file gone (4xx)', () => pm.expect(pm.response.code).to.be.within(400, 499));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{goneUrl}}"
+          }
+        },
+        {
+          "name": "AC-05 PUT photo - failing upload (landscape) while photo exists",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format INVALID_ASPECT_RATIO', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('INVALID_ASPECT_RATIO'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "landscape-1920x1080.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-05 GET profile - photo A2 intact (same version)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('version unchanged, still completed', () => { pm.expect(p.photo.version).to.eql(pm.environment.get('photoA2Version')); pm.expect(p.profileCompleted).to.eql(true); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "AC-05 photo A2 file still served after failed upload",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 jpeg', () => { pm.response.to.have.status(200); pm.expect(pm.response.headers.get('Content-Type')).to.match(/image\\/jpeg/); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{photoA2Url}}"
+          }
+        },
+        {
+          "name": "AC-11 B GET profile - own empty profile (not A data)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('B sees empty profile', () => { pm.expect(p.heightCm).to.eql(null); pm.expect(p.weightKg).to.eql(null); pm.expect(p.photo).to.eql(null); pm.expect(p.consent.accepted).to.eql(false); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "AC-11 B GET profile?userId=A -> still B profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('still B (empty)', () => { pm.expect(p.heightCm).to.eql(null); pm.expect(p.photo).to.eql(null); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile?userId={{idA}}&id={{idA}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{idA}}"
+                },
+                {
+                  "key": "id",
+                  "value": "{{idA}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-11 B GET profile/{idA} -> 404, no data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));",
+                  "pm.test('no A data', () => pm.expect(pm.response.text()).to.not.match(/170|photo|token=/));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile/{{idA}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "{{idA}}"]
+            }
+          }
+        },
+        {
+          "name": "AC-11 B PUT measurements with userId=A in body -> applies to B only",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('B updated', () => { pm.expect(p.heightCm).to.eql(190); pm.expect(p.weightKg).to.eql(90); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 190,\n  \"weightKg\": 90,\n  \"userId\": \"{{idA}}\",\n  \"id\": \"{{idA}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/measurements",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "AC-11 A GET profile - unchanged by B (170 / 60, photo A2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('A data intact', () => { pm.expect(p.heightCm).to.eql(170); pm.expect(p.weightKg).to.eql(60); pm.expect(p.photo.version).to.eql(pm.environment.get('photoA2Version')); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "AC-11 B DELETE photo (B has none) does not touch A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('B photo null', () => pm.expect(p.photo).to.eql(null));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-11 A photo still served after B DELETE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 jpeg', () => { pm.response.to.have.status(200); pm.expect(pm.response.headers.get('Content-Type')).to.match(/image\\/jpeg/); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{photoA2Url}}"
+          }
+        },
+        {
+          "name": "AC-11 B photo-consent has its own record",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('B consent set', () => pm.expect(p.consent.accepted).to.eql(true));",
+                  "pm.test('B acceptedAt differs from A', () => pm.expect(p.consent.acceptedAt).to.not.eql(pm.environment.get('consentAt')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo-consent",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo-consent"]
+            }
+          }
+        },
+        {
+          "name": "B PUT photo - wrong field name -> VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "valid-1080x1920.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "B PUT photo - WEBP accepted, stored as JPEG",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('photo present, url signed from private bucket', () => { pm.expect(p.photo).to.be.an('object'); pm.expect(p.photo.url).to.be.a('string').and.match(/\\/object\\/sign\\/profile-photos\\/.+token=/); pm.expect(p.photo.version).to.be.a('number').and.at.least(1); });",
+                  "pm.environment.set('photoB1Url', p.photo.url); pm.environment.set('photoB1Version', p.photo.version);",
+                  "pm.sendRequest({ url: p.photo.url, method: 'GET' }, (err, r) => {",
+                  "  pm.test('fetch ok (no network error)', () => pm.expect(err).to.eql(null));",
+                  "  if (!err) { pm.test('signed URL serves a JPEG with no EXIF/GPS (webp)', () => { pm.expect(r.code).to.eql(200); pm.expect(r.headers.get('Content-Type')).to.match(/image\\/jpeg/); const buf = r.stream; pm.expect(buf[0]).to.eql(0xff); pm.expect(buf[1]).to.eql(0xd8); const s = buf.toString('latin1'); pm.expect(s.includes('Exif')).to.eql(false); pm.expect(s.includes('GPS')).to.eql(false); }); }",
+                  "});",
+                  "pm.test('B completed (190/90 + photo)', () => pm.expect(p.profileCompleted).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-1080x1920.webp"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-11 A GET profile - still A after B upload",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('A photo differs from B photo', () => pm.expect(p.photo.url).to.not.eql(pm.environment.get('photoB1Url')));",
+                  "pm.test('A measurements', () => pm.expect(p.heightCm).to.eql(170));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "AC-11 B GET profile - photo URL belongs to B only",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('B url has B id, not A id', () => { pm.expect(p.photo.url).to.include(pm.environment.get('idB')); pm.expect(p.photo.url).to.not.include(pm.environment.get('idA')); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "AC-12 DELETE photo (user A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('photo null, not completed, measurements kept', () => { pm.expect(p.photo).to.eql(null); pm.expect(p.profileCompleted).to.eql(false); pm.expect(p.missing).to.eql(['photo']); pm.expect(p.heightCm).to.eql(170); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-12 deleted file no longer served (signed URL A2)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// D-39: Supabase CDN vẫn phục vụ signed URL cũ tới ~45s sau khi xoá file; poll tới khi bị từ chối (4xx) hoặc hết 90s.",
+                  "const base = pm.environment.get('photoA2Url');",
+                  "const deadline = Date.now() + 90000;",
+                  "const poll = () => {",
+                  "  pm.sendRequest(base + '&cb=' + Date.now(), (err, res) => {",
+                  "    if ((res && res.code >= 400 && res.code < 500) || Date.now() > deadline) return;",
+                  "    setTimeout(poll, 3000);",
+                  "  });",
+                  "};",
+                  "poll();",
+                  "pm.variables.set('goneUrl', base + '&cb=' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('file gone (4xx)', () => pm.expect(pm.response.code).to.be.within(400, 499));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{goneUrl}}"
+          }
+        },
+        {
+          "name": "AC-12 DELETE photo again - idempotent 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('still null', () => pm.expect(p.photo).to.eql(null));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "AC-12 GET auth/me - profileCompleted false after delete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('profileCompleted false', () => pm.expect(pm.response.json().data.user.profileCompleted).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Replace again (user B, EXIF-rotated JPEG; version +1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('photo present, url signed from private bucket', () => { pm.expect(p.photo).to.be.an('object'); pm.expect(p.photo.url).to.be.a('string').and.match(/\\/object\\/sign\\/profile-photos\\/.+token=/); pm.expect(p.photo.version).to.be.a('number').and.at.least(1); });",
+                  "pm.environment.set('photoB2Url', p.photo.url); pm.environment.set('photoB2Version', p.photo.version);",
+                  "pm.sendRequest({ url: p.photo.url, method: 'GET' }, (err, r) => {",
+                  "  pm.test('fetch ok (no network error)', () => pm.expect(err).to.eql(null));",
+                  "  if (!err) { pm.test('signed URL serves a JPEG with no EXIF/GPS (exif6)', () => { pm.expect(r.code).to.eql(200); pm.expect(r.headers.get('Content-Type')).to.match(/image\\/jpeg/); const buf = r.stream; pm.expect(buf[0]).to.eql(0xff); pm.expect(buf[1]).to.eql(0xd8); const s = buf.toString('latin1'); pm.expect(s.includes('Exif')).to.eql(false); pm.expect(s.includes('GPS')).to.eql(false); }); }",
+                  "});",
+                  "pm.test('version +1', () => pm.expect(p.photo.version).to.eql(pm.environment.get('photoB1Version') + 1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-rotated-exif6.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "B previous (WEBP-derived) file deleted (old signed URL)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// D-39: Supabase CDN vẫn phục vụ signed URL cũ tới ~45s sau khi xoá file; poll tới khi bị từ chối (4xx) hoặc hết 90s.",
+                  "const base = pm.environment.get('photoB1Url');",
+                  "const deadline = Date.now() + 90000;",
+                  "const poll = () => {",
+                  "  pm.sendRequest(base + '&cb=' + Date.now(), (err, res) => {",
+                  "    if ((res && res.code >= 400 && res.code < 500) || Date.now() > deadline) return;",
+                  "    setTimeout(poll, 3000);",
+                  "  });",
+                  "};",
+                  "poll();",
+                  "pm.variables.set('goneUrl', base + '&cb=' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('old B file gone (4xx)', () => pm.expect(pm.response.code).to.be.within(400, 499));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{goneUrl}}"
+          }
+        },
+        {
+          "name": "Rate limit - 11th upload request of user C -> 429 TOO_MANY_REQUESTS",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const base = pm.environment.get('baseUrl'), tok = pm.environment.get('tokenC');",
+                  "const put = () => new Promise((res, rej) => pm.sendRequest({ url: base + '/profile/photo', method: 'PUT', header: { Authorization: 'Bearer ' + tok } }, (e, r) => e ? rej(e) : res(r)));",
+                  "(async () => { for (let i = 1; i <= 10; i++) { const r = await put(); pm.test('C request ' + i + ' counted but allowed (400 CONSENT_REQUIRED)', () => { pm.expect(r.code).to.eql(400); pm.expect(r.json().error.code).to.eql('CONSENT_REQUIRED'); }); } })().catch(e => { throw e; });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 429', () => pm.response.to.have.status(429));",
+                  "const b = pm.response.json();",
+                  "pm.test('error format TOO_MANY_REQUESTS', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('TOO_MANY_REQUESTS'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+                  "pm.test('Retry-After header present', () => pm.expect(pm.response.headers.get('Retry-After')).to.be.ok);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-1080x1920.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "Rate limit - user C other profile endpoints unaffected",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "Rate limit - user A has separate counter (not limited by C)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - DELETE photo user B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;",
+                  "pm.test('photo null', () => pm.expect(p.photo).to.eql(null));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - DELETE photo user A (already none)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('success + Profile shape', () => { pm.expect(b.success).to.eql(true); const p = b.data.profile; pm.expect(p).to.have.all.keys('heightCm','weightKg','photo','consent','profileCompleted','missing'); pm.expect(p.consent).to.have.all.keys('accepted','acceptedAt','version'); pm.expect(p.profileCompleted).to.be.a('boolean'); pm.expect(p.missing).to.be.an('array'); if (p.photo !== null) pm.expect(p.photo).to.have.all.keys('url','expiresAt','version','updatedAt'); });",
+                  "pm.test('no internal fields leaked', () => pm.expect(pm.response.text()).to.not.match(/photo_path|photoPath|storage_path|user_id|password/i));",
+                  "const p = b.data.profile;"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

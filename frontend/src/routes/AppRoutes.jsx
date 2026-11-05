@@ -7,7 +7,7 @@ import { RegisterPage } from '../features/auth/RegisterPage.jsx';
 import { AdminPage } from '../pages/AdminPage.jsx';
 import { HomePage } from '../pages/HomePage.jsx';
 import { NotFoundPage } from '../pages/NotFoundPage.jsx';
-import { ProfilePage } from '../pages/ProfilePage.jsx';
+import { ProfilePage } from '../features/profile/ProfilePage.jsx';
 
 /** Bảng guard theo header-navigation.md; phải render bên trong Router và AuthProvider. */
 export function AppRoutes() {

@@ -17,16 +17,21 @@ export function Button({
   loadingText,
   fullWidth = false,
   disabled = false,
+  softDisabled = false,
+  onClick,
   className = '',
   children,
   type = 'button',
   ...rest
 }) {
-  const inactive = disabled || loading;
+  // softDisabled: trông như bị khóa và chặn click nhưng vẫn focus được để đọc lý do (aria-describedby).
+  const inactive = disabled || loading || softDisabled;
   return (
     <button
       type={type}
-      disabled={inactive}
+      disabled={disabled || loading}
+      aria-disabled={softDisabled || undefined}
+      onClick={softDisabled ? undefined : onClick}
       aria-busy={loading || undefined}
       className={[
         'inline-flex items-center justify-center gap-2 rounded-md font-semibold transition active:scale-[0.98]',

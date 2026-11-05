@@ -136,9 +136,26 @@ export function AuthProvider({ children }) {
     navigate('/login', { replace: true });
   }, [clearSession, navigate]);
 
+  // Hồ sơ (US-02) là nguồn sự thật của profileCompleted; đồng bộ để guard/menu không phải gọi lại /auth/me.
+  const setProfileCompleted = useCallback((profileCompleted) => {
+    setState((prev) =>
+      prev.user && prev.user.profileCompleted !== profileCompleted
+        ? { ...prev, user: { ...prev.user, profileCompleted } }
+        : prev,
+    );
+  }, []);
+
   const value = useMemo(
-    () => ({ ...state, login, register, logout, retryRestore, discardSession }),
-    [state, login, register, logout, retryRestore, discardSession],
+    () => ({
+      ...state,
+      login,
+      register,
+      logout,
+      retryRestore,
+      discardSession,
+      setProfileCompleted,
+    }),
+    [state, login, register, logout, retryRestore, discardSession, setProfileCompleted],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

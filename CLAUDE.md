@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Try-on** is a virtual try-on (GenAI) fashion e-commerce web app. Sprint 1 setup (branch `chore/sprint-01-setup`) has scaffolded `backend/` (Express 5, ESM) and `frontend/` (Vite + React 19 + Tailwind v4); features (auth, profile) are not built yet. The root `package.json` only pulls in `@supabase/supabase-js`; each app has its own `package.json`.
+**Try-on** is a virtual try-on (GenAI) fashion e-commerce web app. `backend/` is Express 5 (ESM) and `frontend/` is Vite + React 19 + Tailwind v4. Auth (US-01) is on `main`; see `PROGRESS.md` for the status of the profile feature (US-02) and later sprints. Main folders: `backend/src`, `backend/tests` (including `tests/postman`), `frontend/src`, `migrations/`, `design/`, `sprint-01/`. The root `package.json` only pulls in `@supabase/supabase-js`; each app has its own `package.json`.
 
 Project docs and agent prompts are written in Vietnamese.
 
@@ -45,7 +45,7 @@ The **main agent is the orchestrator**. It calls the subagents in `.claude/agent
 - **Each user story gets its own branch**, created from an up-to-date `main` (use `/branch`) before implementation of that story starts. Name it `feature/US-xx-<short-name>` (e.g. `feature/US-02-profile-photo`).
 - All commits for that story go on its branch (`/commit`). Do not mix work from several user stories on one branch, and do not commit feature work directly to `main`.
 - **Merge into `main` only after** the story's tests (unit + Postman API tests) pass **and the user has confirmed**. Then merge with `/merge`. Never merge without the user's confirmation.
-- After merging, record it in `PROGRESS.md`. The repo is not yet a git repository, so run `git init` with `main` as the default branch before the first story's branch.
+- After merging, record it in `PROGRESS.md`.
 
 ### Sprint folder layout
 
@@ -77,9 +77,11 @@ Run from the repo root; Node 24 is required. Copy `backend/.env.example` to `bac
 | Build | n/a | `npm run build` |
 | Migrate (D-19) | `npm run migrate` (needs `DATABASE_URL`; applies `migrations/NNN_*.sql` in order, tracked in `schema_migrations`) | n/a |
 | Image test fixtures | `npm run fixtures` (writes `tests/fixtures/generated/`, gitignored) | n/a |
-| Seed admin / setup storage | `scripts/seed-admin.js`, `scripts/setup-storage.js` are added in US-01 / US-02 | n/a |
+| Seed admin (D-32) | `npm run seed:admin` (needs `ADMIN_EMAIL`, `ADMIN_PASSWORD`) | n/a |
+| Setup Storage bucket (D-26) | `npm run setup:storage` (creates/repairs private bucket `profile-photos`, idempotent) | n/a |
+| API tests on Supabase dev (D-40) | `npm run test:postman` (starts the server, runs newman on `tests/postman/*.collection.json`; port 4000 must be free) | n/a |
 
-Notes: Tailwind v4 is configured in CSS (`frontend/src/index.css`, `@theme` tokens from `design/design-system.md`), there is no `tailwind.config.js`. Vitest uses `vite.config.js` on the frontend and `vitest.config.js` on the backend. Postman workspace "Try-on", collection "Try-on API" and environment "local" are created through Postman MCP.
+Notes: Tailwind v4 is configured in CSS (`frontend/src/index.css`, `@theme` tokens from `design/design-system.md`), there is no `tailwind.config.js`. Vitest uses `vite.config.js` on the frontend and `vitest.config.js` on the backend. Postman workspace "Try-on", collection "Try-on API" and environment "local" are created through Postman MCP. Postman MCP cannot run collections or attach files to form-data requests, so the source of truth for API tests is `backend/tests/postman/`; import those files into the Postman app by hand if needed (D-40).
 
 ## Product notes
 

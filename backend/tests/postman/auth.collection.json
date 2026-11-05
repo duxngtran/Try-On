@@ -1,0 +1,775 @@
+{
+  "info": {
+    "name": "Auth",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register - ok (email normalized, role user)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);",
+              "pm.environment.set('email', 'pm-' + id + '@example.com');",
+              "pm.environment.set('email2', 'pm-' + id + '-b@example.com');",
+              "pm.environment.set('lockEmail', 'pm-' + id + '-lock@example.com');",
+              "pm.environment.set('password', 'Test1234x');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 201', () => pm.response.to.have.status(201));",
+              "const b = pm.response.json();",
+              "pm.test('success + token', () => { pm.expect(b.success).to.eql(true); pm.expect(b.data.token).to.be.a('string').and.not.empty; });",
+              "pm.test('user shape', () => { const u = b.data.user; pm.expect(u).to.have.keys('id','email','role','profileCompleted','createdAt'); pm.expect(u.role).to.eql('user'); pm.expect(u.profileCompleted).to.be.a('boolean'); pm.expect(new Date(u.createdAt).toISOString()).to.eql(u.createdAt); });",
+              "pm.test('email trimmed + lowercase, profileCompleted false', () => { pm.expect(b.data.user.email).to.eql(pm.environment.get('email')); pm.expect(b.data.user.profileCompleted).to.eql(false); });",
+              "pm.test('no password/hash leaked', () => { const t = pm.response.text(); pm.expect(t).to.not.match(/password_hash|passwordHash|\\$2[aby]\\$/); });",
+              "pm.environment.set('userToken', b.data.token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"  {{email}}  \",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Register - 409 duplicate email (case-insensitive)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.variables.set('emailUpper', pm.environment.get('email').toUpperCase());"]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 409', () => pm.response.to.have.status(409));",
+              "const b = pm.response.json();",
+              "pm.test('error format EMAIL_ALREADY_EXISTS', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('EMAIL_ALREADY_EXISTS'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+              "pm.test('message', () => pm.expect(pm.response.json().error.message).to.eql('Email này đã được đăng ký.'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{emailUpper}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Register - 400 weak password (no digit)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 400', () => pm.response.to.have.status(400));",
+              "const b = pm.response.json();",
+              "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+              "pm.test('details has password field', () => { const d = b.error.details; pm.expect(d).to.be.an('array'); pm.expect(d.map(x => x.field)).to.include('password'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"pm-weak@example.com\",\n  \"password\": \"abcdefgh\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Register - 400 invalid email",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 400', () => pm.response.to.have.status(400));",
+              "const b = pm.response.json();",
+              "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+              "pm.test('details has email field', () => pm.expect(b.error.details.map(x => x.field)).to.include('email'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"not-an-email\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Register - 400 password equals email",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 400', () => pm.response.to.have.status(400));",
+              "const b = pm.response.json();",
+              "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"pm.same1@example.com\",\n  \"password\": \"PM.Same1@Example.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Register - body role:admin is ignored (role user)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 201', () => pm.response.to.have.status(201));",
+              "const b = pm.response.json();",
+              "pm.test('user shape', () => { const u = b.data.user; pm.expect(u).to.have.keys('id','email','role','profileCompleted','createdAt'); pm.expect(u.role).to.eql('user'); pm.expect(u.profileCompleted).to.be.a('boolean'); pm.expect(new Date(u.createdAt).toISOString()).to.eql(u.createdAt); });",
+              "pm.test('no password/hash leaked', () => { const t = pm.response.text(); pm.expect(t).to.not.match(/password_hash|passwordHash|\\$2[aby]\\$/); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email2}}\",\n  \"password\": \"{{password}}\",\n  \"role\": \"admin\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Login - ok user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('success + token', () => { pm.expect(b.success).to.eql(true); pm.expect(b.data.token).to.be.a('string').and.not.empty; });",
+              "pm.test('user shape', () => { const u = b.data.user; pm.expect(u).to.have.keys('id','email','role','profileCompleted','createdAt'); pm.expect(u.role).to.eql('user'); pm.expect(u.profileCompleted).to.be.a('boolean'); pm.expect(new Date(u.createdAt).toISOString()).to.eql(u.createdAt); });",
+              "pm.test('no password/hash leaked', () => { const t = pm.response.text(); pm.expect(t).to.not.match(/password_hash|passwordHash|\\$2[aby]\\$/); });",
+              "pm.environment.set('userToken', b.data.token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Login - ok admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('success + token', () => { pm.expect(b.success).to.eql(true); pm.expect(b.data.token).to.be.a('string').and.not.empty; });",
+              "pm.test('user shape', () => { const u = b.data.user; pm.expect(u).to.have.keys('id','email','role','profileCompleted','createdAt'); pm.expect(u.role).to.eql('admin'); pm.expect(u.profileCompleted).to.be.a('boolean'); pm.expect(new Date(u.createdAt).toISOString()).to.eql(u.createdAt); });",
+              "pm.test('no password/hash leaked', () => { const t = pm.response.text(); pm.expect(t).to.not.match(/password_hash|passwordHash|\\$2[aby]\\$/); });",
+              "pm.environment.set('adminToken', b.data.token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{ADMIN_EMAIL}}\",\n  \"password\": \"{{ADMIN_PASSWORD}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Login - 401 unknown email",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 401', () => pm.response.to.have.status(401));",
+              "const b = pm.response.json();",
+              "pm.test('error format INVALID_CREDENTIALS', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('INVALID_CREDENTIALS'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+              "pm.test('message', () => pm.expect(b.error.message).to.eql('Email hoặc mật khẩu không đúng.'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"pm-nobody-{{$timestamp}}@example.com\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Login - 401 wrong password (same message as unknown email)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 401', () => pm.response.to.have.status(401));",
+              "const b = pm.response.json();",
+              "pm.test('error format INVALID_CREDENTIALS', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('INVALID_CREDENTIALS'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+              "pm.test('message', () => pm.expect(b.error.message).to.eql('Email hoặc mật khẩu không đúng.'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"WrongPass999\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Login - 400 empty password",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 400', () => pm.response.to.have.status(400));",
+              "const b = pm.response.json();",
+              "pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Login - 429 TOO_MANY_ATTEMPTS after 5 wrong passwords (dedicated email)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const base = pm.environment.get('baseUrl'), email = pm.environment.get('lockEmail'), pw = pm.environment.get('password');",
+              "const post = (path, body) => new Promise((res, rej) => pm.sendRequest({ url: base + '/' + path, method: 'POST', header: { 'Content-Type': 'application/json' }, body: { mode: 'raw', raw: JSON.stringify(body) } }, (e, r) => e ? rej(e) : res(r)));",
+              "(async () => {",
+              "  const reg = await post('auth/register', { email, password: pw });",
+              "  pm.test('setup: lock email registered', () => pm.expect(reg.code).to.eql(201));",
+              "  for (let i = 1; i <= 5; i++) {",
+              "    const r = await post('auth/login', { email, password: 'WrongPass999' });",
+              "    pm.test('wrong attempt ' + i + ' -> 401', () => pm.expect(r.code).to.eql(401));",
+              "  }",
+              "})().catch(e => { throw e; });"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 429', () => pm.response.to.have.status(429));",
+              "const b = pm.response.json();",
+              "pm.test('error format TOO_MANY_ATTEMPTS', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('TOO_MANY_ATTEMPTS'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+              "pm.test('retryAfterSeconds + Retry-After header', () => { const s = b.error.details.retryAfterSeconds; pm.expect(s).to.be.a('number').within(1, 900); pm.expect(pm.response.headers.get('Retry-After')).to.be.ok; });",
+              "pm.test('message mentions minutes', () => pm.expect(b.error.message).to.match(/quá nhiều lần.*\\d+ phút/));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{lockEmail}}\",\n  \"password\": \"WrongPass999\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Login - 429 locked email rejects even correct password",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 429', () => pm.response.to.have.status(429));",
+              "const b = pm.response.json();",
+              "pm.test('error format TOO_MANY_ATTEMPTS', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('TOO_MANY_ATTEMPTS'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{lockEmail}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Me - ok (user)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('success', () => pm.expect(b.success).to.eql(true));",
+              "pm.test('user shape', () => { const u = b.data.user; pm.expect(u).to.have.keys('id','email','role','profileCompleted','createdAt'); pm.expect(u.role).to.eql('user'); pm.expect(u.profileCompleted).to.be.a('boolean'); pm.expect(new Date(u.createdAt).toISOString()).to.eql(u.createdAt); });",
+              "pm.test('email matches', () => pm.expect(b.data.user.email).to.eql(pm.environment.get('email')));",
+              "pm.test('no password/hash leaked', () => { const t = pm.response.text(); pm.expect(t).to.not.match(/password_hash|passwordHash|\\$2[aby]\\$/); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{userToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "me"]
+        }
+      }
+    },
+    {
+      "name": "Me - ok (admin, profileCompleted false)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('user shape', () => { const u = b.data.user; pm.expect(u).to.have.keys('id','email','role','profileCompleted','createdAt'); pm.expect(u.role).to.eql('admin'); pm.expect(u.profileCompleted).to.be.a('boolean'); pm.expect(new Date(u.createdAt).toISOString()).to.eql(u.createdAt); });",
+              "pm.test('admin profileCompleted false', () => pm.expect(b.data.user.profileCompleted).to.eql(false));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "me"]
+        }
+      }
+    },
+    {
+      "name": "Me - 401 no token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 401', () => pm.response.to.have.status(401));",
+              "const b = pm.response.json();",
+              "pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/auth/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "me"]
+        }
+      }
+    },
+    {
+      "name": "Me - 401 junk token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 401', () => pm.response.to.have.status(401));",
+              "const b = pm.response.json();",
+              "pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer not.a.jwt"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "me"]
+        }
+      }
+    },
+    {
+      "name": "Admin ping - 403 user role",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 403', () => pm.response.to.have.status(403));",
+              "const b = pm.response.json();",
+              "pm.test('error format FORBIDDEN', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FORBIDDEN'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });",
+              "pm.test('message', () => pm.expect(b.error.message).to.eql('Bạn không có quyền truy cập.'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{userToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/admin/ping",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "ping"]
+        }
+      }
+    },
+    {
+      "name": "Admin ping - 401 no token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 401', () => pm.response.to.have.status(401));",
+              "const b = pm.response.json();",
+              "pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(b).to.not.have.property('data'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/ping",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "ping"]
+        }
+      }
+    },
+    {
+      "name": "Admin ping - 200 admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('pong', () => pm.expect(pm.response.json()).to.eql({ success: true, data: { pong: true, role: 'admin' } }));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/admin/ping",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "ping"]
+        }
+      }
+    }
+  ]
+}
