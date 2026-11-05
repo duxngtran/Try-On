@@ -26,9 +26,13 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 - **`npx playwright install chromium` treo trên máy này.** **Sửa:** đặt `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1`, dùng Chrome đã cài qua `channel: 'chrome'`. (sprint-01)
 
 - **Mock server trả danh sách tĩnh khi UI tải lại sau thao tác ghi:** lần tải lại ngầm ghi đè cập nhật cục bộ, test thấy dòng cũ. **Sửa:** mock giữ trạng thái, POST/PATCH/DELETE đổi danh sách mà GET trả. (sprint-02)
+- **Test race luôn ra một kết quả nên không thử được nhánh còn lại:** tạo sản phẩm song song xóa danh mục ở mức service cho 30/30 xóa thắng vì xử lý ảnh chậm. **Sửa:** tải ảnh trước, chạy RPC song song với độ lệch ngẫu nhiên, kiểm cả hai nhánh đều xuất hiện. (sprint-02)
+- **Ảnh chụp e2e cũ hơn commit sửa cuối:** T-59 chụp lúc 17:55, sửa nhãn tab lúc 18:01. **Sửa:** so thời gian ảnh với commit và chạy lại e2e sau khi sửa UI. (sprint-02)
+- **`getByRole` báo nhiều phần tử khi cùng một link xuất hiện 2 lần** (`AdminNav` + link quay lại). **Sửa:** thu hẹp phạm vi tìm. jsdom báo "Not implemented: scrollTo": stub `window.scrollTo` trong `test/setup.js`. (sprint-02)
 
 ## Backend / API
 - **429 chỉ có `retryAfterSeconds` trong body, thiếu header `Retry-After`.** **Sửa:** đặt header ở error handler chung. (sprint-01)
+- **`page` vượt tổng số dòng làm PostgREST trả 416 (PGRST103) và API thành 500;** repository giả không bắt được, chỉ Postman trên DB thật lộ ra. **Sửa:** bắt PGRST103 rồi đếm riêng; kiểm biên "page vượt quá" trên DB thật. (sprint-02)
 
 ## Supabase / kết nối DB
 - **`getaddrinfo ENOTFOUND db.<ref>.supabase.co`:** host direct chỉ có IPv6, máy không có IPv6. **Sửa:** dùng Session pooler `aws-0-<region>.pooler.supabase.com:5432`, user `postgres.<ref>`; không dùng cổng 6543 cho migrate. (sprint-01)
