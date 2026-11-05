@@ -1,0 +1,3519 @@
+{
+  "info": {
+    "name": "Products",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Setup - đăng nhập admin",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const tag = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);",
+                  "pm.environment.set('tag', tag);",
+                  "pm.environment.set('prefix', 'POSTMAN-' + tag);",
+                  "pm.environment.set('userEmail', 'pm-prod-' + tag + '@example.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.user.role).to.eql('admin');",
+                  "pm.environment.set('adminToken', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{ADMIN_EMAIL}}\",\n  \"password\": \"{{ADMIN_PASSWORD}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - đăng ký user thường",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('userToken', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"Test1234x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo danh mục A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('catA', pm.response.json().data.category.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo danh mục B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('catB', pm.response.json().data.category.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-B\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo danh mục C",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('catC', pm.response.json().data.category.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-C\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-12 GET không token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 401', () => pm.response.to.have.status(401));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            }
+          }
+        },
+        {
+          "name": "AC-12 GET token user -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "pm.test('error.code = FORBIDDEN', () => pm.expect(pm.response.json().error.code).to.eql('FORBIDDEN'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            }
+          }
+        },
+        {
+          "name": "AC-12 POST token user -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "pm.test('error.code = FORBIDDEN', () => pm.expect(pm.response.json().error.code).to.eql('FORBIDDEN'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-12 POST không token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 401', () => pm.response.to.have.status(401));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-12 DELETE token user -> 403 (không lộ 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 403', () => pm.response.to.have.status(403));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "abc"]
+            }
+          }
+        },
+        {
+          "name": "AC-12 PATCH token user -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 403', () => pm.response.to.have.status(403));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "abc"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "x",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-01 thêm JPG 800x800 có GPS -> 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product;",
+                  "pm.test('tên được chuẩn hóa, giá là number, version 1', () => {",
+                  "  pm.expect(p.name).to.eql(pm.environment.get('prefix') + ' Áo thun trắng');",
+                  "  pm.expect(p.priceVnd).to.eql(199000);",
+                  "  pm.expect(p.image.version).to.eql(1);",
+                  "  pm.expect(p.category.id).to.eql(pm.environment.get('catA'));",
+                  "  pm.expect(p.createdAt).to.match(/\\.\\d{3}Z$/);",
+                  "});",
+                  "pm.test('không lộ image_path', () => pm.expect(JSON.stringify(p)).to.not.include('image_path'));",
+                  "pm.environment.set('p1', p.id);",
+                  "pm.environment.set('p1Url', p.image.url);",
+                  "pm.environment.set('p1Name', p.name);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "  {{prefix}}   Áo thun  trắng ",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-800x800-gps.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-01 ảnh mở được không cần token, JPEG, cache 7 ngày",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('content-type image/jpeg', () => pm.expect(pm.response.headers.get('content-type')).to.eql('image/jpeg'));",
+                  "pm.test('cache-control max-age=604800', () => pm.expect(pm.response.headers.get('cache-control')).to.match(/max-age=604800/));",
+                  "pm.test('URL nằm trong bucket public product-images', () => pm.expect(pm.request.url.toString()).to.include('/object/public/product-images/'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{p1Url}}"
+          }
+        },
+        {
+          "name": "AC-01 sản phẩm đứng đầu danh sách danh mục",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('đứng đầu', () => pm.expect(pm.response.json().data.items[0].id).to.eql(pm.environment.get('p1')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products?categoryId={{catA}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-02 thêm PNG 3000x3000 trong suốt -> 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('p2', pm.response.json().data.product.id);",
+                  "pm.environment.set('p2Url', pm.response.json().data.product.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} PNG alpha",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-3000x3000-alpha.png"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-02 file lưu: JPEG 2048x2048, không EXIF",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('content-type image/jpeg', () => pm.expect(pm.response.headers.get('content-type')).to.eql('image/jpeg'));",
+                  "const buf = pm.response.stream;",
+                  "pm.test('đọc được nhị phân', () => pm.expect(buf.length).to.be.greaterThan(1000));",
+                  "pm.test('kích thước 2048x2048 (SOF)', () => {",
+                  "  let i = 2; let size = null;",
+                  "  while (i < buf.length) {",
+                  "    if (buf[i] !== 0xff) { i += 1; continue; }",
+                  "    const marker = buf[i + 1];",
+                  "    if (marker >= 0xc0 && marker <= 0xc3) { size = [buf.readUInt16BE(i + 7), buf.readUInt16BE(i + 5)]; break; }",
+                  "    i += 2 + buf.readUInt16BE(i + 2);",
+                  "  }",
+                  "  pm.expect(size).to.eql([2048, 2048]);",
+                  "});",
+                  "pm.test('không còn EXIF/GPS', () => { const text = buf.toString('latin1'); pm.expect(text).to.not.include('Exif'); pm.expect(text).to.not.include('GPS'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{p2Url}}"
+          }
+        },
+        {
+          "name": "AC-03 không có ảnh -> FILE_REQUIRED",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = FILE_REQUIRED', () => pm.expect(pm.response.json().error.code).to.eql('FILE_REQUIRED'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-03 .exe đổi đuôi .jpg -> INVALID_FILE_TYPE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = INVALID_FILE_TYPE', () => pm.expect(pm.response.json().error.code).to.eql('INVALID_FILE_TYPE'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "fake-exe.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-03 file hỏng -> INVALID_IMAGE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = INVALID_IMAGE', () => pm.expect(pm.response.json().error.code).to.eql('INVALID_IMAGE'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "corrupt.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-03 ảnh > 10 MB -> 413 FILE_TOO_LARGE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 413', () => pm.response.to.have.status(413));",
+                  "pm.test('error.code = FILE_TOO_LARGE', () => pm.expect(pm.response.json().error.code).to.eql('FILE_TOO_LARGE'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "too-large-over-10mb.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-03 400x800 -> IMAGE_TOO_SMALL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = IMAGE_TOO_SMALL', () => pm.expect(pm.response.json().error.code).to.eql('IMAGE_TOO_SMALL'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "too-small-400x800.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-03 600x9000 -> IMAGE_TOO_LARGE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = IMAGE_TOO_LARGE', () => pm.expect(pm.response.json().error.code).to.eql('IMAGE_TOO_LARGE'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "too-long-edge-600x9000.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-03 600x2000 -> INVALID_ASPECT_RATIO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = INVALID_ASPECT_RATIO', () => pm.expect(pm.response.json().error.code).to.eql('INVALID_ASPECT_RATIO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-600x2000.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-03 512x512 được chấp nhận",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('p3', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} 512",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-03 512x1536 được chấp nhận",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('p4', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} 1536",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x1536.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-03 WEBP được chấp nhận",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('p7', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} webp",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-800x800.webp"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-03 request JSON thay vì multipart -> 400 VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"x\",\n  \"priceVnd\": \"199000\",\n  \"categoryId\": \"{{catA}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-04 giá \"999\" -> VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "999",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-04 giá \"100000001\" -> VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "100000001",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-04 giá \"199.5\" -> VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199.5",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-04 giá \"-1000\" -> VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "-1000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-04 giá \"abc\" -> VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "abc",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-04 giá \"\" -> VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-04 tên 1 ký tự -> VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "a",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-04 tên 121 ký tự -> VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-04 giá 1000 được chấp nhận",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.expect(pm.response.json().data.product.priceVnd).to.eql(1000);",
+                  "pm.environment.set('p5', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} giá 1000",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "1000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-04 giá 100000000 được chấp nhận",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('p6', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} giá max",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "100000000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-05 setup - tạo danh mục tạm",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('catGone', pm.response.json().data.category.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-Tam\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-05 setup - xóa danh mục tạm",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories/{{catGone}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories", "{{catGone}}"]
+            }
+          }
+        },
+        {
+          "name": "AC-05 thêm vào danh mục đã xóa -> CATEGORY_NOT_FOUND",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = CATEGORY_NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('CATEGORY_NOT_FOUND'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catGone}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-05 thêm vào danh mục không tồn tại -> CATEGORY_NOT_FOUND",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = CATEGORY_NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('CATEGORY_NOT_FOUND'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo thun trắng",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "00000000-0000-4000-8000-000000000000",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-05 chuyển sang danh mục đã xóa -> CATEGORY_NOT_FOUND",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = CATEGORY_NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('CATEGORY_NOT_FOUND'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p1}}"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "categoryId",
+                  "value": "{{catGone}}",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-06 chỉ đổi giá -> các trường khác không đổi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.product;",
+                  "pm.test('giá mới, còn lại giữ nguyên, version 1', () => {",
+                  "  pm.expect(p.priceVnd).to.eql(249000);",
+                  "  pm.expect(p.name).to.eql(pm.environment.get('p1Name'));",
+                  "  pm.expect(p.category.id).to.eql(pm.environment.get('catA'));",
+                  "  pm.expect(p.image.url).to.eql(pm.environment.get('p1Url'));",
+                  "  pm.expect(p.image.version).to.eql(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p1}}"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "priceVnd",
+                  "value": "249000",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-08 tên mới kèm ảnh sai quy tắc -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = INVALID_ASPECT_RATIO', () => pm.expect(pm.response.json().error.code).to.eql('INVALID_ASPECT_RATIO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p1}}"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} TEN-KHONG-DUOC-LUU",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-600x2000.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-08 sản phẩm không đổi sau lỗi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.product;",
+                  "pm.test('tên và ảnh không đổi', () => { pm.expect(p.name).to.eql(pm.environment.get('p1Name')); pm.expect(p.image.url).to.eql(pm.environment.get('p1Url')); pm.expect(p.image.version).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p1}}"]
+            }
+          }
+        },
+        {
+          "name": "AC-07 đổi tên và ảnh -> version 2, URL mới",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.product;",
+                  "pm.test('tên mới, version 2, URL khác', () => {",
+                  "  pm.expect(p.name).to.eql(pm.environment.get('prefix') + ' Tên mới');",
+                  "  pm.expect(p.image.version).to.eql(2);",
+                  "  pm.expect(p.image.url).to.not.eql(pm.environment.get('p1Url'));",
+                  "});",
+                  "pm.environment.set('p1Url2', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p1}}"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Tên mới",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-800x800.webp"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-07 ảnh mới mở được không cần token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{p1Url2}}"
+          }
+        },
+        {
+          "name": "AC-09 PATCH không có trường hợp lệ nào -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p1}}"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "khongPhaiTruong",
+                  "value": "x",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-09 name rỗng là lỗi, không phải giữ nguyên",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p1}}"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-14 GET id \"abc\" -> 404 NOT_FOUND",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('error.code = NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "abc"]
+            }
+          }
+        },
+        {
+          "name": "AC-14 PATCH id \"abc\" -> 404 NOT_FOUND",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('error.code = NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "abc"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Áo",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-14 DELETE id \"abc\" -> 404 NOT_FOUND",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('error.code = NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "abc"]
+            }
+          }
+        },
+        {
+          "name": "AC-11 limit=2 trang 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('2 sản phẩm, total và totalPages khớp', () => { pm.expect(d.items.length).to.eql(2); pm.expect(d.pagination.limit).to.eql(2); pm.expect(d.pagination.totalPages).to.eql(Math.ceil(d.pagination.total / 2)); });",
+                  "pm.environment.set('listTotal', d.pagination.total);",
+                  "pm.environment.set('page1Ids', JSON.stringify(d.items.map((p) => p.id)));",
+                  "pm.test('mọi sản phẩm thuộc danh mục lọc', () => d.items.forEach((p) => pm.expect(p.category.id).to.eql(pm.environment.get('catA'))));",
+                  "pm.test('mới nhất trước', () => pm.expect(d.items[0].createdAt >= d.items[1].createdAt).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products?categoryId={{catA}}&page=1&limit=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "2"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-11 limit=2 trang 2 không lặp trang 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data;",
+                  "const first = JSON.parse(pm.environment.get('page1Ids'));",
+                  "pm.test('không lặp, cùng total', () => { d.items.forEach((p) => pm.expect(first).to.not.include(p.id)); pm.expect(d.pagination.total).to.eql(Number(pm.environment.get('listTotal'))); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products?categoryId={{catA}}&page=2&limit=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}"
+                },
+                {
+                  "key": "page",
+                  "value": "2"
+                },
+                {
+                  "key": "limit",
+                  "value": "2"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-11 trang vượt quá -> items rỗng, không lỗi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('items rỗng', () => pm.expect(pm.response.json().data.items).to.eql([]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products?categoryId={{catA}}&page=999",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}"
+                },
+                {
+                  "key": "page",
+                  "value": "999"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-11 lọc danh mục rỗng -> total 0",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('total 0', () => pm.expect(pm.response.json().data.pagination.total).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products?categoryId={{catC}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "{{catC}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-11 tham số sai limit=101 -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products?limit=101",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "101"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-11 tham số sai page=0 -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products?page=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-11 tham số sai categoryId=abc -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error.code = VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products?categoryId=abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "abc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "US-03 setup - thêm 2 sản phẩm vào danh mục B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('pB1', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} B1",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catB}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "US-03 setup - sản phẩm thứ 2 của danh mục B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('pB2', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} B2",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catB}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "US-03 AC-05 đổi tên danh mục -> sản phẩm hiện tên mới, số sản phẩm giữ nguyên",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('productCount 2', () => pm.expect(pm.response.json().data.category.productCount).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories/{{catB}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories", "{{catB}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-B-Doi-Ten\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-03 AC-05 sản phẩm thấy tên danh mục mới",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('tên danh mục mới', () => pm.expect(pm.response.json().data.product.category.name).to.eql(pm.environment.get('prefix') + '-B-Doi-Ten'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{pB1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{pB1}}"]
+            }
+          }
+        },
+        {
+          "name": "US-03 AC-06 xóa danh mục còn 2 sản phẩm -> 409 kèm productCount",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 409', () => pm.response.to.have.status(409));",
+                  "pm.test('error.code = CATEGORY_HAS_PRODUCTS', () => pm.expect(pm.response.json().error.code).to.eql('CATEGORY_HAS_PRODUCTS'));",
+                  "pm.test('details.productCount = 2', () => pm.expect(pm.response.json().error.details.productCount).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories/{{catB}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories", "{{catB}}"]
+            }
+          }
+        },
+        {
+          "name": "US-03 AC-06 danh mục và sản phẩm không đổi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{pB2}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{pB2}}"]
+            }
+          }
+        },
+        {
+          "name": "US-03 AC-07 xóa sản phẩm B1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{pB1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{pB1}}"]
+            }
+          }
+        },
+        {
+          "name": "US-03 AC-07 xóa sản phẩm B2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{pB2}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{pB2}}"]
+            }
+          }
+        },
+        {
+          "name": "US-03 AC-07 danh mục B còn 0 sản phẩm chưa xóa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data.categories.find((x) => x.id === pm.environment.get('catB'));",
+                  "pm.test('productCount 0 dù còn dòng xóa mềm', () => pm.expect(c.productCount).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories"]
+            }
+          }
+        },
+        {
+          "name": "US-03 AC-07 xóa danh mục chỉ còn sản phẩm đã xóa mềm -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories/{{catB}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories", "{{catB}}"]
+            }
+          }
+        },
+        {
+          "name": "US-03 AC-07 danh mục đã xóa không còn trong danh sách",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('không còn', () => pm.expect(pm.response.json().data.categories.some((x) => x.id === pm.environment.get('catB'))).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories"]
+            }
+          }
+        },
+        {
+          "name": "US-03 AC-07 thêm lại cùng tên -> 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('catB2', pm.response.json().data.category.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-B-Doi-Ten\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-10 DELETE sản phẩm p3 -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('trả id', () => pm.expect(pm.response.json().data.id).to.eql(pm.environment.get('p3')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p3}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p3}}"]
+            }
+          }
+        },
+        {
+          "name": "AC-10 GET sau xóa -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('error.code = NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p3}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p3}}"]
+            }
+          }
+        },
+        {
+          "name": "AC-10 PATCH sau xóa -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('error.code = NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p3}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p3}}"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Áo",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-10 DELETE lần 2 -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('error.code = NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p3}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p3}}"]
+            }
+          }
+        },
+        {
+          "name": "AC-10 không còn trong danh sách, total giảm 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('p3 biến mất, total giảm 1', () => { pm.expect(d.items.some((p) => p.id === pm.environment.get('p3'))).to.eql(false); pm.expect(d.pagination.total).to.eql(Number(pm.environment.get('listTotal')) - 1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products?categoryId={{catA}}&limit=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "{{catA}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-10 ảnh của sản phẩm đã xóa vẫn còn (xóa mềm giữ file, D-42)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{p2Url}}"
+          }
+        },
+        {
+          "name": "AC-13 tải lên bucket không có key -> bị từ chối",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('4xx', () => pm.expect(pm.response.code).to.be.within(400, 403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{SUPABASE_URL}}/storage/v1/object/product-images/{{prefix}}-anon.jpg"
+          }
+        },
+        {
+          "name": "AC-13 xóa file bucket không có key -> bị từ chối",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('4xx', () => pm.expect(pm.response.code).to.be.within(400, 403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{SUPABASE_URL}}/storage/v1/object/product-images/{{prefix}}-anon.jpg"
+          }
+        },
+        {
+          "name": "AC-13 liệt kê bucket không có key -> bị từ chối",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('4xx', () => pm.expect(pm.response.code).to.be.within(400, 403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{SUPABASE_URL}}/storage/v1/object/list/product-images",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prefix\": \"\",\n  \"limit\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa p1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p1}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa p2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p2}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p2}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa p4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p4}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p4}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa p5",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p5}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p5}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa p6",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p6}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p6}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa p7",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p7}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p7}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa catA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories/{{catA}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories", "{{catA}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa catB2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories/{{catB2}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories", "{{catB2}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa catC",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories/{{catC}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories", "{{catC}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router';
 import { Pencil, Plus, Tags, Trash2, WifiOff } from 'lucide-react';
 import { Alert } from '../../components/Alert.jsx';
 import { Button } from '../../components/Button.jsx';
@@ -37,7 +38,16 @@ function CategoryRow({ category, highlighted, onEdit, onDelete }) {
       <p title={name} className="line-clamp-2 break-words font-semibold">
         {name}
       </p>
-      <p className="text-small text-ink-muted">{productCount} sản phẩm</p>
+      {productCount > 0 ? (
+        <Link
+          to={`/admin/products?categoryId=${category.id}`}
+          className="text-small font-semibold text-accent-strong underline hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+        >
+          {productCount} sản phẩm
+        </Link>
+      ) : (
+        <p className="text-small text-ink-muted">{productCount} sản phẩm</p>
+      )}
       <div className="grid grid-cols-2 gap-2 md:flex">
         <Button
           variant="secondary"

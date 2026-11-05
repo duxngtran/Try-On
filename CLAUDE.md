@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Try-on** is a virtual try-on (GenAI) fashion e-commerce web app. `backend/` is Express 5 (ESM) and `frontend/` is Vite + React 19 + Tailwind v4. Auth (US-01) and profile (US-02) are on `main`; see `PROGRESS.md` for the status of later sprints. Main folders: `backend/src`, `backend/tests` (including `tests/postman`), `frontend/src`, `migrations/`, `design/`, `sprint-01/`. The root `package.json` only pulls in `@supabase/supabase-js`; each app has its own `package.json`.
+**Try-on** is a virtual try-on (GenAI) fashion e-commerce web app. `backend/` is Express 5 (ESM) and `frontend/` is Vite + React 19 + Tailwind v4. Auth (US-01), profile (US-02), admin categories (US-03) and products (US-04) are on `main`; see `PROGRESS.md` for the status of later sprints. Main folders: `backend/src`, `backend/tests` (including `tests/postman`), `frontend/src` (admin UI in `features/admin`), `migrations/`, `design/`, `sprint-01/`, `sprint-02/`. The root `package.json` only pulls in `@supabase/supabase-js`; each app has its own `package.json`.
 
 Project docs and agent prompts are written in Vietnamese.
 
@@ -78,7 +78,8 @@ Run from the repo root; Node 24 is required. Copy `backend/.env.example` to `bac
 | Migrate (D-19) | `npm run migrate` (needs `DATABASE_URL`; applies `migrations/NNN_*.sql` in order, tracked in `schema_migrations`) | n/a |
 | Image test fixtures | `npm run fixtures` (writes `tests/fixtures/generated/`, gitignored) | n/a |
 | Seed admin (D-32) | `npm run seed:admin` (needs `ADMIN_EMAIL`, `ADMIN_PASSWORD`) | n/a |
-| Setup Storage bucket (D-26) | `npm run setup:storage` (creates/repairs private bucket `profile-photos`, idempotent) | n/a |
+| Setup Storage buckets (D-26, D-46) | `npm run setup:storage` (creates/repairs private bucket `profile-photos` and public read-only bucket `product-images`, idempotent) | n/a |
+| Live check on Supabase dev (T-54) | `npm run verify:products` (parallel `create_product` vs `soft_delete_category`, parallel image replace; cleans up after itself; set `SUPABASE_ANON_KEY` in the shell to also run the anon-access checks) | n/a |
 | API tests on Supabase dev (D-40) | `npm run test:postman` (starts the server, runs newman on `tests/postman/*.collection.json`; port 4000 must be free) | n/a |
 
 Notes: Tailwind v4 is configured in CSS (`frontend/src/index.css`, `@theme` tokens from `design/design-system.md`), there is no `tailwind.config.js`. Vitest uses `vite.config.js` on the frontend and `vitest.config.js` on the backend. Postman workspace "Try-on", collection "Try-on API" and environment "local" are created through Postman MCP. Postman MCP cannot run collections or attach files to form-data requests, so the source of truth for API tests is `backend/tests/postman/`; import those files into the Postman app by hand if needed (D-40).

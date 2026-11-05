@@ -52,6 +52,38 @@ export async function generateFixtures(outDir = OUT_DIR) {
   await add('fake-exe.jpg', Buffer.concat([Buffer.from('MZ'), Buffer.alloc(2048, 0x90)]));
   // JPEG hỏng: header đúng nhưng cắt cụt thân
   await add('corrupt.jpg', valid.subarray(0, 600));
+
+  // Ảnh sản phẩm (US-04): chỉ là khối màu, không chứa ảnh người (bucket sản phẩm là public).
+  const flat = (size, rgb) => blank(size, size, rgb);
+  await add(
+    'product-800x800-gps.jpg',
+    await flat(800, { r: 240, g: 240, b: 235 }).withExif(GPS).jpeg().toBuffer(),
+  );
+  // PNG nền trong suốt, có khối màu ở giữa và metadata EXIF, để kiểm tra nền trắng + bỏ metadata.
+  const square = await sharp({
+    create: { width: 1200, height: 1200, channels: 3, background: { r: 200, g: 30, b: 30 } },
+  })
+    .png()
+    .toBuffer();
+  await add(
+    'product-3000x3000-alpha.png',
+    await sharp({
+      create: {
+        width: 3000,
+        height: 3000,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
+    })
+      .composite([{ input: square, left: 900, top: 900 }])
+      .withExif(GPS)
+      .png()
+      .toBuffer(),
+  );
+  await add('product-800x800.webp', await flat(800, { r: 30, g: 90, b: 160 }).webp().toBuffer());
+  await add('product-512x512.jpg', await flat(512, { r: 90, g: 160, b: 90 }).jpeg().toBuffer());
+  await add('product-512x1536.jpg', await blank(512, 1536).jpeg().toBuffer()); // đúng tỉ lệ 3
+  await add('product-600x2000.jpg', await blank(600, 2000).jpeg().toBuffer()); // tỉ lệ > 3
   return files;
 }
 

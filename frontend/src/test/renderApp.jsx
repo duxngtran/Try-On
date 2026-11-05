@@ -1,9 +1,8 @@
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach } from 'vitest';
-import { AuthProvider } from '../features/auth/AuthProvider.jsx';
-import { AppRoutes } from '../routes/AppRoutes.jsx';
+import { appRouteObjects } from '../routes/appRouteObjects.jsx';
 import { apiClient } from '../services/apiClient.js';
 import { TOKEN_KEY } from '../services/tokenStorage.js';
 
@@ -40,10 +39,15 @@ export function renderApp(path, { token, routes = {} } = {}) {
     const key = `${config.method.toUpperCase()} ${config.url}`;
     // FormData (upload ảnh) không phải JSON: ghi lại nguyên đối tượng.
     const body = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
-    calls.push({ key, body });
+    calls.push({ key, body, params: config.params });
     const handler = routes[key];
     if (!handler) throw new Error(`Chưa giả lập ${key}`);
-    const { status, data } = typeof handler === 'function' ? handler(body) : handler;
+    const result = typeof handler === 'function' ? handler(body, config) : handler;
+    if (result.networkError) {
+      // Mất mạng: axios báo lỗi không có `response`.
+      throw Object.assign(new Error('Network Error'), { isAxiosError: true, config });
+    }
+    const { status, data } = result;
     const response = { data, status, statusText: '', headers: {}, config, request: {} };
     if (status < 400) return response;
     const error = new Error(`status ${status}`);
@@ -52,12 +56,10 @@ export function renderApp(path, { token, routes = {} } = {}) {
     error.response = response;
     throw error;
   };
-  const view = render(
-    <MemoryRouter initialEntries={Array.isArray(path) ? path : [path]}>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </MemoryRouter>,
-  );
-  return { ...view, calls, user: userEvent.setup() };
+  // Data router như production (D-60), để các trang dùng được `useBlocker`.
+  const router = createMemoryRouter(appRouteObjects, {
+    initialEntries: Array.isArray(path) ? path : [path],
+  });
+  const view = render(<RouterProvider router={router} />);
+  return { ...view, router, calls, user: userEvent.setup() };
 }

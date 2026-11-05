@@ -3,6 +3,7 @@ import { createApp } from '../../src/app.js';
 import { buildServices } from '../../src/config/container.js';
 import { DuplicateEmailError } from '../../src/repositories/userRepository.js';
 import { DuplicateCategoryNameError } from '../../src/repositories/categoryRepository.js';
+import { createProductImageStorage } from '../../src/services/productImageStorage.js';
 
 export const TEST_ENV = Object.freeze({
   JWT_SECRET: 'test-secret-test-secret-test-secret-123',
@@ -195,18 +196,145 @@ export function createFakeCategoryRepository() {
   };
 }
 
+/**
+ * Repository sản phẩm trong bộ nhớ, cùng hợp đồng với productRepository thật (kể cả ngữ nghĩa của hàm SQL
+ * create_product/update_product). Dùng chung `categoryRepository` để kiểm danh mục và lấy tên.
+ * Có thể gài lỗi DB hoặc mô phỏng danh mục bị xóa đúng lúc ghi (race).
+ */
+export function createFakeProductRepository(categoryRepository) {
+  const rows = [];
+  let seq = 0;
+  const active = () => rows.filter((r) => !r.deleted_at);
+  const category = (id) => categoryRepository.rows.find((c) => c.id === id && !c.deleted_at);
+  const withCategory = (r) => {
+    const c = categoryRepository.rows.find((x) => x.id === r.category_id);
+    return {
+      id: r.id,
+      name: r.name,
+      price_vnd: r.price_vnd,
+      image_path: r.image_path,
+      image_version: r.image_version,
+      created_at: r.created_at,
+      updated_at: r.updated_at,
+      category: { id: c.id, name: c.name },
+    };
+  };
+  const repo = {
+    rows,
+    failNextCreate: false,
+    failNextUpdate: false,
+    /** true: danh mục bị xóa ngay trước khi hàm SQL chạy (sau lần kiểm tra sớm). */
+    categoryDeletedBeforeWrite: false,
+    /** true: sản phẩm bị xóa ngay trước khi update_product chạy. */
+    productDeletedBeforeWrite: false,
+    /** Gọi trước mỗi lần ghi, để test dựng tình huống. */
+    listCalls: [],
+    seed({ name = 'Áo thun trắng', priceVnd = 199000, categoryId, imagePath, id = randomUUID() }) {
+      const row = {
+        id,
+        name,
+        price_vnd: priceVnd,
+        category_id: categoryId,
+        image_path: imagePath ?? `${id}/${randomUUID()}.jpg`,
+        image_version: 1,
+        created_at: pgTimestamp(),
+        updated_at: pgTimestamp(),
+        deleted_at: null,
+        seq: (seq += 1),
+      };
+      rows.push(row);
+      return row;
+    },
+    async list({ page, limit, categoryId }) {
+      repo.listCalls.push({ page, limit, categoryId });
+      const all = active()
+        .filter((r) => !categoryId || r.category_id === categoryId)
+        .sort((a, b) => b.seq - a.seq);
+      const from = (page - 1) * limit;
+      return { rows: all.slice(from, from + limit).map(withCategory), total: all.length };
+    },
+    async findById(id) {
+      const row = active().find((r) => r.id === id);
+      return row ? withCategory(row) : null;
+    },
+    async activeCategoryExists(categoryId) {
+      return Boolean(category(categoryId));
+    },
+    async create({ id, name, priceVnd, categoryId, imagePath }) {
+      if (repo.failNextCreate) {
+        repo.failNextCreate = false;
+        throw new Error('db down');
+      }
+      if (repo.categoryDeletedBeforeWrite) {
+        repo.categoryDeletedBeforeWrite = false;
+        const c = categoryRepository.rows.find((x) => x.id === categoryId);
+        if (c) c.deleted_at = pgTimestamp();
+      }
+      if (!category(categoryId)) return 'category_not_found';
+      repo.seed({ id, name, priceVnd, categoryId, imagePath });
+      return 'ok';
+    },
+    async update({ id, name, priceVnd, categoryId, newImagePath }) {
+      if (repo.failNextUpdate) {
+        repo.failNextUpdate = false;
+        throw new Error('db down');
+      }
+      if (repo.productDeletedBeforeWrite) {
+        repo.productDeletedBeforeWrite = false;
+        const gone = rows.find((r) => r.id === id);
+        if (gone) gone.deleted_at = pgTimestamp();
+      }
+      if (repo.categoryDeletedBeforeWrite) {
+        repo.categoryDeletedBeforeWrite = false;
+        const c = categoryRepository.rows.find((x) => x.id === categoryId);
+        if (c) c.deleted_at = pgTimestamp();
+      }
+      const row = active().find((r) => r.id === id);
+      if (!row) return { status: 'not_found', oldImagePath: null };
+      if (categoryId && categoryId !== row.category_id && !category(categoryId)) {
+        return { status: 'category_not_found', oldImagePath: null };
+      }
+      const oldImagePath = newImagePath ? row.image_path : null;
+      if (name !== undefined) row.name = name;
+      if (priceVnd !== undefined) row.price_vnd = priceVnd;
+      if (categoryId) row.category_id = categoryId;
+      if (newImagePath) {
+        row.image_path = newImagePath;
+        row.image_version += 1;
+      }
+      row.updated_at = pgTimestamp();
+      return { status: 'ok', oldImagePath };
+    },
+    async softDelete(id) {
+      const row = active().find((r) => r.id === id);
+      if (!row) return false;
+      row.deleted_at = pgTimestamp();
+      return true;
+    },
+  };
+  return repo;
+}
+
 /** Giả `supabase.storage.from(bucket)` để chạy storage service thật; có thể gài lỗi upload/remove/sign. */
 export function createFakeSupabase() {
   const objects = new Map();
-  const state = { failUpload: false, removeFailures: 0, failSign: false, removed: [] };
+  const state = { failUpload: false, removeFailures: 0, failSign: false, removed: [], uploads: [] };
   const bucketApi = {
     async upload(path, body, options) {
+      state.uploads.push(path);
       if (state.failUpload) return { data: null, error: { message: 'storage down' } };
       if (objects.has(path) && !options?.upsert) {
         return { data: null, error: { message: 'duplicate' } };
       }
-      objects.set(path, { body, contentType: options?.contentType });
+      objects.set(path, {
+        body,
+        contentType: options?.contentType,
+        cacheControl: options?.cacheControl,
+      });
       return { data: { path }, error: null };
+    },
+    getPublicUrl(path) {
+      return { data: { publicUrl: `https://fake.supabase.co/storage/v1/object/public/b/${path}` } };
     },
     async remove(paths) {
       if (state.removeFailures > 0) {
@@ -232,17 +360,27 @@ export function createFakeSupabase() {
   return { objects, state, storage: { from: () => bucketApi } };
 }
 
-export async function createTestApp(envOverrides = {}, { processPhoto, logger } = {}) {
+export async function createTestApp(
+  envOverrides = {},
+  { processPhoto, processProductImage, logger } = {},
+) {
   const userRepository = createFakeUserRepository();
   const profileRepository = createFakeProfileRepository(userRepository);
   const supabase = createFakeSupabase();
   const categoryRepository = createFakeCategoryRepository();
+  const productRepository = createFakeProductRepository(categoryRepository);
+  // Storage riêng cho bucket ảnh sản phẩm, để kiểm tra độc lập với ảnh hồ sơ.
+  const productSupabase = createFakeSupabase();
   const env = {
     ...TEST_ENV,
     PROFILE_PHOTO_BUCKET: 'profile-photos',
     PHOTO_MAX_MB: 10,
     PHOTO_UPLOADS_PER_HOUR: 1000,
     SIGNED_URL_TTL_SECONDS: 900,
+    PRODUCT_IMAGE_BUCKET: 'product-images',
+    PRODUCT_IMAGE_MAX_MB: 10,
+    PRODUCT_IMAGE_CACHE_SECONDS: 604800,
+    PRODUCT_WRITES_PER_HOUR: 1000,
     ...envOverrides,
   };
   const errorLogger = logger ?? { error: () => {} };
@@ -250,10 +388,26 @@ export async function createTestApp(envOverrides = {}, { processPhoto, logger } 
     userRepository,
     profileRepository,
     categoryRepository,
+    productRepository,
+    productImageStorage: createProductImageStorage({
+      client: productSupabase,
+      bucket: env.PRODUCT_IMAGE_BUCKET,
+      cacheSeconds: env.PRODUCT_IMAGE_CACHE_SECONDS,
+    }),
+    processProductImage,
     supabase,
     processPhoto,
     logger: errorLogger,
   });
   const app = createApp({ corsOrigin: 'http://localhost:5173', logger: errorLogger, services });
-  return { app, userRepository, profileRepository, categoryRepository, supabase, env };
+  return {
+    app,
+    userRepository,
+    profileRepository,
+    categoryRepository,
+    productRepository,
+    supabase,
+    productSupabase,
+    env,
+  };
 }

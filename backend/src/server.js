@@ -4,6 +4,7 @@ import { createApp } from './app.js';
 import { buildServices } from './config/container.js';
 import { createUserRepository } from './repositories/userRepository.js';
 import { createCategoryRepository } from './repositories/categoryRepository.js';
+import { createProductRepository } from './repositories/productRepository.js';
 import { createProfileRepository } from './repositories/profileRepository.js';
 
 let env;
@@ -19,6 +20,7 @@ const services = await buildServices(env, {
   userRepository: createUserRepository(supabase),
   profileRepository: createProfileRepository(supabase),
   categoryRepository: createCategoryRepository(supabase),
+  productRepository: createProductRepository(supabase),
   supabase,
   startSweeper: true,
 });

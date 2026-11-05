@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Link } from 'react-router';
 import { Info } from 'lucide-react';
 import { Alert } from '../../components/Alert.jsx';
 import { Button } from '../../components/Button.jsx';
@@ -50,9 +51,17 @@ export function DeleteCategoryModal({ category, onClose, onDeleted, onGone, onBl
         onClose={onClose}
         initialFocusRef={safeRef}
         actions={
-          <Button ref={safeRef} variant="secondary" onClick={onClose}>
-            Đóng
-          </Button>
+          <>
+            <Button ref={safeRef} variant="secondary" onClick={onClose}>
+              Đóng
+            </Button>
+            <Link
+              to={`/admin/products?categoryId=${category.id}`}
+              className="inline-flex h-11 items-center justify-center rounded-md bg-ink px-5 text-small font-semibold text-ink-inverse hover:bg-[#333] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+            >
+              Xem sản phẩm
+            </Link>
+          </>
         }
       >
         <div className="flex gap-3">

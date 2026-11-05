@@ -1,8 +1,11 @@
 const MB = 1024 * 1024;
 
-/** Cấu hình bucket ảnh hồ sơ (D-03, D-26): private, chỉ JPEG (backend luôn xuất JPEG), giới hạn dung lượng. */
-export function buildBucketOptions({ maxMb }) {
-  return { public: false, fileSizeLimit: maxMb * MB, allowedMimeTypes: ['image/jpeg'] };
+/**
+ * Cấu hình bucket: chỉ JPEG (backend luôn xuất JPEG), giới hạn dung lượng.
+ * Ảnh hồ sơ private (D-03, D-26); ảnh sản phẩm public chỉ đọc (D-46).
+ */
+export function buildBucketOptions({ maxMb, public: isPublic = false }) {
+  return { public: isPublic, fileSizeLimit: maxMb * MB, allowedMimeTypes: ['image/jpeg'] };
 }
 
 const isNotFound = (error) =>
@@ -24,11 +27,11 @@ function matches(bucket, options) {
 /**
  * Tạo bucket nếu chưa có, hoặc chỉnh lại nếu cấu hình lệch (idempotent).
  * @param {import('@supabase/supabase-js').SupabaseClient} client
- * @param {{ name: string, maxMb: number }} config
+ * @param {{ name: string, maxMb: number, public?: boolean }} config
  * @returns {Promise<'created' | 'updated' | 'unchanged'>}
  */
-export async function ensureProfilePhotoBucket(client, { name, maxMb }) {
-  const options = buildBucketOptions({ maxMb });
+export async function ensureBucket(client, { name, maxMb, public: isPublic = false }) {
+  const options = buildBucketOptions({ maxMb, public: isPublic });
   const { data, error } = await client.storage.getBucket(name);
   if (error && !isNotFound(error)) throw error;
 
@@ -42,3 +45,11 @@ export async function ensureProfilePhotoBucket(client, { name, maxMb }) {
   if (updated.error) throw updated.error;
   return 'updated';
 }
+
+/** Bucket ảnh hồ sơ: luôn private. */
+export const ensureProfilePhotoBucket = (client, { name, maxMb }) =>
+  ensureBucket(client, { name, maxMb, public: false });
+
+/** Bucket ảnh sản phẩm: luôn public (D-46). */
+export const ensureProductImageBucket = (client, { name, maxMb }) =>
+  ensureBucket(client, { name, maxMb, public: true });
