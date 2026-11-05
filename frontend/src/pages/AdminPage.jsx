@@ -1,13 +1,20 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import { Boxes, CheckCircle2, ClipboardList, Tags } from 'lucide-react';
 import { Spinner } from '../components/Spinner.jsx';
 import { authApi } from '../features/auth/authApi.js';
 import { useAuth } from '../features/auth/authContext.js';
 import { usePageTitle } from '../hooks/usePageTitle.js';
 
-const COMING_SOON = [
-  { icon: Tags, title: 'Danh mục', text: 'Quản lý danh mục trang phục.' },
-  { icon: Boxes, title: 'Sản phẩm', text: 'Thêm và chỉnh sửa sản phẩm.' },
+// `to` có mặt = trang đã có, card bấm được; không có = "Sắp ra mắt" (Sản phẩm bật ở US-04, Đơn hàng ở Epic 4).
+const SECTIONS = [
+  {
+    icon: Tags,
+    title: 'Danh mục',
+    text: 'Thêm, đổi tên, xóa danh mục sản phẩm.',
+    to: '/admin/categories',
+  },
+  { icon: Boxes, title: 'Sản phẩm', text: 'Thêm, sửa, xóa sản phẩm và ảnh.' },
   { icon: ClipboardList, title: 'Đơn hàng', text: 'Theo dõi đơn hàng của khách.' },
 ];
 
@@ -80,24 +87,37 @@ export function AdminPage() {
         </div>
       </div>
 
-      <h2 className="mt-8 text-title font-semibold">Sắp có</h2>
+      <h2 className="mt-8 text-title font-semibold">Quản lý</h2>
       <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {COMING_SOON.map(({ icon: Icon, title, text }) => (
-          <li
-            key={title}
-            aria-disabled="true"
-            className="rounded-lg bg-surface-muted p-4 text-ink-muted"
-          >
-            <div className="flex items-center justify-between">
-              <Icon size={20} aria-hidden="true" />
-              <span className="text-caption font-semibold uppercase tracking-wider">
-                Sắp ra mắt
-              </span>
-            </div>
-            <p className="mt-3 font-semibold text-ink">{title}</p>
-            <p className="text-small">{text}</p>
-          </li>
-        ))}
+        {SECTIONS.map(({ icon: Icon, title, text, to }) =>
+          to ? (
+            <li key={title}>
+              <Link
+                to={to}
+                className="block h-full min-h-[72px] rounded-lg border border-line bg-surface p-4 transition hover:border-line-strong hover:shadow-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+              >
+                <Icon size={20} aria-hidden="true" />
+                <p className="mt-3 font-semibold text-ink">{title}</p>
+                <p className="text-small text-ink-muted">{text}</p>
+              </Link>
+            </li>
+          ) : (
+            <li
+              key={title}
+              aria-disabled="true"
+              className="rounded-lg bg-surface-muted p-4 text-ink-muted"
+            >
+              <div className="flex items-center justify-between">
+                <Icon size={20} aria-hidden="true" />
+                <span className="text-caption font-semibold uppercase tracking-wider">
+                  Sắp ra mắt
+                </span>
+              </div>
+              <p className="mt-3 font-semibold text-ink">{title}</p>
+              <p className="text-small">{text}</p>
+            </li>
+          ),
+        )}
       </ul>
 
       <p className="mt-8 text-small text-ink-muted">

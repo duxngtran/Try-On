@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { createApp } from '../../src/app.js';
 import { buildServices } from '../../src/config/container.js';
 import { DuplicateEmailError } from '../../src/repositories/userRepository.js';
+import { DuplicateCategoryNameError } from '../../src/repositories/categoryRepository.js';
 
 export const TEST_ENV = Object.freeze({
   JWT_SECRET: 'test-secret-test-secret-test-secret-123',
@@ -124,6 +125,76 @@ export function createFakeProfileRepository(userRepository) {
   };
 }
 
+/**
+ * Repository danh mục trong bộ nhớ, cùng hợp đồng với categoryRepository thật: unique theo lower(name)
+ * trong các hàng chưa xóa, xóa mềm, đếm sản phẩm chưa xóa, timestamp kiểu Postgres.
+ * `products` là danh sách `{ category_id, deleted_at }` để test dựng tình huống.
+ */
+export function createFakeCategoryRepository() {
+  const rows = [];
+  const products = [];
+  let seq = 0;
+  const active = () => rows.filter((r) => !r.deleted_at);
+  const nameTaken = (name, exceptId) =>
+    active().some((r) => r.id !== exceptId && r.name.toLowerCase() === name.toLowerCase());
+  const countOf = (id) => products.filter((p) => p.category_id === id && !p.deleted_at).length;
+  const publicRow = (r) => ({
+    id: r.id,
+    name: r.name,
+    created_at: r.created_at,
+    updated_at: r.updated_at,
+  });
+  return {
+    rows,
+    products,
+    failNextList: false,
+    seed(name) {
+      const row = {
+        id: randomUUID(),
+        name,
+        created_at: pgTimestamp(),
+        updated_at: pgTimestamp(),
+        deleted_at: null,
+        seq: (seq += 1),
+      };
+      rows.push(row);
+      return row;
+    },
+    async listWithCounts() {
+      if (this.failNextList) {
+        this.failNextList = false;
+        throw new Error('db down');
+      }
+      return active()
+        .sort((a, b) => a.seq - b.seq)
+        .map((r) => ({ ...publicRow(r), product_count: countOf(r.id) }));
+    },
+    async insert(name) {
+      if (nameTaken(name)) throw new DuplicateCategoryNameError();
+      return publicRow(this.seed(name));
+    },
+    async rename(id, name) {
+      const row = active().find((r) => r.id === id);
+      if (!row) return null;
+      if (nameTaken(name, id)) throw new DuplicateCategoryNameError();
+      row.name = name;
+      row.updated_at = pgTimestamp();
+      return publicRow(row);
+    },
+    async countActiveProducts(id) {
+      return countOf(id);
+    },
+    async softDelete(id) {
+      const row = active().find((r) => r.id === id);
+      if (!row) return { status: 'not_found', productCount: 0 };
+      const count = countOf(id);
+      if (count > 0) return { status: 'has_products', productCount: count };
+      row.deleted_at = pgTimestamp();
+      return { status: 'ok', productCount: 0 };
+    },
+  };
+}
+
 /** Giả `supabase.storage.from(bucket)` để chạy storage service thật; có thể gài lỗi upload/remove/sign. */
 export function createFakeSupabase() {
   const objects = new Map();
@@ -165,6 +236,7 @@ export async function createTestApp(envOverrides = {}, { processPhoto, logger } 
   const userRepository = createFakeUserRepository();
   const profileRepository = createFakeProfileRepository(userRepository);
   const supabase = createFakeSupabase();
+  const categoryRepository = createFakeCategoryRepository();
   const env = {
     ...TEST_ENV,
     PROFILE_PHOTO_BUCKET: 'profile-photos',
@@ -177,10 +249,11 @@ export async function createTestApp(envOverrides = {}, { processPhoto, logger } 
   const services = await buildServices(env, {
     userRepository,
     profileRepository,
+    categoryRepository,
     supabase,
     processPhoto,
     logger: errorLogger,
   });
   const app = createApp({ corsOrigin: 'http://localhost:5173', logger: errorLogger, services });
-  return { app, userRepository, profileRepository, supabase, env };
+  return { app, userRepository, profileRepository, categoryRepository, supabase, env };
 }

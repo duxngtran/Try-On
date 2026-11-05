@@ -4,6 +4,8 @@ import { RouteFocus } from '../components/RouteFocus.jsx';
 import { GuestOnly, RequireAdmin, RequireAuth, SessionGate } from '../features/auth/guards.jsx';
 import { LoginPage } from '../features/auth/LoginPage.jsx';
 import { RegisterPage } from '../features/auth/RegisterPage.jsx';
+import { AdminLayout } from '../features/admin/AdminLayout.jsx';
+import { CategoriesPage } from '../features/admin/CategoriesPage.jsx';
 import { AdminPage } from '../pages/AdminPage.jsx';
 import { HomePage } from '../pages/HomePage.jsx';
 import { NotFoundPage } from '../pages/NotFoundPage.jsx';
@@ -24,7 +26,10 @@ export function AppRoutes() {
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
           <Route element={<RequireAdmin />}>
-            <Route path="/admin" element={<AdminPage />} />
+            <Route element={<AdminLayout />}>
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin/categories" element={<CategoriesPage />} />
+            </Route>
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Route>

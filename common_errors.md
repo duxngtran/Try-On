@@ -25,6 +25,8 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 - **Lọc output test chỉ còn tên assertion rồi suy đoán mã trạng thái.** **Sửa:** đọc dòng `expected ... to be ...` trước khi kết luận. (sprint-01)
 - **`npx playwright install chromium` treo trên máy này.** **Sửa:** đặt `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1`, dùng Chrome đã cài qua `channel: 'chrome'`. (sprint-01)
 
+- **Mock server trả danh sách tĩnh khi UI tải lại sau thao tác ghi:** lần tải lại ngầm ghi đè cập nhật cục bộ, test thấy dòng cũ. **Sửa:** mock giữ trạng thái, POST/PATCH/DELETE đổi danh sách mà GET trả. (sprint-02)
+
 ## Backend / API
 - **429 chỉ có `retryAfterSeconds` trong body, thiếu header `Retry-After`.** **Sửa:** đặt header ở error handler chung. (sprint-01)
 
@@ -43,6 +45,7 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 - **Stitch tự thêm tính năng ngoài phạm vi** (Quên mật khẩu, đăng nhập Google/Apple). **Sửa:** đối chiếu với DECISIONS.md, ghi chú bỏ. (sprint-01)
 
 ## Quyền / phiên chạy song song
+- **Bash trong worktree từ chối lệnh phức tạp** (`node -e` dài, heredoc kèm chạy file): "too complex to verify it stays inside the worktree". **Sửa:** dùng Edit/Write cho từng file, mỗi lệnh Bash đơn giản. (sprint-02)
 - **Phiên nền chạy `git merge` bị bộ kiểm soát quyền từ chối ("Merge Without Review")** dù user đã đồng ý trong chat. **Sửa:** không nhờ phiên khác merge thay; báo user và để user gọi trực tiếp `/merge`. (sprint-01)
 
 ## UI / font

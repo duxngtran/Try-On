@@ -1,6 +1,7 @@
 import { createAuthService, createDummyHash } from '../services/authService.js';
 import { createLoginLock } from '../services/loginLock.js';
 import { createTokenService } from '../services/tokenService.js';
+import { createCategoryService } from '../services/categoryService.js';
 import { createProfileService } from '../services/profileService.js';
 import { createPhotoStorage } from '../services/storage.js';
 import { createAuthenticate } from '../middlewares/auth.js';
@@ -14,6 +15,7 @@ import { createUploadPhoto } from '../middlewares/uploadPhoto.js';
  * @param {{
  *   userRepository: object,
  *   profileRepository: object,
+ *   categoryRepository?: object,
  *   photoStorage?: object,
  *   supabase?: import('@supabase/supabase-js').SupabaseClient,
  *   processPhoto?: (buffer: Buffer) => Promise<Buffer>,
@@ -26,6 +28,7 @@ export async function buildServices(
   {
     userRepository,
     profileRepository,
+    categoryRepository,
     photoStorage,
     supabase,
     processPhoto,
@@ -65,6 +68,9 @@ export async function buildServices(
     authService,
     authenticate: createAuthenticate({ tokenService, userRepository }),
     authRateLimiter: createAuthRateLimiter({ limitPerMinute: env.AUTH_RATE_LIMIT_PER_MIN }),
+    categories: categoryRepository && {
+      categoryService: createCategoryService({ categoryRepository }),
+    },
     profile: {
       profileService: createProfileService({
         profileRepository,
