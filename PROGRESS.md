@@ -3,7 +3,7 @@
 ## Tổng quan
 | Sprint | Epic | Trạng thái | Bước hiện tại |
 |---|---|---|---|
-| sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Đang làm | Bước 5: US-01 trên `feature/US-01-auth` (agent-coder) |
+| sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Đang làm | Bước 5: US-01 đã merge; US-02 trên `feature/US-02-profile` chưa code |
 | sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Chưa bắt đầu | — |
 | sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Chưa bắt đầu | — |
 | sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Chưa bắt đầu | — |
@@ -13,10 +13,11 @@
 - [x] Bước 2: Sprint backlog (`sprint-01/sprint-backlog.md`, 34 task) — xong, user xác nhận Q1–Q6 (D-17 → D-21, cập nhật D-06) (2026-11-04)
 - [x] Bước 3: Thiết kế nghiệp vụ (`design/flows/` 11 luồng, `design/api.md`, `design/db/`) — xong, user xác nhận (D-22 → D-33) (2026-11-04)
 - [x] Bước 4: UI/UX (`design/design-system.md` "Try-on Atelier v2", 6 file `sprint-01/screens/`) — xong, user xác nhận (D-34 → D-38) (2026-11-04)
-- [ ] Bước 5: Implement + test (unit + Postman) — setup (T-01, T-03→T-06, T-08) xong; T-07 (migrate) và T-09 (chạy Postman) chờ Supabase của user; US-01 đang làm trên `feature/US-01-auth`: backend đã commit (`cc5c1ce`); frontend T-17 → T-20 đã commit (`b88fdf8`), test FE 81/81 pass nhưng T-17 → T-19 chưa duyệt thủ công trên UI; T-07, T-10, T-11 xong trên Supabase dev; T-21 xong (newman 26 request, 66 assertion, 0 fail; test BE 78/78; 2 bug backend đã sửa) (2026-11-05); T-22 chờ duyệt UI + user xác nhận; US-02 chưa bắt đầu
+- [ ] Bước 5: Implement + test (unit + Postman) — 21/34 task xong. Setup xong trừ T-02 (còn kiểm `list_tables` qua MCP); US-01 (T-10 → T-22) xong và đã merge, user đã duyệt giao diện (2026-11-05); US-02 (T-23 → T-34) chưa bắt đầu code, branch `feature/US-02-profile` đã tạo
 
 ## Merge log
 - 2026-11-04: `chore/sprint-01-setup` → `main` (merge commit `3a8d178`). Setup T-01, T-03→T-06, T-08 + Prettier, .gitattributes, README. Test BE 20/20, FE 8/8, lint, format:check, build đều pass. T-07, T-09 còn chờ Supabase.
+- 2026-11-05: `feature/US-01-auth` → `main` (merge commit `570a0ee`), user xác nhận. Trên `main`: test BE 78/78, FE 86/86, lint, build pass. Trước merge: newman `Auth` 26 request, 66 assertion, 0 fail (nâng rate limit cho server test); newman `System` 2 request, 5 assertion, 0 fail. Chưa kiểm thật: token hết hạn, hết khóa sau 15 phút, đăng ký đồng thời, rate limit 20/phút (chỉ có unit test hoặc chưa chạy).
 
 ## Blockers
 - T-02 (2026-11-05): Supabase project `nkkzeomvgmlqrdjevkqn`, `.env` và `.mcp.json` đã điền; `DATABASE_URL` dùng Session pooler cổng 5432 vì host direct chỉ có IPv6 mà máy dev không có IPv6. Còn chờ user khởi động lại Claude Code để kiểm `list_tables` qua MCP. User quyết định không đổi các secret đã gửi trong chat (2026-11-05)
