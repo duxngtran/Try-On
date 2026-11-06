@@ -171,6 +171,21 @@ Mỗi component dưới đây là nguồn chuẩn cho agent-coder; đặt tại 
 - **Cross-fade ảnh**: 300ms `opacity` (trải phẳng → thử đồ); chuyển sản phẩm 200ms `opacity` + `translateX` 12px. Reduced motion: đổi tức thì.
 - **Thẻ consent**: card `max-w-xl`, danh sách "điều cần biết" mỗi dòng icon 20px `accent` + tiêu đề `small` 700 + nội dung `small`; luôn hiển thị đầy đủ, không thu gọn.
 
+### 7.13 Thành phần cho Giỏ hàng và Đơn hàng (thêm ở Sprint 04)
+
+> Không thêm hay đổi token màu/font/radius/shadow; chỉ ghép từ token sẵn có. Chi tiết dùng ở `sprint-04/screens/`. Mục này **bổ sung** 7.4 và 7.11 (mô tả AdminNav ở 7.11 có mục "Đơn hàng" disabled là của Sprint 02; từ Sprint 04 mục này là link bình thường, xem `sprint-04/screens/entry-points.md`).
+
+- **Nút đang gửi (chế độ `busy`) của `Button`**: nút gửi request (Thêm vào giỏ, Xác nhận đặt hàng, `−`/`+`, Bỏ) dùng `aria-disabled="true"` + `aria-busy="true"` + spinner, **không** dùng thuộc tính `disabled`, để người dùng bàn phím không mất focus về `body` (cùng lý do mũi tên ở 7.12). `loading` hiện có (đặt `disabled`) giữ nguyên cho các nơi không cần giữ focus. Chặn click bằng cách bỏ `onClick`, giữ nguyên chiều rộng nút.
+- **Liên kết giỏ hàng (`CartLink`)**: link 44 × 44px, icon `ShoppingBag` 24px, badge số 20px (nền `ink`, chữ `ink-inverse`, `caption` 700) ở góc trên phải; `99+` từ 100. Chấm `warning` 8px góc dưới phải khi giỏ có dòng ngừng bán. Tên truy cập "Giỏ hàng, 3 món". Không hiện badge khi số là 0 hoặc chưa biết.
+- **Toast không tương tác (`CartNotice`)**: biến thể của toast 7.4: `pointer-events: none`, không nút đóng, không link; thành công 4s, lỗi 6s (`role="alert"`); thông báo mới thay cái cũ. Dùng khi toast không được cản chạm hay vuốt bên dưới.
+- **Bộ chọn số lượng (`QuantityStepper`)**: nhóm `role="group"` gồm nút `−`, số, nút `+`; mỗi nút 44 × 44px, viền `line-strong`, radius `md`, tổng rộng ~128px; số `body` 600 `tabular-nums`, không phải ô nhập. Nút khóa dùng `aria-disabled` (kiểu `disabled-bg`/`disabled-ink`); khi đang cập nhật, số được thay bằng spinner 16px.
+- **Dòng giỏ (`CartLine`)**: dòng trong `DataList` có ảnh vuông (72px mobile / 96px ≥ md, `object-contain` trên `surface-muted`), tên, đơn giá, `QuantityStepper`, thành tiền, nút Bỏ. Huy hiệu "Giá đã đổi từ X" và "Không còn bán": chip `small` nền `warning-soft`, chữ `warning`, kèm icon (`Info`, `PackageX`). Dòng ngừng bán: ảnh mờ 60%, viền trái 4px `warning`, không giá, không stepper.
+- **Thẻ tóm tắt (`OrderSummaryCard`)**: card `surface`, viền `line`, radius `lg`, padding 16/24; `h2` `heading`; tổng tiền `font-display` 600 `text-title` `tabular-nums`; dòng phụ `small` `ink-muted`. Từ lg: `sticky top-20`.
+- **Ô nhập nhiều dòng (`TextAreaField`)**: cùng khung và trạng thái với Input 7.2 (viền `line-strong`, radius `md`, `body` 16px, padding 12px 16px, lỗi viền 2px `danger` + `aria-describedby`), tối thiểu 3 dòng, `resize-y`.
+- **Khối lưu ý thanh toán**: `Alert` `info` tĩnh, không đóng được, dòng đầu in đậm "Chưa thanh toán trực tuyến.". Quy tắc chữ: không dùng "thành công", "đã thanh toán", "thanh toán khi nhận hàng", "đang xử lý", "đang giao", "hủy đơn" ở bất cứ đâu trong luồng mua hàng; dùng "Đã ghi nhận đơn hàng".
+- **Dòng đơn (`OrderRow`, `AdminOrderRow`)**: `<a>` cả dòng trong `DataList`, số đơn `body` 700 `tabular-nums`, thời gian `<time>` theo `Asia/Ho_Chi_Minh`, icon `ChevronRight` 20px. Mobile: khối hai-ba hàng; ≥ md: lưới cột có hàng tiêu đề `caption` (`aria-hidden`).
+- **Tab ngang quản trị 4 mục**: dưới sm ẩn icon trong tab và để `overflow-x-auto` kèm dải mờ mép phải; mục đang chọn được `scrollIntoView` khi vào trang.
+
 ## 8. Accessibility (tối thiểu WCAG 2.1 AA)
 
 1. **Tương phản**: chữ thường ≥ 4,5:1, chữ lớn (≥ 24px hoặc ≥ 18,66px đậm) và thành phần UI (viền input, icon quan trọng) ≥ 3:1 — dùng đúng các token ở mục 1 (đã tính sẵn).
