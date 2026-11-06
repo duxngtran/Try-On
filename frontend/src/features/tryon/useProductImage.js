@@ -96,8 +96,17 @@ function preload(url) {
  * không khởi động lại luồng). `onGate({ gate, missing })`: 403/409 giữa chừng. `onGenerated()`: một ảnh vừa
  * sinh xong, nơi gọi làm mới `/state`. `refreshState()` trả `/state` mới (hoặc null).
  */
-export function useProductImage(productId, { getRoom, refreshState, onGate, onGenerated }) {
-  const [state, dispatch] = useReducer(reducer, productId, blankView);
+export function useProductImage(
+  productId,
+  { imageVersion, cache, getRoom, refreshState, onGate, onGenerated },
+) {
+  const [state, dispatch] = useReducer(
+    reducer,
+    { productId, image: cache?.get(productId, imageVersion) ?? null },
+    ({ productId: id, image }) =>
+      // Có ảnh trong bộ nhớ: hiện ngay, `/result` vẫn chạy để xác nhận (try-on-states.md mục 5, D-123).
+      image ? { ...blankView(id), phase: 'ready', image } : blankView(id),
+  );
   const [attempt, setAttempt] = useState(0);
   const modeRef = useRef('normal'); // 'normal' | 'post' | 'check', dùng một lần cho lần chạy kế tiếp
   const callbacks = useRef({});
@@ -106,7 +115,7 @@ export function useProductImage(productId, { getRoom, refreshState, onGate, onGe
   const refreshToken = useRef(0);
 
   useEffect(() => {
-    callbacks.current = { getRoom, refreshState, onGate, onGenerated };
+    callbacks.current = { getRoom, refreshState, onGate, onGenerated, cache, imageVersion };
     productRef.current = productId;
   });
 
@@ -114,6 +123,10 @@ export function useProductImage(productId, { getRoom, refreshState, onGate, onGe
     if (!productId) return undefined;
     const mode = modeRef.current;
     modeRef.current = 'normal';
+    // Chỉ lần chạy đầu của sản phẩm này dùng ảnh trong bộ nhớ; Thử lại, Tải lại ảnh luôn hỏi lại server.
+    const { cache: imageCache, imageVersion: version } = callbacks.current;
+    const cached = attempt === 0 ? (imageCache?.get(productId, version) ?? null) : null;
+    const dropCached = () => imageCache?.drop(productId, version);
     imageErrorRetried.current = false;
     const session = { alive: true, timers: new Set(), controller: new AbortController() };
     const { signal } = session.controller;
@@ -159,6 +172,7 @@ export function useProductImage(productId, { getRoom, refreshState, onGate, onGe
           callbacks.current.refreshState?.();
         }
       } else if (failure.type !== 'canceled') show('failed');
+      if (failure.type !== 'canceled') dropCached();
     }
 
     async function recheck() {
@@ -168,6 +182,24 @@ export function useProductImage(productId, { getRoom, refreshState, onGate, onGe
       if (!result) return undefined;
       if (result.failure) return handleFailure(result.failure);
       return settle(result.data, { posted: false });
+    }
+
+    /**
+     * Job tìm thấy qua `/result` có thể là generate trước: sau 400 ms gửi `display` để nâng ưu tiên và tính là đã xem
+     * (flows/tryon-prefetch.md). Backend gắn vào đúng job đó (idempotent), không tạo job thứ hai.
+     */
+    async function upgradeToDisplay() {
+      await sleep(Math.max(0, SETTLE_MS - (Date.now() - startedAt)));
+      if (!live()) return;
+      try {
+        const data = await tryonApi.createJob(productId, { signal });
+        if (live() && data.state === 'ready') dispatch({ type: 'ready', image: data.image });
+      } catch (error) {
+        if (!live()) return;
+        const failure = classifyError(error, 'create');
+        if (failure.type === 'gate') callbacks.current.onGate?.(failure);
+        // Lỗi khác bỏ qua: việc theo dõi job vẫn tiếp tục, không đổi trạng thái đang hiện.
+      }
     }
 
     async function track(jobId) {
@@ -221,11 +253,15 @@ export function useProductImage(productId, { getRoom, refreshState, onGate, onGe
     }
 
     async function settle(data, { posted }) {
+      if (data.state !== 'ready') dropCached();
       switch (data.state) {
         case 'ready':
+          // Ảnh trong bộ nhớ còn đúng: giữ nguyên URL đang hiện, không đổi sang URL ký mới (tránh nhấp nháy).
+          if (cached) return undefined;
           return dispatch({ type: 'ready', image: data.image });
         case 'pending':
           dispatch({ type: 'waiting' });
+          if (!posted) upgradeToDisplay();
           return track(data.job.id);
         case 'blocked':
           return show(overlayForBlocked(data.errorCode));
@@ -262,7 +298,7 @@ export function useProductImage(productId, { getRoom, refreshState, onGate, onGe
           dispatch({ type: 'waiting' });
           await create();
         } else {
-          dispatch({ type: 'resolving', productId });
+          if (!cached) dispatch({ type: 'resolving', productId });
           const result = await call('result', (opts) => tryonApi.getResult(productId, opts));
           if (!result) return;
           if (result.failure) handleFailure(result.failure);
@@ -292,6 +328,11 @@ export function useProductImage(productId, { getRoom, refreshState, onGate, onGe
       clearTimeout(timeoutTimer);
     };
   }, [waiting, waitEpoch]);
+
+  const readyImage = state.productId === productId && state.phase === 'ready' ? state.image : null;
+  useEffect(() => {
+    if (readyImage) cache?.set(productId, imageVersion, readyImage);
+  }, [cache, productId, imageVersion, readyImage]);
 
   const viewReady = state.productId === productId;
   const view = viewReady ? state : blankView(productId);

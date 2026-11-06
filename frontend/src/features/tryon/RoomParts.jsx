@@ -98,18 +98,29 @@ export function StageIdle() {
 }
 
 /** Thông tin sản phẩm: hiện ngay, không chờ API ảnh (US-06 §4.1.2), kể cả khi ảnh lỗi. */
-export function ProductInfo({ product, titleId, quota }) {
+export function ProductInfo({ product, titleId, quota, position, total, children }) {
   return (
     <div className="min-w-0 space-y-1 md:col-start-2 md:row-start-2 md:self-start">
       <h2
         id={titleId}
+        tabIndex={-1}
         title={product.name}
-        className="line-clamp-2 font-display text-heading font-semibold md:text-title"
+        className="line-clamp-2 font-display text-heading font-semibold focus:outline-none md:text-title"
       >
         {product.name}
       </h2>
       <p className="text-small text-ink-muted">{product.category.name}</p>
       <p className="text-heading font-semibold">{formatPriceVnd(product.priceVnd)}</p>
+      {position != null && total != null && (
+        <>
+          <p aria-hidden="true" className="hidden text-small text-ink-muted lg:block">
+            {position} / {total}
+          </p>
+          <p className="sr-only">
+            Sản phẩm {position} trên {total}
+          </p>
+        </>
+      )}
       {quota && quota.remaining > 0 && quota.remaining <= LOW_QUOTA_THRESHOLD && (
         <Alert variant="info" role="group" className="mt-3">
           <p>
@@ -120,6 +131,7 @@ export function ProductInfo({ product, titleId, quota }) {
           </p>
         </Alert>
       )}
+      {children}
     </div>
   );
 }

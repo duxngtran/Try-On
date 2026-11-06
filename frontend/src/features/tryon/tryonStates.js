@@ -132,7 +132,10 @@ export function describeOverlay(id, data = {}) {
         role: 'alert',
         icon: 'package-x',
         body: 'Sản phẩm này không còn bán.',
-        action: { kind: 'otherCategory', label: 'Danh mục khác' },
+        // D-87: không tự chuyển; còn sản phẩm sau nó thì cho nút chuyển tiếp (S14).
+        action: data.hasNext
+          ? { kind: 'nextProduct', label: 'Xem sản phẩm tiếp theo' }
+          : { kind: 'otherCategory', label: 'Danh mục khác' },
       };
     default:
       throw new Error(`Trạng thái lạ: ${id}`);

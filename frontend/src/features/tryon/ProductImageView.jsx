@@ -10,7 +10,14 @@ const LAYER = 'absolute inset-0 h-full w-full object-contain transition-opacity 
  * Sân khấu của một sản phẩm: ảnh trải phẳng (nhãn "ẢNH SẢN PHẨM"), ảnh thử đồ cross-fade 300ms khi sẵn sàng,
  * lớp phủ chờ/lỗi và dải mất kết nối. `image` là kết quả của `useProductImage`. Khung luôn 3:4 cố định.
  */
-export function ProductImageView({ product, image, titleId, onOtherCategory }) {
+export function ProductImageView({
+  product,
+  image,
+  titleId,
+  hasNext = false,
+  onOtherCategory,
+  onNextProduct,
+}) {
   const { view, retry, recheck, reloadImage, onImageError, onImageLoad } = image;
   const [flatFailed, setFlatFailed] = useState({ productId: null });
   const [loadedFor, setLoadedFor] = useState(null);
@@ -29,6 +36,7 @@ export function ProductImageView({ product, image, titleId, onOtherCategory }) {
 
   const act = (kind) => {
     if (kind === 'otherCategory') return onOtherCategory();
+    if (kind === 'nextProduct') return onNextProduct();
     focusWait.current = true; // nút vừa bấm sẽ biến mất, focus sang khối chờ mới
     if (kind === 'retry') return retry();
     if (kind === 'recheck') return recheck();
@@ -36,7 +44,9 @@ export function ProductImageView({ product, image, titleId, onOtherCategory }) {
   };
 
   const overlay =
-    view.phase === 'overlay' ? describeOverlay(view.overlayId, view.overlayData ?? {}) : null;
+    view.phase === 'overlay'
+      ? describeOverlay(view.overlayId, { ...view.overlayData, hasNext })
+      : null;
 
   return (
     <StageFrame

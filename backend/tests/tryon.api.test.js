@@ -750,6 +750,22 @@ describe('danh mục và sản phẩm (AC-05, AC-07, D-44, D-73)', () => {
       expect([names(backAgain), backAgain.prevCursor]).toEqual([['p5', 'p4'], null]);
     });
 
+    it('AC-11 (US-06): thêm sản phẩm mới nhất và xóa sản phẩm đã đi qua thì mũi tên phải vẫn tới đúng sản phẩm kế, không lặp, không sót', async () => {
+      const { kit, cat, rows, page } = await fiveProducts();
+      const first = await page('?limit=2'); // p5, p4: con trỏ đứng ở p4
+      kit.product('p6', cat.id); // mới nhất, nằm trước vị trí đang xem
+      rows[4].deleted_at = 'x'; // p5 đã đi qua bị xóa
+      const next = await page(`?limit=3&after=${first.nextCursor}`);
+      expect(names(next)).toEqual(['p3', 'p2', 'p1']);
+      expect(next.nextCursor).toBeNull();
+
+      // Chiều ngược từ p3: sản phẩm mới hơn con trỏ là p4 (p5 đã xóa, p6 thêm sau đó nên đứng đầu).
+      const at = await page(`?at=${rows[2].id}&limit=1`);
+      expect(names(at)).toEqual(['p3']);
+      const back = await page(`?limit=2&before=${at.prevCursor}`);
+      expect(names(back)).toEqual(['p6', 'p4']);
+    });
+
     it('con trỏ giữ nguyên chuỗi created_at (micro giây), không qua Date', async () => {
       const { page, rows } = await fiveProducts();
       const first = await page('?limit=2');

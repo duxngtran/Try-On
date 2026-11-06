@@ -4097,6 +4097,1676 @@
           }
         },
         {
+          "name": "US-06 Setup - register user D",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('emailD', 'pm-tryon-' + pm.environment.get('tag') + '-d@example.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json(); pm.environment.set('tokenD', b.data.token); pm.environment.set('idD', b.data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailD}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - D nhập số đo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/measurements",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165,\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - D đồng ý lưu ảnh",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo-consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - D tải ảnh toàn thân",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.profile.profileCompleted).to.eql(true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-1080x1920.png"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - D đồng ý gửi ảnh cho dịch vụ AI",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.consent.accepted).to.eql(true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - tạo danh mục N (điều hướng)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('catN', pm.response.json().data.category.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/categories",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-N\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - tạo danh mục H (job treo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('catH', pm.response.json().data.category.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/categories",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-H\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - tạo sản phẩm N1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('pN1', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Nav 1",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catN}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - tạo sản phẩm N2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('pN2', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Nav 2",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catN}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - tạo sản phẩm N3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('pN3', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Nav 3",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catN}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - tạo sản phẩm H1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('pH1', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "FAKE-HANG-{{tag}}-1",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catH}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - tạo sản phẩm H2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('pH2', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "FAKE-HANG-{{tag}}-2",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catH}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "US-06 Setup - tạo sản phẩm H3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('pH3', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "FAKE-HANG-{{tag}}-3",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catH}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "US-06 AC-03 D: prefetch N3 -> 202 pending",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "const d = pm.response.json().data; pm.expect(d.state).to.eql('pending'); pm.environment.set('jobN3', d.job.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pN3}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"prefetch\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 AC-03 D: job prefetch có purpose prefetch",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.job.purpose).to.eql('prefetch');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{jobN3}}"
+          }
+        },
+        {
+          "name": "US-06 AC-03 D: không có job cho sản phẩm kế tiếp nào khác (N2 chưa có ảnh)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.state).to.eql('none');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pN2}}/result"
+          }
+        },
+        {
+          "name": "US-06 AC-03 D: chuyển tới N3 (display) -> cùng job, không sinh trùng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.expect(pm.response.json().data.job.id).to.eql(pm.environment.get('jobN3'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pN3}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 AC-03 D: job được nâng lên display và xong",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = pm.environment.get('jobN3'); const token = pm.environment.get('tokenD');",
+                  "const deadline = Date.now() + 40000;",
+                  "const poll = () => pm.sendRequest({ url: pm.environment.get('baseUrl') + '/try-on/jobs/' + id, method: 'GET', header: { Authorization: 'Bearer ' + token } }, (err, res) => {",
+                  "  const st = res && res.code === 200 ? res.json().data.job.status : null;",
+                  "  if ((st && st !== 'queued' && st !== 'running') || Date.now() > deadline) return;",
+                  "  setTimeout(poll, 400);",
+                  "});",
+                  "poll();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data.job; pm.test('succeeded, purpose display, có ảnh', () => { pm.expect(j.status).to.eql('succeeded'); pm.expect(j.purpose).to.eql('display'); pm.expect(j.image.url).to.be.a('string'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{jobN3}}"
+          }
+        },
+        {
+          "name": "US-06 AC-03 D: lượt tăng đúng 1 khi generate trước xong",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const q = pm.response.json().data.quota; pm.test('dailyUsed 1, không giữ chỗ', () => { pm.expect(q.dailyUsed).to.eql(1); pm.expect(q.held).to.eql(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "US-06 AC-10 D: quay lại N3 -> 200 ready, không gọi dịch vụ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.state).to.eql('ready');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pN3}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 AC-10 D: quay lại không tốn lượt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const q = pm.response.json().data.quota; pm.test('dailyUsed vẫn 1', () => pm.expect(q.dailyUsed).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "US-06 AC-08 D: job hiển thị H1 -> 202",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.environment.set('jobH1', pm.response.json().data.job.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pH1}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 AC-08 D: job hiển thị H2 -> 202",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.environment.set('jobH2', pm.response.json().data.job.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pH2}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 AC-04, AC-08 D: gọi thẳng prefetch khi đã đủ 2 job -> 200 skipped busy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'skipped', reason: 'busy' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pN1}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"prefetch\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 AC-04 D: prefetch bị bỏ qua không tạo job (N1 vẫn none)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.state).to.eql('none');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pN1}}/result"
+          }
+        },
+        {
+          "name": "US-06 AC-08 D: job hiển thị thứ ba H3 -> 202, xếp hàng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.environment.set('jobH3', pm.response.json().data.job.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pH3}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 AC-08 D: trong 3 giây H3 vẫn queued (không quá 2 job đang gửi)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = pm.environment.get('jobH3'); const token = pm.environment.get('tokenD');",
+                  "const until = Date.now() + 3000; const seen = [];",
+                  "const poll = () => pm.sendRequest({ url: pm.environment.get('baseUrl') + '/try-on/jobs/' + id, method: 'GET', header: { Authorization: 'Bearer ' + token } }, (err, res) => {",
+                  "  seen.push(res && res.code === 200 ? res.json().data.job.status : 'error');",
+                  "  if (Date.now() < until) return setTimeout(poll, 400);",
+                  "  pm.environment.set('h3Seen', JSON.stringify(seen));",
+                  "});",
+                  "poll();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const seen = JSON.parse(pm.environment.get('h3Seen')); pm.test('mọi lần poll đều queued', () => { pm.expect(seen.length).to.be.above(3); pm.expect(seen.every((s) => s === 'queued')).to.eql(true); });",
+                  "pm.expect(pm.response.json().data.job.status).to.eql('queued');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{jobH3}}"
+          }
+        },
+        {
+          "name": "US-06 AC-07 D: không ai theo dõi quá 8 giây -> job chưa gửi bị hủy",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["setTimeout(() => {}, 11000);"]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data.job; pm.test('canceled, không có ảnh', () => { pm.expect(j.status).to.eql('canceled'); pm.expect(j.image).to.eql(null); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{jobH3}}"
+          }
+        },
+        {
+          "name": "US-06 AC-07 D: không tính lượt, giữ chỗ chỉ còn 2 job đang gửi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const q = pm.response.json().data.quota; pm.test('dailyUsed vẫn 1, held 2', () => { pm.expect(q.dailyUsed).to.eql(1); pm.expect(q.held).to.eql(2); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "US-06 AC-07 D: result của H3 sau khi hủy là none (không bị chặn)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.state).to.eql('none');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pH3}}/result"
+          }
+        },
+        {
+          "name": "US-06 AC-11 D: trang đầu limit=2 -> [N3, N2], con trỏ đứng ở N2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data; pm.test('N3, N2, total 3, chưa có trang trước', () => { pm.expect(d.items.map((i) => i.id)).to.eql([pm.environment.get('pN3'), pm.environment.get('pN2')]); pm.expect(d.items.map((i) => i.position)).to.eql([1, 2]); pm.expect(d.total).to.eql(3); pm.expect(d.prevCursor).to.eql(null); pm.expect(d.nextCursor).to.be.a('string'); });",
+                  "pm.environment.set('cursorN2', d.nextCursor);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catN}}/products?limit=2"
+          }
+        },
+        {
+          "name": "US-06 AC-11 Setup - admin thêm sản phẩm mới nhất N4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('pN4', pm.response.json().data.product.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Nav 4",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catN}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "US-06 AC-11 Setup - admin xóa N3 (sản phẩm đã đi qua)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pN3}}"
+          }
+        },
+        {
+          "name": "US-06 AC-11 D: mũi tên phải vẫn tới N1: không lặp N2, không thấy N3 đã xóa hay N4 mới thêm",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data; pm.test('chỉ còn N1, hết trang', () => { pm.expect(d.items.map((i) => i.id)).to.eql([pm.environment.get('pN1')]); pm.expect(d.nextCursor).to.eql(null); pm.expect(d.total).to.eql(3); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catN}}/products?limit=5&after={{cursorN2}}"
+          }
+        },
+        {
+          "name": "US-06 AC-11 D: at=N2 limit=1 -> N2 ở vị trí 2, có trang trước",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data; pm.test('N2, anchor found, position 2', () => { pm.expect(d.items.map((i) => i.id)).to.eql([pm.environment.get('pN2')]); pm.expect(d.anchor).to.eql({ found: true, deleted: false }); pm.expect(d.items[0].position).to.eql(2); pm.expect(d.prevCursor).to.be.a('string'); });",
+                  "pm.environment.set('prevCursorN2', d.prevCursor);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catN}}/products?limit=1&at={{pN2}}"
+          }
+        },
+        {
+          "name": "US-06 AC-11 D: before=prevCursor (chiều ngược) -> N4 mới thêm, N3 đã xóa không còn",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data; pm.test('chỉ N4', () => { pm.expect(d.items.map((i) => i.id)).to.eql([pm.environment.get('pN4')]); pm.expect(d.prevCursor).to.eql(null); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catN}}/products?limit=5&before={{prevCursorN2}}"
+          }
+        },
+        {
+          "name": "US-06 AC-12 D: at=N3 đã xóa -> anchor.deleted, danh sách bắt đầu từ sản phẩm kế tiếp theo con trỏ (N2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data; pm.test('deleted, N2 rồi N1', () => { pm.expect(d.anchor).to.eql({ found: true, deleted: true }); pm.expect(d.items.map((i) => i.id)).to.eql([pm.environment.get('pN2'), pm.environment.get('pN1')]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catN}}/products?limit=5&at={{pN3}}"
+          }
+        },
+        {
+          "name": "US-06 AC-12 D: GET result sản phẩm đã xóa -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pN3}}/result"
+          }
+        },
+        {
+          "name": "US-06 AC-12 D: POST jobs sản phẩm đã xóa -> 404, không tạo job, không tính lượt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pN3}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 AC-12 D: lượt không đổi sau lỗi 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const q = pm.response.json().data.quota; pm.test('dailyUsed vẫn 1, held 2', () => { pm.expect(q.dailyUsed).to.eql(1); pm.expect(q.held).to.eql(2); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "US-06 Cleanup - D rút consent (hủy job treo, xóa ảnh try-on)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.consent.accepted).to.eql(false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent"
+          }
+        },
+        {
+          "name": "US-06 Cleanup - D xóa ảnh hồ sơ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu chưa có ảnh', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo"
+          }
+        },
+        {
+          "name": "US-06 Cleanup - xóa sản phẩm pN1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pN1}}"
+          }
+        },
+        {
+          "name": "US-06 Cleanup - xóa sản phẩm pN2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pN2}}"
+          }
+        },
+        {
+          "name": "US-06 Cleanup - xóa sản phẩm pN3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pN3}}"
+          }
+        },
+        {
+          "name": "US-06 Cleanup - xóa sản phẩm pN4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pN4}}"
+          }
+        },
+        {
+          "name": "US-06 Cleanup - xóa sản phẩm pH1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pH1}}"
+          }
+        },
+        {
+          "name": "US-06 Cleanup - xóa sản phẩm pH2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pH2}}"
+          }
+        },
+        {
+          "name": "US-06 Cleanup - xóa sản phẩm pH3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pH3}}"
+          }
+        },
+        {
+          "name": "US-06 Cleanup - xóa danh mục catN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/categories/{{catN}}"
+          }
+        },
+        {
+          "name": "US-06 Cleanup - xóa danh mục catH",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/categories/{{catH}}"
+          }
+        },
+        {
           "name": "Cleanup - A rút consent (xóa ảnh try-on khỏi tryon-images)",
           "event": [
             {

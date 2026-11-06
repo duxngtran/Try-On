@@ -301,7 +301,7 @@ describe('phòng thử đồ (AC-03 → AC-07 phía giao diện)', () => {
     expect(callsTo(calls, 'POST /try-on/products/p1/jobs')).toHaveLength(0);
     // D-117: đổi danh mục thay thế mục lịch sử, URL chỉ chứa id.
     expect(router.state.historyAction).toBe('REPLACE');
-    expect(router.state.location.search).toBe('?category=c1');
+    expect(router.state.location.search).toBe('?category=c1&product=p1');
   });
 
   it('ảnh chưa có: hiện chờ ngay với ảnh trải phẳng + nhãn "Ảnh sản phẩm", rồi POST sau 400 ms (AC-03)', async () => {

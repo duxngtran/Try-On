@@ -5,7 +5,7 @@
 |---|---|---|---|
 | sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Xong | US-01 và US-02 đã merge vào `main` |
 | sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Xong | US-03 và US-04 đã merge vào `main` |
-| sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Đang làm | Bước 1–4 xong; bước 5: US-05 đã merge, US-06 trên `feature/US-06-product-navigation`. User ủy quyền duyệt cả sprint, trừ pilot FASHN |
+| sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Xong mức A | US-05, US-06 đã merge, dùng adapter giả. Mức B (T-93 → T-97) chờ user. User ủy quyền duyệt cả sprint, trừ pilot FASHN |
 | sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Chưa bắt đầu | Làm ngay sau sprint 3; user phê duyệt mọi quyết định của main agent, kể cả merge khi test đạt (2026-11-06) |
 
 ## Sprint 01 — chi tiết
@@ -27,7 +27,7 @@
 - [x] Bước 2: Sprint backlog (`sprint-03/sprint-backlog.md`, 37 task T-61 → T-97) — xong (2026-11-06)
 - [x] Bước 3: Thiết kế nghiệp vụ (`sprint-03/design/`: 11 luồng, `api.md`, `tryon-provider.md`, `db/`) — xong; SQL 005, 006 chưa áp dụng lên Supabase; D-97 → D-110 do user ủy quyền duyệt (2026-11-06)
 - [x] Bước 4: UI/UX (5 file `sprint-03/screens/`, mục 7.12 trong `design/design-system.md`) — xong, không có mockup; D-111 → D-126 do user ủy quyền duyệt (2026-11-06)
-- [ ] Bước 5: Implement + test — mức A dùng adapter giả (T-61 → T-92). Backend US-05 (T-61 → T-75) xong: test BE 490/490, migration 005, 006 và bucket `tryon-images` đã áp dụng trên Supabase dev, `verify:tryon` 0 lỗi SQL, 0 deadlock theo agent-coder (main agent đã kiểm schema, quyền, dữ liệu dọn sạch, chưa chạy lại script); US-05 (T-61 → T-83) xong và đã merge; US-06 (T-84 → T-92) đang làm (2026-11-06). Mức B (T-93 → T-97: API key, pilot, ngân sách thật, pháp lý) chờ user cho phép riêng (D-91, D-96)
+- [x] Bước 5: Implement + test — mức A dùng adapter giả (T-61 → T-92). Backend US-05 (T-61 → T-75) xong: test BE 490/490, migration 005, 006 và bucket `tryon-images` đã áp dụng trên Supabase dev, `verify:tryon` 0 lỗi SQL, 0 deadlock theo agent-coder (main agent đã kiểm schema, quyền, dữ liệu dọn sạch, chưa chạy lại script); US-05 (T-61 → T-83) và US-06 (T-84 → T-92) xong và đã merge (2026-11-06). Mức B (T-93 → T-97: API key, pilot, ngân sách thật, pháp lý) chờ user cho phép riêng (D-91, D-96)
 
 ## Merge log
 - 2026-11-04: `chore/sprint-01-setup` → `main` (merge commit `3a8d178`). Setup T-01, T-03→T-06, T-08 + Prettier, .gitattributes, README. Test BE 20/20, FE 8/8, lint, format:check, build đều pass. T-07, T-09 còn chờ Supabase.
@@ -36,9 +36,10 @@
 - 2026-11-05: `feature/US-03-categories` → `main` (merge commit `ed9fec3`), user cho phép merge khi test đạt. Trước merge: test BE 221/221, FE 186/186, lint, format:check, build pass; newman `System` 2/5, `Auth` 26/66, `Profile` 126/244, `Categories` 34/68 (request/assertion), đều 0 fail. Migration 003, 004 đã áp dụng trên Supabase dev. Chưa kiểm: AC-05, AC-06, AC-07 với sản phẩm thật và AC-08 (chuyển T-54, T-58 của US-04); trình duyệt thật (T-59).
 - 2026-11-05: `feature/US-04-products` → `main` (merge commit `8860e9d`), user cho phép merge khi test đạt. Trước merge: test BE 331/331, FE 283/283, lint, format:check, build pass; newman `System` 2/5, `Auth` 26/66, `Profile` 111/244, `Categories` 34/68, `Products` 89/149 (request/assertion), đều 0 fail. Số request của `Profile` đổi theo số lần poll (D-39). Agent-coder báo `verify:products` (T-54) 60 lượt RPC song song 0 vi phạm, AC-08 đạt; T-59 đạt ở 360/768/1280 px (main agent chưa chạy lại hai kiểm tra này). Bucket public `product-images` đã tạo trên Supabase dev. Chưa kiểm: `whitespace-nowrap` của `AdminNav` trên trình duyệt (commit sau khi chụp T-59; lệnh chạy lại e2e bị bộ kiểm soát quyền chặn), p95, 429 đếm ngược trên trình duyệt, mobile thật/Safari.
 - 2026-11-06: `feature/US-05-tryon-room` → `main` (merge commit `e8cefc3`), user ủy quyền merge. Trước merge (main agent tự chạy): test BE 505/505, FE 405/405, lint, format:check, build pass; newman `System` 2/5, `Auth` 26/66, `Profile` 111/244, `Categories` 34/68, `Products` 89/149, `Tryon` 216/221, `Tryon-quota` 29/26, `Tryon-budget` 16/21 (request/assertion), đều 0 fail, đều dùng adapter giả. Agent-coder báo T-81 đạt 120/120 kiểm tra trình duyệt ở 360/768/1280 px (main agent chưa chạy lại). Chưa kiểm: FASHN thật, độ trễ p95 (T-94, D-106), `tryon:pilot` chưa chạy lần nào, `prefers-reduced-motion`, trình đọc màn hình, Firefox/Safari, cross-fade từng khung hình. Câu chữ nhắc mũi tên, vuốt tạm đổi cho tới T-85.
+- 2026-11-06: `feature/US-06-product-navigation` → `main` (merge commit MERGE_HASH), user ủy quyền merge. Trước merge (main agent tự chạy): test BE 506/506, FE 453/453, lint, format:check, build pass; newman `System` 2/5, `Auth` 26/66, `Profile` 110/244, `Categories` 34/68, `Products` 89/149, `Tryon` 283/284, `Tryon-quota` 32/30, `Tryon-budget` 16/21 (request/assertion), đều 0 fail, đều dùng adapter giả. Agent-coder báo T-91 đạt 116/116 kiểm tra trình duyệt ở 360/768/1280 px và số job đếm trên DB đúng (main agent chưa chạy lại). Chưa kiểm: FASHN thật, AC-12, AC-13, AC-16 trên trình duyệt thật (chỉ test FE), `prefers-reduced-motion`, trình đọc màn hình, tỉ lệ ảnh generate trước được xem.
 
 ## Blockers
-- Chưa có
+- Mức B của sprint 3 (T-93 → T-97): cần user cấp API key FASHN và cho phép pilot với ảnh người thật (D-91); không chặn sprint 4
 
 ## Ghi chú Supabase
 - `DATABASE_URL` dùng Session pooler cổng 5432 vì host direct chỉ có IPv6 mà máy dev không có IPv6. User quyết định không đổi các secret đã gửi trong chat (2026-11-05)
@@ -54,6 +55,9 @@
 - Chạy lại e2e admin ở 360 px để xác nhận `whitespace-nowrap` của `AdminNav`
 - Chưa kiểm thật: Storage/DB lỗi giữa lúc tải ảnh (chỉ có mock), signed URL hết hạn sau 15 phút, token hết hạn, hết khóa sau 15 phút, đăng ký đồng thời, rate limit 20/phút; nút Back sau đăng xuất chỉ xác nhận không lộ nội dung riêng tư
 - Stitch: xóa tay design system cũ `assets/10966836231677352902` trên stitch.withgoogle.com (font không có tiếng Việt)
+- UI US-06 chưa khớp `sprint-03/screens/`: hiệu ứng chuyển sản phẩm 200 ms; thiếu mũi tên khi mở URL có sản phẩm đã xóa; hai nút "Danh mục khác" trùng khi sản phẩm cuối bị xóa; nhãn "Ảnh do AI tạo" hiện cả lúc khung còn là ảnh trải phẳng đang chờ tải
+- Prefetch khi hết lượt trả 429 thay vì `skipped` như `sprint-03/design/api.md` (D-135)
+- Dọn dữ liệu test Supabase dev: user `pm-*`, `tryon_jobs` do newman tích lũy
 
 ## Ghi chú công cụ
 - Stitch MCP: `update_design_system` luôn lỗi `Request contains an invalid argument`; `generate_screen_from_text` timeout với màn Hồ sơ; `list_screens` trả rỗng. Nguồn chuẩn là file `.md`, không phải mockup Stitch.

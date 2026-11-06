@@ -397,6 +397,94 @@
           }
         },
         {
+          "name": "US-06 AC-04 còn 1 lượt (<= 3): prefetch -> 200 skipped low_quota, không phải lỗi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'skipped', reason: 'low_quota' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pQ1}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"prefetch\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "US-06 AC-04 prefetch bị bỏ qua không tạo job và không giữ lượt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const q = pm.response.json().data.quota; pm.test('held 0, dailyUsed 0, remaining 1', () => { pm.expect(q.held).to.eql(0); pm.expect(q.dailyUsed).to.eql(0); pm.expect(q.remaining).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "US-06 AC-04 pQ1 vẫn chưa có job (result none)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.state).to.eql('none');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pQ1}}/result"
+          }
+        },
+        {
           "name": "AC-17 dùng lượt duy nhất cho pQ2",
           "event": [
             {

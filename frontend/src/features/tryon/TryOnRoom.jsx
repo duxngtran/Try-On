@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import { Shirt } from 'lucide-react';
+import { PackageX, Shirt } from 'lucide-react';
 import { Alert } from '../../components/Alert.jsx';
 import { Button } from '../../components/Button.jsx';
 import { CategoryChips } from './CategoryChips.jsx';
 import { ProductImageView } from './ProductImageView.jsx';
+import { ArrowButton, NavNotices } from './ProductNav.jsx';
 import {
   EmptyStore,
   InfoSkeleton,
@@ -14,12 +15,40 @@ import {
   StageNote,
 } from './RoomParts.jsx';
 import { SHIMMER, StageFrame } from './StageFrame.jsx';
-import { useCategories, useFirstProduct } from './useCatalog.js';
+import { MessageOverlay } from './StageOverlay.jsx';
+import { ANNOUNCE_DWELL_MS } from './tryonConfig.js';
+import { describeOverlay } from './tryonStates.js';
+import { useCategories } from './useCatalog.js';
+import { useImageCache } from './useImageCache.js';
+import { useArrowKeys, useSwipe } from './useNavInput.js';
+import { useNeighbors } from './useNeighbors.js';
 import { useProductImage } from './useProductImage.js';
+import { useProductNavigation } from './useProductNavigation.js';
 
-/** Sân khấu của sản phẩm đang xem: chạy máy trạng thái ảnh và hiện thông báo cho trình đọc màn hình. */
-function ProductStage({ product, tryonState, refreshState, onGate, announce, onOtherCategory }) {
+const END_MESSAGE = 'Đây là sản phẩm cuối của danh mục';
+
+/** "Sản phẩm 3 trên 12: tên, giá" cho vùng aria-live. */
+const describeForSpeech = (product, position, total) =>
+  `Sản phẩm ${position} trên ${total}: ${product.name}, ${product.priceVnd.toLocaleString('vi-VN')} đồng`;
+
+/**
+ * Sân khấu của sản phẩm đang xem: máy trạng thái ảnh, mũi tên, vuốt, việc nền (tải trước ảnh liền kề, generate
+ * trước) và thông báo cho trình đọc màn hình. Được mount lại (`key`) mỗi khi đổi sản phẩm, nên timer, request và poll
+ * của sản phẩm trước bị hủy hết (US-06 R7).
+ */
+function ProductStage({
+  product,
+  nav,
+  tryonState,
+  refreshState,
+  onGate,
+  announce,
+  onOtherCategory,
+  cache,
+  focusRequest,
+}) {
   const titleId = useId();
+  const rootRef = useRef(null);
   const stateRef = useRef(tryonState);
   useEffect(() => {
     stateRef.current = tryonState;
@@ -27,17 +56,61 @@ function ProductStage({ product, tryonState, refreshState, onGate, announce, onO
   const getRoom = useCallback(
     () => ({
       generationAvailable: stateRef.current.generation.available,
+      prefetchAllowed: stateRef.current.generation.prefetchAllowed,
       quota: stateRef.current.quota,
     }),
     [],
   );
+  const onGenerated = useCallback(() => refreshState({ silent: true }), [refreshState]);
   const image = useProductImage(product.id, {
+    imageVersion: product.image.version,
+    cache,
     getRoom,
     refreshState,
     onGate,
-    onGenerated: () => refreshState({ silent: true }),
+    onGenerated,
   });
   const { phase, long } = image.view;
+  const { hasPrev, hasNext, position, total } = nav;
+
+  useNeighbors({
+    product,
+    prev: nav.prevProduct,
+    next: nav.nextProduct,
+    ready: phase === 'ready',
+    cache,
+    getRoom,
+    onGenerated,
+  });
+
+  const swipe = useSwipe({
+    canPrev: hasPrev,
+    canNext: hasNext,
+    onPrev: nav.prev,
+    onNext: nav.next,
+    onEdge: (direction) => direction === 'next' && announce(END_MESSAGE),
+  });
+
+  // Người mua vừa bấm "Xem sản phẩm tiếp theo": nút đó biến mất, focus sang nút Sau (nếu dùng được) hoặc tên sản phẩm.
+  useEffect(() => {
+    if (!focusRequest.current) return;
+    focusRequest.current = false;
+    const next = rootRef.current?.querySelector('[data-nav="next"]:not([aria-disabled="true"])');
+    (next ?? document.getElementById(titleId))?.focus();
+  }, [focusRequest, titleId]);
+
+  // Thông báo vị trí một lần sau khi dừng 400 ms, nên lướt nhanh qua 5 sản phẩm chỉ đọc sản phẩm cuối.
+  useEffect(() => {
+    if (position == null) return undefined;
+    const timer = setTimeout(
+      () =>
+        announce(
+          `${describeForSpeech(product, position, total)}${hasNext ? '' : `. ${END_MESSAGE}`}`,
+        ),
+      ANNOUNCE_DWELL_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [product, position, total, hasNext, announce]);
 
   // Thông báo một lần cho từng mốc (không đọc từng giây, không lặp lại khối lỗi đã có role="alert").
   useEffect(() => {
@@ -46,36 +119,116 @@ function ProductStage({ product, tryonState, refreshState, onGate, announce, onO
     else if (phase === 'ready') announce(`Ảnh bạn mặc ${product.name} đã sẵn sàng`);
   }, [phase, long, product.name, announce]);
 
+  const skipDeleted = async () => {
+    focusRequest.current = true;
+    if (!(await nav.skipGone())) focusRequest.current = false;
+  };
+  const bouncing =
+    swipe.bounce === 'left' ? '-translate-x-4' : swipe.bounce === 'right' ? 'translate-x-4' : '';
+
   return (
     <>
-      <div className="md:col-start-1 md:row-span-2 md:row-start-1">
-        <ProductImageView
-          product={product}
-          image={image}
-          titleId={titleId}
-          onOtherCategory={onOtherCategory}
+      <div
+        ref={rootRef}
+        className="grid grid-cols-[48px_1fr_48px] items-center gap-x-2 gap-y-3 md:col-start-1 md:row-span-2 md:row-start-1 lg:gap-x-4"
+      >
+        <div
+          {...swipe.bind}
+          className={`col-span-3 touch-pan-y transition-transform duration-150 motion-reduce:transition-none lg:col-span-1 lg:col-start-2 lg:row-start-1 ${bouncing}`}
+        >
+          <ProductImageView
+            product={product}
+            image={image}
+            titleId={titleId}
+            hasNext={hasNext}
+            onOtherCategory={onOtherCategory}
+            onNextProduct={skipDeleted}
+          />
+          <p className="hidden text-center text-caption text-ink-subtle [@media(hover:hover)]:lg:block">
+            Phím ← → để chuyển sản phẩm
+          </p>
+        </div>
+        <ArrowButton
+          direction="prev"
+          enabled={hasPrev}
+          busy={nav.moving === 'prev'}
+          onClick={nav.prev}
+          className="lg:col-start-1 lg:row-start-1 lg:self-center"
+        />
+        <p aria-hidden="true" className="text-center text-small text-ink-muted lg:hidden">
+          {position} / {total}
+        </p>
+        <ArrowButton
+          direction="next"
+          enabled={hasNext}
+          busy={nav.moving === 'next'}
+          onClick={nav.next}
+          className="lg:col-start-3 lg:row-start-1 lg:self-center"
         />
       </div>
-      <ProductInfo product={product} titleId={titleId} quota={tryonState.quota} />
+      <ProductInfo
+        product={product}
+        titleId={titleId}
+        quota={tryonState.quota}
+        position={position}
+        total={total}
+      >
+        <NavNotices
+          atEnd={!hasNext}
+          navError={nav.navError}
+          onRetry={nav.retryNav}
+          onOtherCategory={onOtherCategory}
+        />
+      </ProductInfo>
     </>
   );
 }
 
+/** Sản phẩm trên URL đã xóa (US-06 E3, S14): báo và cho nút chuyển tiếp, không tự chuyển, không tự sinh ảnh. */
+function GoneStage({ nav, onOtherCategory, onSkip }) {
+  const overlay = describeOverlay('deleted', { hasNext: nav.hasNextAfterGone });
+  return (
+    <StageFrame>
+      <div className="flex h-full w-full items-start justify-center pt-[22%]">
+        <PackageX size={40} aria-hidden="true" className="text-ink-subtle" />
+      </div>
+      <MessageOverlay
+        overlay={overlay}
+        onAction={(kind) => (kind === 'nextProduct' ? onSkip() : onOtherCategory())}
+      />
+    </StageFrame>
+  );
+}
+
 /**
- * Phòng thử đồ (G4): chip danh mục, sân khấu, thông tin. Chỉ mount khi hồ sơ đủ và consent hiệu lực.
- * Điều hướng giữa các sản phẩm (mũi tên, vuốt, phím) thuộc US-06, chưa có ở đây.
+ * Phòng thử đồ (G4): chip danh mục, sân khấu, thông tin, điều hướng giữa các sản phẩm (US-06). Chỉ mount khi
+ * hồ sơ đủ và consent hiệu lực. URL `?category&product` chỉ chứa id và dùng `replace` (D-117).
  */
 export function TryOnRoom({ tryonState, refreshState, onGate, announce }) {
   const [params, setParams] = useSearchParams();
   const categoryId = params.get('category');
+  const productParam = params.get('product');
   const catalog = useCategories();
-  const first = useFirstProduct(categoryId);
+  const nav = useProductNavigation(categoryId, productParam);
+  const cache = useImageCache();
   const chipsRef = useRef(null);
+  const focusRequest = useRef(false);
   const [notice, setNotice] = useState(null); // 'empty' | 'gone': danh mục vừa bị bỏ chọn
   const { reload: reloadCategories } = catalog;
 
+  const handleGate = useCallback(
+    (failure) => {
+      cache.clear(); // 403/409: xóa mọi ảnh thử đồ khỏi bộ nhớ trang (AC-16)
+      onGate(failure);
+    },
+    [cache, onGate],
+  );
+
   const selectCategory = (category) => {
-    if (category.id === categoryId) return; // đang ở sản phẩm đầu: không gọi lại
+    if (category.id === categoryId) {
+      nav.goFirst?.(); // chọn lại danh mục đang chọn: về sản phẩm đầu
+      return;
+    }
     setNotice(null);
     setParams({ category: category.id }, { replace: true }); // D-117: Back rời phòng, không lùi từng bước
     announce(`Danh mục ${category.name}, ${category.productCount} sản phẩm`);
@@ -87,8 +240,24 @@ export function TryOnRoom({ tryonState, refreshState, onGate, announce }) {
     chip?.focus();
   };
 
+  // Giữ `product` trên URL đúng với sản phẩm đang xem, thay thế mục lịch sử (D-117, R8).
+  const wantedProduct = nav.status === 'ready' ? (nav.product?.id ?? nav.goneId ?? null) : null;
+  useEffect(() => {
+    if (categoryId && wantedProduct && wantedProduct !== productParam) {
+      setParams({ category: categoryId, product: wantedProduct }, { replace: true });
+    }
+  }, [categoryId, wantedProduct, productParam, setParams]);
+
+  // `←` `→` chỉ khi đang ở bố cục phòng có sản phẩm.
+  const canNavigate = nav.status === 'ready' && Boolean(nav.product);
+  useArrowKeys({
+    enabled: canNavigate,
+    onPrev: () => nav.prev?.(),
+    onNext: () => (nav.hasNext ? nav.next() : announce(END_MESSAGE)),
+  });
+
   // E6, E7: danh mục trống hoặc không còn tồn tại thì làm mới danh sách và bỏ chọn nếu nó đã biến mất.
-  const { status } = first;
+  const { status } = nav;
   useEffect(() => {
     if (status !== 'empty' && status !== 'gone') return undefined;
     let cancelled = false;
@@ -133,9 +302,9 @@ export function TryOnRoom({ tryonState, refreshState, onGate, announce }) {
 
   let stage;
   let info = null;
-  if (first.status === 'idle') {
+  if (nav.status === 'idle') {
     stage = notice === 'gone' ? <StageGone /> : notice === 'empty' ? <StageEmpty /> : <StageIdle />;
-  } else if (first.status === 'loading') {
+  } else if (nav.status === 'loading') {
     stage = (
       <>
         <div className={`h-full w-full ${SHIMMER}`} />
@@ -145,18 +314,29 @@ export function TryOnRoom({ tryonState, refreshState, onGate, announce }) {
       </>
     );
     info = <InfoSkeleton />;
-  } else if (first.status === 'empty') {
+  } else if (nav.status === 'empty') {
     stage = <StageEmpty />;
-  } else if (first.status === 'gone') {
+  } else if (nav.status === 'gone') {
     stage = <StageGone />;
-  } else if (first.status === 'error') {
+  } else if (nav.status === 'error') {
     stage = (
       <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-6">
         <Alert variant="danger" role="alert" className="w-full">
           Không tải được sản phẩm. Vui lòng thử lại.
         </Alert>
-        <Button onClick={first.retry}>Thử lại</Button>
+        <Button onClick={nav.retry}>Thử lại</Button>
       </div>
+    );
+  } else if (!nav.product) {
+    stage = (
+      <GoneStage
+        nav={nav}
+        onOtherCategory={focusChip}
+        onSkip={async () => {
+          focusRequest.current = true;
+          if (!(await nav.skipGone())) focusRequest.current = false;
+        }}
+      />
     );
   }
 
@@ -169,24 +349,31 @@ export function TryOnRoom({ tryonState, refreshState, onGate, announce }) {
             categories={catalog.categories}
             selectedId={categoryId}
             onSelect={selectCategory}
-            busy={first.status === 'loading'}
+            busy={nav.status === 'loading'}
             chipsRef={chipsRef}
           />
         </div>
-        {first.status === 'ready' ? (
+        {nav.status === 'ready' && nav.product ? (
           <ProductStage
-            key={first.product.id}
-            product={first.product}
+            key={nav.product.id}
+            product={nav.product}
+            nav={nav}
             tryonState={tryonState}
             refreshState={refreshState}
-            onGate={onGate}
+            onGate={handleGate}
             announce={announce}
             onOtherCategory={focusChip}
+            cache={cache}
+            focusRequest={focusRequest}
           />
         ) : (
           <>
             <div className="md:col-start-1 md:row-span-2 md:row-start-1">
-              <StageFrame busy={first.status === 'loading'}>{stage}</StageFrame>
+              {stage?.type === GoneStage ? (
+                stage
+              ) : (
+                <StageFrame busy={nav.status === 'loading'}>{stage}</StageFrame>
+              )}
             </div>
             {info}
           </>
