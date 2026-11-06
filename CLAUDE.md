@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Try-on** is a virtual try-on (GenAI) fashion e-commerce web app. `backend/` is Express 5 (ESM) and `frontend/` is Vite + React 19 + Tailwind v4. Auth (US-01), profile (US-02), admin categories (US-03) and products (US-04) are on `main`; the try-on room (US-05, `/try-on`, `frontend/src/features/tryon`) is on branch `feature/US-05-tryon-room` until merged; see `PROGRESS.md` for the status of later sprints. Main folders: `backend/src`, `backend/tests` (including `tests/postman`), `frontend/src` (admin UI in `features/admin`), `migrations/`, `design/`, `sprint-01/`, `sprint-02/`. The root `package.json` only pulls in `@supabase/supabase-js`; each app has its own `package.json`.
+**Try-on** is a virtual try-on (GenAI) fashion e-commerce web app. `backend/` is Express 5 (ESM) and `frontend/` is Vite + React 19 + Tailwind v4. Auth (US-01), profile (US-02), admin categories (US-03), products (US-04) and the try-on room with product navigation (US-05, US-06) are on `main`. Try-on runs on a fake provider by default (`TRYON_PROVIDER=fake`); the real FASHN provider has not been called yet. See `PROGRESS.md` for the status of later sprints. Main folders: `backend/src` (try-on in `services/tryon`), `backend/tests` (including `tests/postman`), `frontend/src` (admin UI in `features/admin`, try-on in `features/tryon`), `migrations/`, `design/`, `sprint-01/`, `sprint-02/`, `sprint-03/`. The root `package.json` only pulls in `@supabase/supabase-js`; each app has its own `package.json`.
 
 Project docs and agent prompts are written in Vietnamese.
 
