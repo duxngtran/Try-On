@@ -4,6 +4,11 @@ import { buildServices } from '../../src/config/container.js';
 import { DuplicateEmailError } from '../../src/repositories/userRepository.js';
 import { DuplicateCategoryNameError } from '../../src/repositories/categoryRepository.js';
 import { createProductImageStorage } from '../../src/services/productImageStorage.js';
+import { createPhotoStorage } from '../../src/services/storage.js';
+import { createFakeProvider } from '../../src/services/tryon/fakeProvider.js';
+import { buildTryonConfig } from '../../src/services/tryon/config.js';
+import { parseEnv } from '../../src/config/env.js';
+import { createFakeTryonRepository } from './fakeTryonRepository.js';
 
 export const TEST_ENV = Object.freeze({
   JWT_SECRET: 'test-secret-test-secret-test-secret-123',
@@ -78,12 +83,18 @@ export function createFakeProfileRepository(userRepository) {
         photo_updated_at: null,
         photo_consent_at: null,
         photo_consent_version: null,
+        tryon_consent_at: null,
+        tryon_consent_version: null,
+        tryon_consent_withdrawn_at: null,
+        tryon_consent_generation: 0,
       });
     }
     return rows.get(userId) ?? null;
   };
   return {
     rows,
+    /** Mô phỏng trigger DB: gọi sau khi photo_version đổi. */
+    listeners: [],
     failNextSetPhoto: false,
     async findByUserId(userId) {
       const row = ensure(userId);
@@ -121,6 +132,7 @@ export function createFakeProfileRepository(userRepository) {
       row.photo_path = newPath;
       row.photo_version += 1;
       row.photo_updated_at = pgTimestamp();
+      for (const listener of this.listeners) listener(userId);
       return { oldPath, photoVersion: row.photo_version, photoUpdatedAt: row.photo_updated_at };
     },
   };
@@ -221,6 +233,8 @@ export function createFakeProductRepository(categoryRepository) {
   };
   const repo = {
     rows,
+    /** Mô phỏng trigger DB: gọi khi image_version đổi hoặc sản phẩm bị xóa mềm. */
+    listeners: [],
     failNextCreate: false,
     failNextUpdate: false,
     /** true: danh mục bị xóa ngay trước khi hàm SQL chạy (sau lần kiểm tra sớm). */
@@ -301,6 +315,7 @@ export function createFakeProductRepository(categoryRepository) {
       if (newImagePath) {
         row.image_path = newImagePath;
         row.image_version += 1;
+        for (const listener of repo.listeners) listener(id);
       }
       row.updated_at = pgTimestamp();
       return { status: 'ok', oldImagePath };
@@ -309,6 +324,7 @@ export function createFakeProductRepository(categoryRepository) {
       const row = active().find((r) => r.id === id);
       if (!row) return false;
       row.deleted_at = pgTimestamp();
+      for (const listener of repo.listeners) listener(id);
       return true;
     },
   };
@@ -347,6 +363,11 @@ export function createFakeSupabase() {
       }
       return { data: [], error: null };
     },
+    async download(path) {
+      const object = objects.get(path);
+      if (!object) return { data: null, error: { message: 'Object not found' } };
+      return { data: new Blob([object.body]), error: null };
+    },
     async createSignedUrl(path, expiresIn) {
       if (state.failSign) return { data: null, error: { message: 'sign failed' } };
       return {
@@ -360,9 +381,30 @@ export function createFakeSupabase() {
   return { objects, state, storage: { from: () => bucketApi } };
 }
 
+/** Mặc định của biến TRYON_*, FASHN_* lấy từ chính env schema (chạy cả bước parse env). */
+const tryonEnvDefaults = () => {
+  const parsed = parseEnv({
+    CORS_ORIGIN: 'http://localhost:5173',
+    SUPABASE_URL: 'https://fake.supabase.co',
+    SUPABASE_SERVICE_ROLE_KEY: 'fake',
+    JWT_SECRET: 'x'.repeat(32),
+  });
+  return Object.fromEntries(
+    Object.entries(parsed).filter(([k]) => k.startsWith('TRYON_') || k.startsWith('FASHN_')),
+  );
+};
+
+/**
+ * @param {object} [envOverrides]
+ * @param {{
+ *   processPhoto?: Function, processProductImage?: Function, logger?: object,
+ *   tryon?: boolean, tryonDelayMs?: number,
+ * }} [options] `tryon: true` lắp phòng thử đồ với repository giả, adapter giả và đồng hồ điều khiển bằng tay.
+ *   Worker KHÔNG tự chạy: test gọi `ctx.tryon.worker.tick()`.
+ */
 export async function createTestApp(
   envOverrides = {},
-  { processPhoto, processProductImage, logger } = {},
+  { processPhoto, processProductImage, logger, tryon = false, tryonDelayMs = 0 } = {},
 ) {
   const userRepository = createFakeUserRepository();
   const profileRepository = createFakeProfileRepository(userRepository);
@@ -373,6 +415,7 @@ export async function createTestApp(
   const productSupabase = createFakeSupabase();
   const env = {
     ...TEST_ENV,
+    ...tryonEnvDefaults(),
     PROFILE_PHOTO_BUCKET: 'profile-photos',
     PHOTO_MAX_MB: 10,
     PHOTO_UPLOADS_PER_HOUR: 1000,
@@ -384,6 +427,40 @@ export async function createTestApp(
     ...envOverrides,
   };
   const errorLogger = logger ?? { error: () => {} };
+
+  let tryonOptions = {};
+  let tryonCtx;
+  if (tryon) {
+    const clock = { t: Date.now(), now: () => clock.t, advance: (ms) => (clock.t += ms) };
+    const tryonSupabase = createFakeSupabase();
+    const config = buildTryonConfig(env);
+    const tryonRepository = createFakeTryonRepository({
+      profileRepository,
+      productRepository,
+      categoryRepository,
+      config,
+      clock,
+    });
+    const provider = createFakeProvider({
+      delayMs: tryonDelayMs,
+      now: clock.now,
+      resolveScenario: async ({ garmentImageUrl }) => {
+        const id = /([0-9a-f-]{36})\/[0-9a-f-]{36}\.jpg$/.exec(garmentImageUrl)?.[1];
+        return productRepository.rows.find((r) => r.id === id)?.name;
+      },
+    });
+    tryonOptions = {
+      tryonRepository,
+      provider,
+      tryonStorage: createPhotoStorage({
+        client: tryonSupabase,
+        bucket: env.TRYON_IMAGE_BUCKET,
+        signedUrlTtlSeconds: env.SIGNED_URL_TTL_SECONDS,
+      }),
+    };
+    tryonCtx = { repository: tryonRepository, provider, clock, supabase: tryonSupabase, config };
+  }
+
   const services = await buildServices(env, {
     userRepository,
     profileRepository,
@@ -398,7 +475,9 @@ export async function createTestApp(
     supabase,
     processPhoto,
     logger: errorLogger,
+    ...tryonOptions,
   });
+  if (tryonCtx) Object.assign(tryonCtx, services.tryon);
   const app = createApp({ corsOrigin: 'http://localhost:5173', logger: errorLogger, services });
   return {
     app,
@@ -409,5 +488,7 @@ export async function createTestApp(
     supabase,
     productSupabase,
     env,
+    services,
+    tryon: tryonCtx,
   };
 }

@@ -4,12 +4,14 @@ import { adminPing, createAuthController } from '../controllers/authController.j
 import { createCategoryController } from '../controllers/categoryController.js';
 import { createProductController } from '../controllers/productController.js';
 import { createProfileController, requirePhotoConsent } from '../controllers/profileController.js';
+import { createTryonController } from '../controllers/tryonController.js';
 import { requireRole } from '../middlewares/auth.js';
 import { validateBody } from '../middlewares/validate.js';
 import { validateUuidParam } from '../middlewares/validateUuidParam.js';
 import { categoryBodySchema } from '../validation/categorySchemas.js';
 import { loginSchema, registerSchema } from '../validation/authSchemas.js';
 import { consentSchema, measurementsSchema } from '../validation/profileSchemas.js';
+import { consentBodySchema, createJobBodySchema } from '../validation/tryonSchemas.js';
 
 /**
  * @param {{
@@ -29,6 +31,11 @@ import { consentSchema, measurementsSchema } from '../validation/profileSchemas.
  *     uploadPhoto: import('express').RequestHandler,
  *     photoUploadRateLimiter: import('express').RequestHandler,
  *   },
+ *   tryon?: {
+ *     tryonService: ReturnType<import('../services/tryonService.js').createTryonService>,
+ *     tryonReadRateLimiter: import('express').RequestHandler,
+ *     tryonCreateRateLimiter: import('express').RequestHandler,
+ *   },
  * }} [services] Không truyền thì chỉ có `/health` (dùng cho test hạ tầng).
  */
 export function createApiRouter(services) {
@@ -36,7 +43,8 @@ export function createApiRouter(services) {
   router.get('/health', health);
   if (!services) return router;
 
-  const { authService, authenticate, authRateLimiter, categories, products, profile } = services;
+  const { authService, authenticate, authRateLimiter, categories, products, profile, tryon } =
+    services;
   const auth = createAuthController(authService);
 
   router.post('/auth/register', authRateLimiter, validateBody(registerSchema), auth.register);
@@ -124,6 +132,50 @@ export function createApiRouter(services) {
       controller.replacePhoto,
     );
     router.delete('/profile/photo', ...userOnly, controller.deletePhoto);
+  }
+
+  if (tryon) {
+    // Chỉ role user (D-14, D-28). Thứ tự: auth -> role -> uuid (404) -> rate limit (đếm mọi request) -> body.
+    const { tryonService, tryonReadRateLimiter: read, tryonCreateRateLimiter: create } = tryon;
+    const controller = createTryonController(tryonService);
+    const userOnly = [authenticate, requireRole('user')];
+    const categoryId = validateUuidParam('Danh mục không còn tồn tại.', 'categoryId');
+    const productId = validateUuidParam('Sản phẩm này không còn bán.', 'productId');
+    const jobId = validateUuidParam('Không tìm thấy tác vụ.', 'jobId');
+
+    router.get('/try-on/state', ...userOnly, read, controller.state);
+    router.post(
+      '/try-on/consent',
+      ...userOnly,
+      read,
+      validateBody(consentBodySchema),
+      controller.acceptConsent,
+    );
+    router.delete('/try-on/consent', ...userOnly, read, controller.withdrawConsent);
+    router.get('/try-on/categories', ...userOnly, read, controller.categories);
+    router.get(
+      '/try-on/categories/:categoryId/products',
+      ...userOnly,
+      categoryId,
+      read,
+      controller.products,
+    );
+    router.get(
+      '/try-on/products/:productId/result',
+      ...userOnly,
+      productId,
+      read,
+      controller.result,
+    );
+    router.post(
+      '/try-on/products/:productId/jobs',
+      ...userOnly,
+      productId,
+      create,
+      validateBody(createJobBodySchema),
+      controller.createJob,
+    );
+    router.get('/try-on/jobs/:jobId', ...userOnly, jobId, read, controller.job);
   }
   return router;
 }

@@ -6,6 +6,8 @@ import { createUserRepository } from './repositories/userRepository.js';
 import { createCategoryRepository } from './repositories/categoryRepository.js';
 import { createProductRepository } from './repositories/productRepository.js';
 import { createProfileRepository } from './repositories/profileRepository.js';
+import { createTryonRepository } from './repositories/tryonRepository.js';
+import { buildTryonConfig } from './services/tryon/config.js';
 
 let env;
 try {
@@ -21,14 +23,28 @@ const services = await buildServices(env, {
   profileRepository: createProfileRepository(supabase),
   categoryRepository: createCategoryRepository(supabase),
   productRepository: createProductRepository(supabase),
+  tryonRepository: createTryonRepository(supabase, buildTryonConfig(env)),
   supabase,
   startSweeper: true,
+  startWorker: true,
 });
 const app = createApp({
   corsOrigin: env.CORS_ORIGIN,
   isProduction: env.NODE_ENV === 'production',
   services,
 });
-app.listen(env.PORT, () => {
+const server = app.listen(env.PORT, () => {
   console.log(`API listening on http://localhost:${env.PORT}/api`);
 });
+
+// Tắt gọn: ngừng nhận request, rồi dừng worker và dọn dẹp (chờ job đang xử lý).
+let shuttingDown = false;
+async function shutdown() {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  server.close();
+  await services.stop();
+  process.exit(0);
+}
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);

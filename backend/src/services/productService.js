@@ -40,6 +40,7 @@ export const createToProduct = (imageStorage) => (row) => ({
  *   productRepository: ReturnType<import('../repositories/productRepository.js').createProductRepository>,
  *   imageStorage: ReturnType<import('./productImageStorage.js').createProductImageStorage>,
  *   processImage?: (buffer: Buffer) => Promise<Buffer>,
+ *   tryonCleanup?: { kick(): unknown },
  *   logger?: Pick<Console, 'error'>,
  *   newId?: () => string,
  * }} deps
@@ -48,10 +49,20 @@ export function createProductService({
   productRepository,
   imageStorage,
   processImage = processProductImage,
+  tryonCleanup,
   logger = console,
   newId = randomUUID,
 }) {
   const toProduct = createToProduct(imageStorage);
+
+  /** Trigger DB đã xóa ảnh try-on của sản phẩm cùng transaction; kick để xóa file sớm. Best-effort. */
+  const kickTryonCleanup = () => {
+    try {
+      void tryonCleanup?.kick();
+    } catch {
+      // hàng đợi xóa file sẽ tự chạy ở tick kế tiếp
+    }
+  };
 
   /** Xóa file, thử lại 1 lần; vẫn lỗi thì ghi ORPHAN_PRODUCT_IMAGE (không làm request lỗi). */
   const removeBestEffort = async (path, productId) => {
@@ -148,6 +159,7 @@ export function createProductService({
         if (newImagePath) await removeBestEffort(newImagePath, id);
         throw result.status === 'not_found' ? NOT_FOUND() : CATEGORY_NOT_FOUND();
       }
+      if (newImagePath) kickTryonCleanup();
       if (result.oldImagePath) await removeBestEffort(result.oldImagePath, id);
       return toProduct(await requireProduct(id));
     },
@@ -155,6 +167,7 @@ export function createProductService({
     /** Xóa mềm, giữ file ảnh (D-42). */
     async remove(id) {
       if (!(await productRepository.softDelete(id))) throw NOT_FOUND();
+      kickTryonCleanup();
       return { id };
     },
   };
