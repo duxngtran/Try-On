@@ -71,3 +71,11 @@ export function describeAdded({ name, priceAtClick, priceNow }) {
     ? `${base} Giá hiện tại: ${formatPriceVnd(priceNow)}.`
     : base;
 }
+
+/** Lỗi thao tác ở trang giỏ (PATCH, DELETE) không có chữ riêng (screens/cart.md, "Thông báo trang"). */
+export function describeCartActionError({ code, details }) {
+  if (code === 'TOO_MANY_REQUESTS') {
+    return { text: `Bạn thao tác quá nhanh, thử lại sau ${retrySeconds(details)} giây.` };
+  }
+  return { text: 'Chưa cập nhật được giỏ hàng. Vui lòng thử lại.' };
+}

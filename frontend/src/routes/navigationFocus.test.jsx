@@ -58,9 +58,8 @@ describe('menu tài khoản (bottom sheet mobile / dropdown desktop)', () => {
     const { user } = renderApp('/', { token: 'jwt', routes });
     await h1('Xin chào');
     await openMenu(user);
-    await user.tab();
-    await user.tab();
-    await user.tab();
+    // Trang chủ -> Thử đồ -> Giỏ hàng -> Đơn của tôi -> Hồ sơ -> Đăng xuất (D-165).
+    for (let i = 0; i < 5; i += 1) await user.tab();
     expect(screen.getByRole('menuitem', { name: 'Đăng xuất' })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole('menuitem', { name: 'Trang chủ' })).toHaveFocus();

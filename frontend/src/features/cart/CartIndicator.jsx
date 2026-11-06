@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
+import { Link, useLocation } from 'react-router';
 import { useCart } from './cartContext.js';
 
 /** "Giỏ hàng", "Giỏ hàng, trống", "Giỏ hàng, 3 món", kèm cảnh báo khi có dòng ngừng bán (entry-points.md mục 1). */
@@ -10,13 +11,15 @@ function accessibleName(cart) {
 }
 
 /**
- * Biểu tượng giỏ hàng và số món trên header, chỉ cho role `user` (Layout quyết định).
- * Chưa là liên kết: trang `/cart` thuộc US-08 (T-116 bật link, như D-62), nên ở story này chỉ là chỉ báo.
+ * Liên kết giỏ hàng và số món trên header, chỉ cho role `user` (Layout quyết định). Bật link ở US-08 (D-165).
  * Chưa biết số (đang tải lần đầu, tải lỗi): chỉ icon, không badge, không báo lỗi ở header.
+ * Đang ở `/cart` hoặc `/checkout`: gạch chân 2px và `aria-current="page"`.
  */
 export function CartIndicator() {
   const { cart } = useCart();
+  const { pathname } = useLocation();
   const count = cart?.itemCount ?? null;
+  const active = pathname === '/cart' || pathname === '/checkout';
 
   // Badge nảy 200 ms khi số tăng (chỉ `transform`; reduced motion tắt bằng `motion-safe`).
   const [seen, setSeen] = useState(count);
@@ -27,11 +30,15 @@ export function CartIndicator() {
   }
 
   return (
-    <span
-      role="img"
+    <Link
+      to="/cart"
       aria-label={accessibleName(cart)}
+      aria-current={active ? 'page' : undefined}
+      title="Giỏ hàng"
       data-cart-indicator
-      className="relative inline-flex h-11 w-11 shrink-0 items-center justify-center text-ink"
+      className={`relative inline-flex h-11 w-11 shrink-0 items-center justify-center border-b-2 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink ${
+        active ? 'border-ink' : 'border-transparent'
+      }`}
     >
       <ShoppingBag size={24} aria-hidden="true" />
       {count > 0 && (
@@ -51,6 +58,6 @@ export function CartIndicator() {
           className="absolute bottom-1 right-1 h-2 w-2 rounded-full bg-warning"
         />
       )}
-    </span>
+    </Link>
   );
 }

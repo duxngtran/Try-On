@@ -79,7 +79,7 @@ const calls = (all, key) => all.filter((c) => c.key === key);
 const postsToCart = (all) => calls(all, 'POST /cart/items');
 const jobPosts = (all) =>
   all.filter((c) => c.key.startsWith('POST /try-on') && c.key.endsWith('/jobs'));
-const headerCart = () => screen.getByRole('img', { name: /^Giỏ hàng/ });
+const headerCart = () => screen.getByRole('link', { name: /^Giỏ hàng/ });
 
 /** Một response giữ lại cho tới khi test gọi `release`. */
 function deferred() {
@@ -111,6 +111,8 @@ describe('thêm vào giỏ ở phòng thử đồ (AC-01, AC-02)', () => {
     expect(headerCart()).toHaveAccessibleName('Giỏ hàng, 1 món');
     expect(await screen.findByText('Trong giỏ: 1')).toBeInTheDocument();
     expect(await addButton()).toHaveAccessibleDescription('Trong giỏ: 1');
+    // Link tới giỏ (D-165) nằm cạnh ghi chú nhưng không lẫn vào mô tả của nút.
+    expect(screen.getByRole('link', { name: 'Xem giỏ hàng' })).toHaveAttribute('href', '/cart');
     expect(router.state.location.pathname).toBe('/try-on');
     expect(router.state.location.search).toBe('?category=c1&product=p1');
     expect(screen.getByAltText('Ảnh bạn mặc Áo 1, do AI tạo')).toBeInTheDocument();
@@ -493,7 +495,7 @@ describe('giỏ qua phiên và theo vai (AC-12, E8, R7)', () => {
     });
     await screen.findByRole('heading', { level: 1, name: 'Khu vực quản trị' });
     expect(all.some((c) => c.key.includes('/cart'))).toBe(false);
-    expect(screen.queryByRole('img', { name: /Giỏ hàng/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /^Giỏ hàng/ })).not.toBeInTheDocument();
   });
 
   it('chưa biết số (đang tải, hoặc tải lỗi): chỉ icon, không badge; có số sau lần thêm thành công', async () => {
@@ -553,7 +555,7 @@ describe('giỏ qua phiên và theo vai (AC-12, E8, R7)', () => {
     await user.click(screen.getByRole('button', { name: 'Tài khoản' }));
     await user.click(screen.getByRole('menuitem', { name: 'Đăng xuất' }));
     await screen.findByRole('heading', { level: 1, name: 'Chào mừng trở lại' });
-    expect(screen.queryByRole('img', { name: /Giỏ hàng/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /^Giỏ hàng/ })).not.toBeInTheDocument();
     expect(localStorage.length).toBe(0);
   });
 });

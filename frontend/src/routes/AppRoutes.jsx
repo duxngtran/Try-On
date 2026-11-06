@@ -21,6 +21,34 @@ const TryOnPage = lazy(() =>
   import('../features/tryon/TryOnPage.jsx').then((m) => ({ default: m.TryOnPage })),
 );
 
+// Giỏ hàng và đơn hàng cũng tải theo nhu cầu (T-116).
+const CartPage = lazy(() =>
+  import('../features/cart/CartPage.jsx').then((m) => ({ default: m.CartPage })),
+);
+const CheckoutPage = lazy(() =>
+  import('../features/orders/CheckoutPage.jsx').then((m) => ({ default: m.CheckoutPage })),
+);
+const OrdersPage = lazy(() =>
+  import('../features/orders/OrdersPage.jsx').then((m) => ({ default: m.OrdersPage })),
+);
+const OrderDetailPage = lazy(() =>
+  import('../features/orders/OrderDetailPage.jsx').then((m) => ({ default: m.OrderDetailPage })),
+);
+
+function PageSuspense({ label, children }) {
+  return (
+    <Suspense
+      fallback={
+        <div role="status" className="flex justify-center py-16">
+          <Spinner size={24} label={label} />
+        </div>
+      }
+    >
+      {children}
+    </Suspense>
+  );
+}
+
 /** Bảng guard theo header-navigation.md; phải render bên trong Router và AuthProvider. */
 export function AppRoutes() {
   return (
@@ -46,6 +74,38 @@ export function AppRoutes() {
                 >
                   <TryOnPage />
                 </Suspense>
+              }
+            />
+            <Route
+              path="/cart"
+              element={
+                <PageSuspense label="Đang tải giỏ hàng">
+                  <CartPage />
+                </PageSuspense>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <PageSuspense label="Đang tải đơn hàng">
+                  <CheckoutPage />
+                </PageSuspense>
+              }
+            />
+            <Route
+              path="/orders"
+              element={
+                <PageSuspense label="Đang tải đơn hàng">
+                  <OrdersPage />
+                </PageSuspense>
+              }
+            />
+            <Route
+              path="/orders/:id"
+              element={
+                <PageSuspense label="Đang tải đơn hàng">
+                  <OrderDetailPage />
+                </PageSuspense>
               }
             />
           </Route>
