@@ -6,7 +6,7 @@
 | sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Xong | US-01 và US-02 đã merge vào `main` |
 | sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Xong | US-03 và US-04 đã merge vào `main` |
 | sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Xong mức A | US-05, US-06 đã merge, dùng adapter giả. Mức B (T-93 → T-97) chờ user. User ủy quyền duyệt cả sprint, trừ pilot FASHN |
-| sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Đang làm | Bước 1–3 xong; đang làm bước 4 (UI/UX). User phê duyệt mọi quyết định của main agent, kể cả merge khi test đạt (2026-11-06) |
+| sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Đang làm | Bước 1–4 xong; bước 5: US-07 trên `feature/US-07-add-to-cart`. User phê duyệt mọi quyết định của main agent, kể cả merge khi test đạt (2026-11-06) |
 
 ## Sprint 01 — chi tiết
 - [x] Bước 1: User stories (`sprint-01/US-01.md`, `sprint-01/US-02.md`) — xong, user xác nhận giả định (D-04 → D-15) (2026-11-04)
@@ -33,8 +33,8 @@
 - [x] Bước 1: User stories (`sprint-04/US-07.md`, `US-08.md`, `US-09.md`) — xong (2026-11-06)
 - [x] Bước 2: Sprint backlog (`sprint-04/sprint-backlog.md`, 32 task T-98 → T-129) — xong (2026-11-06)
 - [x] Bước 3: Thiết kế nghiệp vụ (`sprint-04/design/`: 5 luồng, `api.md`, `db/`) — xong; SQL 007, 008 chưa áp dụng lên Supabase; D-137 → D-154 (2026-11-06)
-- [ ] Bước 4: UI/UX — đang làm
-- [ ] Bước 5: Implement + test
+- [x] Bước 4: UI/UX (7 file `sprint-04/screens/`, mục 7.13 trong `design/design-system.md`) — xong, không có mockup; D-155 → D-164 (2026-11-06)
+- [ ] Bước 5: Implement + test — US-07 đang làm
 
 ## Merge log
 - 2026-11-04: `chore/sprint-01-setup` → `main` (merge commit `3a8d178`). Setup T-01, T-03→T-06, T-08 + Prettier, .gitattributes, README. Test BE 20/20, FE 8/8, lint, format:check, build đều pass. T-07, T-09 còn chờ Supabase.
@@ -52,7 +52,7 @@
 - `DATABASE_URL` dùng Session pooler cổng 5432 vì host direct chỉ có IPv6 mà máy dev không có IPv6. User quyết định không đổi các secret đã gửi trong chat (2026-11-05)
 
 ## Trước khi ra mắt thật
-- Xem lại việc bắt buộc ảnh, số đo, consent AI để mua hàng (D-147), thời hạn giữ thông tin nhận hàng (D-152), đơn giả (D-154), cùng các việc pháp lý ở D-96
+- Xem lại việc bắt buộc ảnh, số đo, consent AI để mua hàng (D-147), thời hạn giữ thông tin nhận hàng (D-152), đơn giả (D-154), số điện thoại sai không sửa được và chưa có hủy đơn (D-164), cùng các việc pháp lý ở D-96
 
 ## Backlog kỹ thuật (để sau)
 - Script dọn file ảnh mồ côi (log `ORPHAN_PHOTO`) — D-25
