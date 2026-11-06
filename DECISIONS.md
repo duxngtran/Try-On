@@ -135,3 +135,6 @@ Ghi lại các quyết định nghiệp vụ & thuật toán. Khi một quyết 
 | D-129 | `GET /jobs/:id` với job `succeeded` mà consent đã lỗi thời trả `discarded`, `image: null` | Nhất quán D-108; agent-coder chọn, user ủy quyền duyệt cả sprint 3 | sprint-03 |
 | D-130 | Lỗi `failed` có tên lạ từ FASHN coi là tạm thời, thử lại 1 lần | Tài liệu FASHN có thể thêm tên mới; tối đa tốn thêm 1 lần gọi; agent-coder chọn, user ủy quyền duyệt cả sprint 3 | sprint-03 |
 | D-131 | Trạng thái tạm dừng khi hết credit nằm trong bộ nhớ; khởi động lại server là thử lại ngay | Một instance (D-99); agent-coder chọn, user ủy quyền duyệt cả sprint 3 | sprint-03 |
+| D-132 | `npm run test:postman` chạy mỗi nhóm collection trên một server riêng để AC-17 có cấu hình `TRYON_DAILY_LIMIT=1` và ngân sách rất nhỏ; nhận tên collection làm tham số | Kiểm được giới hạn qua HTTP thật; agent-coder chọn, user ủy quyền duyệt cả sprint 3 | sprint-03 |
+| D-133 | Mục "Thử đồ" đặt giữa Trang chủ và Hồ sơ, hiện cả ở mobile; ở US-05 tạm dùng câu "Chọn danh mục để xem bạn mặc thử sản phẩm." tới khi có mũi tên ở T-85 | Không nói về tính năng chưa có; theo khuyến nghị, user ủy quyền duyệt cả sprint 3 | sprint-03 |
+| D-134 | Trang Hồ sơ ghi rõ số đo chưa ảnh hưởng đến ảnh thử đồ và không gửi tới dịch vụ AI | Câu cũ mâu thuẫn D-82, D-95; main agent chốt, user ủy quyền duyệt cả sprint 3 | sprint-03 |

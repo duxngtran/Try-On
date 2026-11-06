@@ -137,14 +137,14 @@ Không đổi (D-02).
 
 | ID | Task | Phụ thuộc | Ước lượng | Definition of Done | TT |
 |---|---|---|---|---|---|
-| T-76 | `features/tryon/`: `tryonApi.js`, route `/try-on` (admin về `/admin`), mục điều hướng, màn hình theo `flows/tryon-room-entry.md` | T-71, Màn hình bước 4 | S | AC-01; lazy-load route | [ ] |
-| T-77 | Khối consent ở phòng (ô không tích sẵn, chi tiết). **Sửa US-02 (frontend):** khối rút consent ở `/profile`, nội dung modal `ConsentBlock`, hộp thoại xóa và thay ảnh (US-05 §5.5). `PHOTO_CONSENT_VERSION` giữ nguyên | T-76 | M | AC-02, AC-10 trên UI; câu consent nêu đủ theo D-93 | [ ] |
-| T-78 | Trang phòng thử đồ: danh mục, sản phẩm đầu, khung ảnh ổn định, chờ theo mốc 200 ms / 15 giây / 60 giây, hook poll, nhãn AI, E2–E22, số lượt khi ≤ 5, đổi danh mục giữa chừng | T-76 | L | AC-03 → AC-07, AC-15 trên UI, ≥ 360 px; `aria-live`, `prefers-reduced-motion` | [ ] |
-| T-79 | Test FE: hook poll (dừng khi rời, kết quả muộn không đổi ảnh), mốc thời gian bằng fake timer, map lỗi, consent; schema dùng chung bảng case với BE (D-21) | T-77, T-78 | M | Pass | [ ] |
-| T-80 | API test `tryon.collection.json`, thêm vào `run.js`: US-05 AC-01 → AC-04, AC-06 → AC-13, AC-16 → AC-18, AC-21 với adapter giả (sản phẩm `FAKE-*`). Có poll như D-39 cho link bị từ chối. Không đưa service role key vào collection | T-71, T-47 | L | `npm run test:postman` pass cả bộ; chạy lại lần 2 vẫn pass; không có request nào ra ngoài | [ ] |
-| T-81 | Kiểm tra trình duyệt thật ở 360, 768, 1280 px với adapter giả: vào phòng, consent, chọn danh mục, chờ, lỗi, rút consent, xóa ảnh hồ sơ | T-78 | S | Không lỗi console, không tràn ngang, không xê dịch khung ảnh | [ ] |
-| T-82 | Script `npm run tryon:pilot` **chỉ viết, không chạy**: đọc thư mục ảnh ngoài repo qua tham số, gọi adapter FASHN, ghi độ trễ, `x-fashn-credits-used`, mã lỗi. Yêu cầu cờ `--confirm-people-consented` và giới hạn `--max 20`. Không ghi ảnh hay đường dẫn vào log | T-65 | S | Chạy với `TRYON_PROVIDER=fake` ra đúng báo cáo; thiếu cờ thì thoát | [ ] |
-| T-83 | Review + user xác nhận → `/merge`, ghi `PROGRESS.md` | T-74, T-75, T-79 → T-82 | S | `main` có US-05, test pass sau merge | [ ] |
+| T-76 | `features/tryon/`: `tryonApi.js`, route `/try-on` (admin về `/admin`), mục điều hướng, màn hình theo `flows/tryon-room-entry.md` | T-71, Màn hình bước 4 | S | AC-01; lazy-load route | [x] |
+| T-77 | Khối consent ở phòng (ô không tích sẵn, chi tiết). **Sửa US-02 (frontend):** khối rút consent ở `/profile`, nội dung modal `ConsentBlock`, hộp thoại xóa và thay ảnh (US-05 §5.5). `PHOTO_CONSENT_VERSION` giữ nguyên | T-76 | M | AC-02, AC-10 trên UI; câu consent nêu đủ theo D-93 | [x] |
+| T-78 | Trang phòng thử đồ: danh mục, sản phẩm đầu, khung ảnh ổn định, chờ theo mốc 200 ms / 15 giây / 60 giây, hook poll, nhãn AI, E2–E22, số lượt khi ≤ 5, đổi danh mục giữa chừng | T-76 | L | AC-03 → AC-07, AC-15 trên UI, ≥ 360 px; `aria-live`, `prefers-reduced-motion` | [x] |
+| T-79 | Test FE: hook poll (dừng khi rời, kết quả muộn không đổi ảnh), mốc thời gian bằng fake timer, map lỗi, consent; schema dùng chung bảng case với BE (D-21) | T-77, T-78 | M | Pass | [x] |
+| T-80 | API test `tryon.collection.json`, thêm vào `run.js`: US-05 AC-01 → AC-04, AC-06 → AC-13, AC-16 → AC-18, AC-21 với adapter giả (sản phẩm `FAKE-*`). Có poll như D-39 cho link bị từ chối. Không đưa service role key vào collection | T-71, T-47 | L | `npm run test:postman` pass cả bộ; chạy lại lần 2 vẫn pass; không có request nào ra ngoài | [x] |
+| T-81 | Kiểm tra trình duyệt thật ở 360, 768, 1280 px với adapter giả: vào phòng, consent, chọn danh mục, chờ, lỗi, rút consent, xóa ảnh hồ sơ | T-78 | S | Không lỗi console, không tràn ngang, không xê dịch khung ảnh | [x] |
+| T-82 | Script `npm run tryon:pilot` **chỉ viết, không chạy**: đọc thư mục ảnh ngoài repo qua tham số, gọi adapter FASHN, ghi độ trễ, `x-fashn-credits-used`, mã lỗi. Yêu cầu cờ `--confirm-people-consented` và giới hạn `--max 20`. Không ghi ảnh hay đường dẫn vào log | T-65 | S | Chạy với `TRYON_PROVIDER=fake` ra đúng báo cáo; thiếu cờ thì thoát | [x] |
+| T-83 | Review + user xác nhận → `/merge`, ghi `PROGRESS.md` | T-74, T-75, T-79 → T-82 | S | `main` có US-05, test pass sau merge | [x] |
 
 ### 5.2 US-06 — Chuyển sản phẩm (branch `feature/US-06-product-navigation`, tạo sau T-83)
 

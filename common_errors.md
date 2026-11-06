@@ -33,6 +33,11 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 - **Ảnh chụp e2e cũ hơn commit sửa cuối:** T-59 chụp lúc 17:55, sửa nhãn tab lúc 18:01. **Sửa:** so thời gian ảnh với commit và chạy lại e2e sau khi sửa UI. (sprint-02)
 - **`getByRole` báo nhiều phần tử khi cùng một link xuất hiện 2 lần** (`AdminNav` + link quay lại). **Sửa:** thu hẹp phạm vi tìm. jsdom báo "Not implemented: scrollTo": stub `window.scrollTo` trong `test/setup.js`. (sprint-02)
 
+- **Playwright coi `aria-disabled="true"` là không bấm được,** `click()` treo 30 giây. **Sửa:** dùng `click({ force: true })` khi cố ý bấm nút khóa mềm. (sprint-03)
+- **Hai đoạn trong cùng script Postman cùng khai báo `const s`** gây `SyntaxError` lúc chạy. **Sửa:** đổi tên hoặc bọc trong block. (sprint-03)
+- **Test hook với fake timer:** effect đặt timer chỉ chạy sau khi React flush. **Sửa:** `advance(0)` trước rồi mới tiến đồng hồ. (sprint-03)
+- **Lưới một cột thiếu `grid-cols-1`, con cuộn ngang làm rộng trang** khoảng 1040 px ở 360 px; chỉ lộ ở trình duyệt thật. **Sửa:** thêm `grid-cols-1`, kiểm tràn ngang bằng trình duyệt. (sprint-03)
+
 ## Backend / API
 - **429 chỉ có `retryAfterSeconds` trong body, thiếu header `Retry-After`.** **Sửa:** đặt header ở error handler chung. (sprint-01)
 - **`page` vượt tổng số dòng làm PostgREST trả 416 (PGRST103) và API thành 500;** repository giả không bắt được, chỉ Postman trên DB thật lộ ra. **Sửa:** bắt PGRST103 rồi đếm riêng; kiểm biên "page vượt quá" trên DB thật. (sprint-02)
