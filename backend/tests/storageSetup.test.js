@@ -3,6 +3,7 @@ import {
   buildBucketOptions,
   ensureProductImageBucket,
   ensureProfilePhotoBucket,
+  ensureTryonImageBucket,
 } from '../src/services/storageSetup.js';
 
 const MB = 1024 * 1024;
@@ -69,6 +70,22 @@ describe('ensureProfilePhotoBucket (D-26, AC-10)', () => {
     expect(wrong.calls[0][2].public).toBe(true);
     const right = fakeClient({ ...good, public: true });
     expect(await ensureProductImageBucket(right.client, productConfig)).toBe('unchanged');
+  });
+
+  it('bucket try-on: private, 5 MB, chỉ JPEG; lỡ đặt public thì đặt lại private (D-78)', async () => {
+    const config5 = { name: 'tryon-images', maxMb: 5 };
+    const created = fakeClient(null);
+    expect(await ensureTryonImageBucket(created.client, config5)).toBe('created');
+    expect(created.calls[0][2]).toEqual({
+      public: false,
+      fileSizeLimit: 5 * MB,
+      allowedMimeTypes: ['image/jpeg'],
+    });
+    const good5 = { public: false, file_size_limit: 5 * MB, allowed_mime_types: ['image/jpeg'] };
+    expect(await ensureTryonImageBucket(fakeClient(good5).client, config5)).toBe('unchanged');
+    const wrong = fakeClient({ ...good5, public: true });
+    expect(await ensureTryonImageBucket(wrong.client, config5)).toBe('updated');
+    expect(wrong.calls[0][2].public).toBe(false);
   });
 
   it('lỗi khác 404 (vd. sai key) -> ném lỗi, không tạo bucket', async () => {

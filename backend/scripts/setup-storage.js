@@ -1,9 +1,10 @@
-// Chạy: npm run setup:storage (cần SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY trong backend/.env). Thiết kế: D-26, D-46.
+// Chạy: npm run setup:storage (cần SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY trong backend/.env). Thiết kế: D-26, D-46, D-78.
 import { getEnv } from '../src/config/env.js';
 import { getSupabase } from '../src/config/supabase.js';
 import {
   ensureProductImageBucket,
   ensureProfilePhotoBucket,
+  ensureTryonImageBucket,
 } from '../src/services/storageSetup.js';
 
 try {
@@ -19,6 +20,11 @@ try {
     maxMb: env.PRODUCT_IMAGE_MAX_MB,
   });
   console.log(`Bucket ${env.PRODUCT_IMAGE_BUCKET}: ${product} (public, chỉ đọc).`);
+  const tryon = await ensureTryonImageBucket(client, {
+    name: env.TRYON_IMAGE_BUCKET,
+    maxMb: env.TRYON_IMAGE_MAX_MB,
+  });
+  console.log(`Bucket ${env.TRYON_IMAGE_BUCKET}: ${tryon} (private).`);
 } catch (err) {
   console.error(err.message);
   process.exitCode = 1;
