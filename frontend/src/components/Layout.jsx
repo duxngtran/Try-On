@@ -1,10 +1,15 @@
+import { Shirt } from 'lucide-react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { useAuth } from '../features/auth/authContext.js';
 import { AccountMenu } from './AccountMenu.jsx';
 
-const NAV_LINK =
-  'hidden h-11 items-center border-b-2 border-transparent px-1 text-small font-semibold text-ink sm:inline-flex';
+const NAV_BASE =
+  'h-11 items-center border-b-2 border-transparent px-1 text-small font-semibold text-ink';
+const NAV_LINK = `hidden ${NAV_BASE} sm:inline-flex`;
 const navClass = ({ isActive }) => `${NAV_LINK} ${isActive ? '!border-ink' : 'hover:underline'}`;
+// Liên kết Thử đồ luôn hiện (cả mobile): đây là chức năng chính của người mua (entry-points.md).
+const tryOnClass = ({ isActive }) =>
+  `${NAV_BASE} inline-flex gap-1.5 ${isActive ? '!border-ink' : 'hover:underline'}`;
 const AUTH_BUTTON =
   'inline-flex h-11 items-center rounded-md px-4 text-small font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink';
 
@@ -42,6 +47,10 @@ function HeaderActions() {
           <>
             <NavLink to="/" end className={navClass}>
               Trang chủ
+            </NavLink>
+            <NavLink to="/try-on" className={tryOnClass}>
+              <Shirt size={16} aria-hidden="true" className="hidden sm:inline" />
+              Thử đồ
             </NavLink>
             <NavLink to="/profile" className={navClass}>
               Hồ sơ

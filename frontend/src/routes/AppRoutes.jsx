@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router';
 import { Layout } from '../components/Layout.jsx';
 import { RouteFocus } from '../components/RouteFocus.jsx';
@@ -13,6 +14,12 @@ import { AdminPage } from '../pages/AdminPage.jsx';
 import { HomePage } from '../pages/HomePage.jsx';
 import { NotFoundPage } from '../pages/NotFoundPage.jsx';
 import { ProfilePage } from '../features/profile/ProfilePage.jsx';
+import { Spinner } from '../components/Spinner.jsx';
+
+// Phòng thử đồ tải theo nhu cầu: không làm nặng gói ban đầu của các trang khác (T-76).
+const TryOnPage = lazy(() =>
+  import('../features/tryon/TryOnPage.jsx').then((m) => ({ default: m.TryOnPage })),
+);
 
 /** Bảng guard theo header-navigation.md; phải render bên trong Router và AuthProvider. */
 export function AppRoutes() {
@@ -27,6 +34,20 @@ export function AppRoutes() {
           <Route element={<RequireAuth />}>
             <Route index element={<HomePage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route
+              path="/try-on"
+              element={
+                <Suspense
+                  fallback={
+                    <div role="status" className="flex justify-center py-16">
+                      <Spinner size={24} label="Đang tải phòng thử đồ" />
+                    </div>
+                  }
+                >
+                  <TryOnPage />
+                </Suspense>
+              }
+            />
           </Route>
           <Route element={<RequireAdmin />}>
             <Route element={<AdminLayout />}>

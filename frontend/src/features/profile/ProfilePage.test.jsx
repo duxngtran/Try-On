@@ -28,10 +28,16 @@ const photo = (url = OLD_URL) => ({
 });
 const consented = { accepted: true, acceptedAt: '2026-11-04T07:00:00.000Z', version: 1 };
 
+// Consent gửi ảnh cho dịch vụ AI nằm ở GET /try-on/state (D-93), độc lập với hồ sơ.
+const AI_STATE = {
+  profile: { completed: true, missing: [] },
+  consent: { accepted: false, acceptedAt: null, version: 1, requiredVersion: 1, withdrawnAt: null },
+};
+
 const renderProfile = (routes) =>
   renderApp('/profile', {
     token: 'jwt',
-    routes: { 'GET /auth/me': ok({ user: USER }), ...routes },
+    routes: { 'GET /auth/me': ok({ user: USER }), 'GET /try-on/state': ok(AI_STATE), ...routes },
   });
 
 const file = () => new File(['x'], 'me.jpg', { type: 'image/jpeg' });

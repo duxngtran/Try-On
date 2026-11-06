@@ -60,6 +60,7 @@ describe('menu tài khoản (bottom sheet mobile / dropdown desktop)', () => {
     await openMenu(user);
     await user.tab();
     await user.tab();
+    await user.tab();
     expect(screen.getByRole('menuitem', { name: 'Đăng xuất' })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole('menuitem', { name: 'Trang chủ' })).toHaveFocus();

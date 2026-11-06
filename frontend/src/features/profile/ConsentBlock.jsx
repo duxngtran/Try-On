@@ -3,6 +3,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { Button } from '../../components/Button.jsx';
 import { Modal } from '../../components/Modal.jsx';
 import { Spinner } from '../../components/Spinner.jsx';
+import { TRYON_PROVIDER } from '../tryon/tryonConfig.js';
 import { profileApi } from './profileApi.js';
 
 const CONSENT_FAILED = 'Chưa ghi nhận được sự đồng ý của bạn, vui lòng thử lại.';
@@ -65,8 +66,8 @@ export function ConsentBlock({ consent, applyProfile, checkboxRef, externalError
         />
         <div className="text-small">
           <label htmlFor={checkboxId} className="text-ink">
-            Tôi đồng ý cho Try-on lưu trữ và sử dụng ảnh này để tạo ảnh thử đồ, bao gồm việc gửi ảnh
-            tới dịch vụ AI xử lý ảnh.
+            Tôi đồng ý cho Try-on lưu trữ ảnh này để dùng trong hồ sơ của tôi và tạo ảnh thử đồ. Ảnh
+            chỉ được gửi tới dịch vụ AI khi tôi đồng ý riêng ở Phòng thử đồ.
           </label>{' '}
           <button
             type="button"
@@ -101,10 +102,26 @@ export function ConsentBlock({ consent, applyProfile, checkboxRef, externalError
         }
       >
         <ul className="list-disc space-y-2 pl-5 text-small">
-          <li>Ảnh được lưu riêng tư, chỉ bạn xem được qua liên kết tạm thời.</li>
-          <li>Ảnh được gửi tới dịch vụ AI để tạo ảnh bạn mặc thử sản phẩm.</li>
-          <li>Quản trị viên không xem được ảnh của bạn.</li>
-          <li>Bạn có thể xóa ảnh bất cứ lúc nào để dừng việc sử dụng.</li>
+          <li>
+            Ảnh toàn thân của bạn được lưu riêng tư trên Try-on. Bạn xem lại qua liên kết tạm thời,
+            hết hạn sau 15 phút.
+          </li>
+          <li>Quản trị viên cửa hàng không có chức năng xem ảnh của bạn.</li>
+          <li>
+            Ảnh chỉ được gửi tới {TRYON_PROVIDER.name} (dịch vụ AI tạo ảnh thử đồ) và các đơn vị hạ
+            tầng của họ, có thể ở ngoài Việt Nam, <strong>sau khi bạn đồng ý riêng</strong> ở Phòng
+            thử đồ. Nếu bạn chưa đồng ý, ảnh không được gửi đi.
+          </li>
+          <li>Chiều cao, cân nặng, email và tên của bạn không được gửi tới dịch vụ AI.</li>
+          <li>
+            Ảnh thử đồ tạo ra được lưu riêng tư tối đa 90 ngày kể từ lần bạn xem gần nhất, rồi tự
+            xóa.
+          </li>
+          <li>
+            Bạn có thể xóa ảnh hoặc rút đồng ý gửi ảnh bất cứ lúc nào. Việc này dừng các lần gửi
+            tiếp theo và xóa ảnh thử đồ trên Try-on, nhưng không xóa được phần đã được gửi và xử lý
+            trước đó.
+          </li>
         </ul>
       </Modal>
     </div>

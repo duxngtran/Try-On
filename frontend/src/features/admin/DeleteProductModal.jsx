@@ -40,12 +40,7 @@ export function DeleteProductModal({ product, onClose, onDeleted, onGone }) {
           <Button ref={cancelRef} variant="secondary" onClick={onClose} disabled={deleting}>
             Hủy
           </Button>
-          <Button
-            className="!bg-danger !text-ink-inverse"
-            loading={deleting}
-            loadingText="Đang xóa…"
-            onClick={confirm}
-          >
+          <Button variant="danger" loading={deleting} loadingText="Đang xóa…" onClick={confirm}>
             Xóa sản phẩm
           </Button>
         </>

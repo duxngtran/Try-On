@@ -4,6 +4,7 @@ const VARIANTS = {
   primary: 'bg-ink text-ink-inverse hover:bg-[#333]',
   secondary: 'border border-line-strong bg-surface text-ink hover:bg-surface-muted',
   ghost: 'text-ink hover:underline',
+  danger: 'bg-danger text-ink-inverse hover:bg-[#9c3a33]',
 };
 const SIZES = { md: 'h-11 px-5 text-small', lg: 'h-12 px-5 text-body' };
 

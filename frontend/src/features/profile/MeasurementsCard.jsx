@@ -95,6 +95,7 @@ export function MeasurementsCard({ profile, applyProfile, onSaved, heightRef }) 
 
   return (
     <section
+      id="measurements"
       aria-labelledby="measurements-title"
       className="rounded-xl border border-line bg-surface p-5 shadow-card"
     >

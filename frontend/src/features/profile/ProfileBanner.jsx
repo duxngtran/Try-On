@@ -10,8 +10,11 @@ export function ProfileBanner({ profile, onGoToPhoto, onGoToMeasurements }) {
     return (
       <Alert variant="success" role="status">
         <p className="font-semibold">Hồ sơ đã đầy đủ. Bạn có thể bắt đầu thử đồ.</p>
-        <Link to="/" className="mt-2 inline-block font-semibold text-accent-strong underline">
-          Về trang chủ
+        <Link
+          to="/try-on"
+          className="mt-3 inline-flex h-11 items-center rounded-md bg-ink px-5 text-small font-semibold text-ink-inverse hover:bg-[#333]"
+        >
+          Vào phòng thử đồ
         </Link>
       </Alert>
     );
