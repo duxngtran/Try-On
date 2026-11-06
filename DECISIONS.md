@@ -130,3 +130,8 @@ Ghi lại các quyết định nghiệp vụ & thuật toán. Khi một quyết 
 | D-124 | Chấp nhận job chưa gửi có thể bị hủy khi tab ẩn làm chậm poll quá 8 giây; quay lại thấy đúng trạng thái và có nút Thử lại | Không tốn lượt; theo khuyến nghị, user ủy quyền duyệt cả sprint 3 | sprint-03 |
 | D-125 | Sau đăng nhập vẫn về Trang chủ, chưa đẩy vào `/try-on` | Giữ phạm vi; theo khuyến nghị, user ủy quyền duyệt cả sprint 3 | sprint-03 |
 | D-126 | Tên bên nhận ảnh nằm trong một hằng cấu hình; đổi nhà cung cấp bắt buộc tăng `TRYON_CONSENT_VERSION` | Consent phải nêu đúng bên nhận; theo khuyến nghị, user ủy quyền duyệt cả sprint 3 | sprint-03 |
+| D-127 | Lỗi mạng không rõ khi `POST /run` coi như timeout: không thử lại, có thể đã tốn tiền. Chỉ `ECONNREFUSED`, `ENOTFOUND`, `EAI_AGAIN`, connect-timeout mới coi là chắc chắn chưa tốn | Không trả tiền hai lần; agent-coder chọn, user ủy quyền duyệt cả sprint 3 | sprint-03 |
+| D-128 | `prefetch` khi tắt tính năng hoặc tạm dừng trả `200 skipped reason: disabled`, không tra DB | Generate trước phải im lặng, không hiện lỗi; agent-coder chọn, user ủy quyền duyệt cả sprint 3 | sprint-03 |
+| D-129 | `GET /jobs/:id` với job `succeeded` mà consent đã lỗi thời trả `discarded`, `image: null` | Nhất quán D-108; agent-coder chọn, user ủy quyền duyệt cả sprint 3 | sprint-03 |
+| D-130 | Lỗi `failed` có tên lạ từ FASHN coi là tạm thời, thử lại 1 lần | Tài liệu FASHN có thể thêm tên mới; tối đa tốn thêm 1 lần gọi; agent-coder chọn, user ủy quyền duyệt cả sprint 3 | sprint-03 |
+| D-131 | Trạng thái tạm dừng khi hết credit nằm trong bộ nhớ; khởi động lại server là thử lại ngay | Một instance (D-99); agent-coder chọn, user ủy quyền duyệt cả sprint 3 | sprint-03 |

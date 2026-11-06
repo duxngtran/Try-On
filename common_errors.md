@@ -8,6 +8,9 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 - **`Set-Location` trong PowerShell làm đổi thư mục cho các lệnh sau** → lệnh tiếp theo chạy nhầm thư mục, đường dẫn tương đối báo sai (ví dụ `.env exists: False`). **Sửa:** dùng đường dẫn tuyệt đối hoặc `npm --prefix`, `git -C`. (sprint-01)
 - **`git merge -F -` lỗi `could not read file '-'`:** `git merge` không đọc message từ stdin. **Sửa:** dùng nhiều cờ `-m`. (sprint-01)
 - **`python -` với heredoc trong Git Bash bị treo đến timeout.** **Sửa:** không pipe stdin vào python; ghi script ra file rồi chạy. (sprint-01)
+- **`TaskStop` không giết tiến trình `node` con,** chạy lại script bị chồng chéo và để lại dữ liệu test. **Sửa:** kiểm `Get-CimInstance Win32_Process` khi dừng; script live phải tự dọn theo tiền tố ở đầu mỗi lần chạy. (sprint-03)
+- **Heredoc Bash trong template literal làm mất backtick và backslash.** **Sửa:** dùng Edit hoặc Write thay vì `node -e` với chuỗi nhiều lớp escape. (sprint-03)
+- **`format:check` báo lỗi vì `backend/.claude/settings.local.json` (file local).** **Sửa:** thêm `.claude` vào `.prettierignore`. (sprint-03)
 
 ## Test (Vitest / Testing Library / Supertest)
 - **Render của test trước còn trong DOM** (ví dụ 2 thẻ `h1`): Vitest không bật `globals` nên `@testing-library/react` không tự cleanup. **Sửa:** `afterEach(cleanup)` trong `frontend/src/test/setup.js`. (sprint-01)

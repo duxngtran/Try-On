@@ -27,7 +27,7 @@
 - [x] Bước 2: Sprint backlog (`sprint-03/sprint-backlog.md`, 37 task T-61 → T-97) — xong (2026-11-06)
 - [x] Bước 3: Thiết kế nghiệp vụ (`sprint-03/design/`: 11 luồng, `api.md`, `tryon-provider.md`, `db/`) — xong; SQL 005, 006 chưa áp dụng lên Supabase; D-97 → D-110 do user ủy quyền duyệt (2026-11-06)
 - [x] Bước 4: UI/UX (5 file `sprint-03/screens/`, mục 7.12 trong `design/design-system.md`) — xong, không có mockup; D-111 → D-126 do user ủy quyền duyệt (2026-11-06)
-- [ ] Bước 5: Implement + test — mức A dùng adapter giả (T-61 → T-92). Mức B (T-93 → T-97: API key, pilot, ngân sách thật, pháp lý) chờ user cho phép riêng (D-91, D-96)
+- [ ] Bước 5: Implement + test — mức A dùng adapter giả (T-61 → T-92). Backend US-05 (T-61 → T-75) xong: test BE 490/490, migration 005, 006 và bucket `tryon-images` đã áp dụng trên Supabase dev, `verify:tryon` 0 lỗi SQL, 0 deadlock theo agent-coder (main agent đã kiểm schema, quyền, dữ liệu dọn sạch, chưa chạy lại script); frontend US-05 đang làm (2026-11-06). Mức B (T-93 → T-97: API key, pilot, ngân sách thật, pháp lý) chờ user cho phép riêng (D-91, D-96)
 
 ## Merge log
 - 2026-11-04: `chore/sprint-01-setup` → `main` (merge commit `3a8d178`). Setup T-01, T-03→T-06, T-08 + Prettier, .gitattributes, README. Test BE 20/20, FE 8/8, lint, format:check, build đều pass. T-07, T-09 còn chờ Supabase.
