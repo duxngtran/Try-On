@@ -31,7 +31,7 @@ export function HomePage() {
         <div className="min-w-0 flex-1">
           <h2 className="text-title font-semibold">Phòng thử đồ</h2>
           <p className="mt-2 max-w-prose text-body text-ink-muted">
-            Chọn danh mục để xem bạn mặc thử sản phẩm.
+            Chọn danh mục, bấm mũi tên hoặc vuốt để xem bạn mặc từng sản phẩm.
           </p>
           <Link
             to="/try-on"

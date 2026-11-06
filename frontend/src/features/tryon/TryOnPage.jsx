@@ -92,9 +92,8 @@ export function TryOnPage() {
       >
         Phòng thử đồ
       </h1>
-      {/* Bản đầy đủ "...bấm mũi tên hoặc vuốt để thử sản phẩm tiếp theo" chỉ đúng sau US-06 (T-85). */}
       <p className="mt-1 hidden text-small text-ink-muted sm:block">
-        Chọn một danh mục để xem bạn mặc thử sản phẩm.
+        Chọn danh mục, rồi bấm mũi tên hoặc vuốt để thử sản phẩm tiếp theo.
       </p>
       {/* Một vùng live duy nhất, luôn có trong DOM; khối lỗi tự có role="alert" và không lặp ở đây. */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">

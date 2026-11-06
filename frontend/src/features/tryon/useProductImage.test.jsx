@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { ApiError } from '../../services/apiClient.js';
 import { tryonApi } from './tryonApi.js';
+import { createImageCache } from './useImageCache.js';
 import { useProductImage } from './useProductImage.js';
 
 vi.mock('./tryonApi.js', () => ({
@@ -106,10 +107,12 @@ describe('useProductImage: luồng ảnh của một sản phẩm', () => {
     await advance(0);
     await advance(60_000);
     expect(result.current.view.overlayId).toBe('timeout');
+    // Một POST display đã đi lúc 400 ms (nâng job tìm thấy qua /result, flows/tryon-prefetch.md).
+    expect(tryonApi.createJob).toHaveBeenCalledTimes(1);
 
     act(() => result.current.retry());
     await advance(0);
-    expect(tryonApi.createJob).toHaveBeenCalledTimes(1);
+    expect(tryonApi.createJob).toHaveBeenCalledTimes(2);
     expect(result.current.view).toMatchObject({ phase: 'waiting', long: false });
     await advance(14_000);
     expect(result.current.view).toMatchObject({ phase: 'waiting', long: false }); // chưa tới 15 giây mới
@@ -430,5 +433,106 @@ describe('useProductImage: ảnh hết hạn hoặc lỗi tải (E20, E22)', () 
     tryonApi.getResult.mockResolvedValueOnce({ state: 'ready', image: fresh });
     await advance(60_000);
     expect(result.current.view.image.url).toBe(fresh.url);
+  });
+});
+
+describe('useProductImage: điều hướng (US-06)', () => {
+  const callbacksOf = (extra = {}) => ({
+    getRoom: () => room(),
+    refreshState: vi.fn(async () => ({ generation: { available: true } })),
+    onGate: vi.fn(),
+    onGenerated: vi.fn(),
+    ...extra,
+  });
+
+  it('kết quả về muộn của sản phẩm cũ không đổi ảnh của sản phẩm đang xem (R7, AC-06)', async () => {
+    let finishOld;
+    tryonApi.getResult.mockImplementation(async (id) =>
+      id === 'p1'
+        ? { state: 'pending', job: { id: 'j1', status: 'running' } }
+        : { state: 'blocked', errorCode: 'TRYON_BLOCKED' },
+    );
+    tryonApi.getJob.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finishOld = () => resolve(job('succeeded', { image: IMAGE }));
+        }),
+    );
+    const callbacks = callbacksOf();
+    const { result, rerender } = renderHook(
+      ({ productId }) => useProductImage(productId, callbacks),
+      {
+        initialProps: { productId: 'p1' },
+      },
+    );
+    await advance(0);
+    await advance(2000); // poll đầu tiên của p1 đang chờ server
+    rerender({ productId: 'p2' });
+    await advance(0);
+    finishOld();
+    await advance(5000);
+    expect(result.current.view).toMatchObject({
+      productId: 'p2',
+      phase: 'overlay',
+      overlayId: 'blocked',
+    });
+    expect(result.current.view.image).toBeNull();
+    expect(callbacks.onGenerated).not.toHaveBeenCalled(); // kết quả muộn không tính là ảnh vừa hiện
+  });
+
+  it('ảnh trong bộ nhớ hiện ngay, /result vẫn được gọi để xác nhận và không đổi URL đang hiện (D-123)', async () => {
+    const cache = createImageCache();
+    cache.set('p1', 3, IMAGE);
+    tryonApi.getResult.mockResolvedValue({
+      state: 'ready',
+      image: { ...IMAGE, url: 'https://storage.test/other.jpg?token=y' },
+    });
+    const { result } = renderHook(() =>
+      useProductImage('p1', { ...callbacksOf(), imageVersion: 3, cache }),
+    );
+    expect(result.current.view).toMatchObject({ phase: 'ready', image: IMAGE }); // trước khi API trả lời
+    await advance(0);
+    expect(tryonApi.getResult).toHaveBeenCalledTimes(1);
+    expect(result.current.view.image.url).toBe(IMAGE.url);
+    expect(tryonApi.createJob).not.toHaveBeenCalled();
+  });
+
+  it('khóa có version: đổi ảnh sản phẩm thì không dùng ảnh cũ trong bộ nhớ', async () => {
+    const cache = createImageCache();
+    cache.set('p1', 1, IMAGE);
+    tryonApi.getResult.mockResolvedValue({ state: 'none' });
+    tryonApi.createJob.mockResolvedValue({ state: 'ready', image: IMAGE });
+    const { result } = renderHook(() =>
+      useProductImage('p1', { ...callbacksOf(), imageVersion: 2, cache }),
+    );
+    expect(result.current.view.phase).toBe('resolving');
+    await advance(0);
+    expect(result.current.view.phase).toBe('waiting');
+  });
+
+  it('bộ nhớ có ảnh nhưng /result nói không còn (đổi ảnh hồ sơ ở tab khác): bỏ ảnh cũ và xác định lại', async () => {
+    const cache = createImageCache();
+    cache.set('p1', 1, IMAGE);
+    tryonApi.getResult.mockResolvedValue({ state: 'none' });
+    tryonApi.createJob.mockResolvedValue({ state: 'pending', job: { id: 'j1', status: 'queued' } });
+    tryonApi.getJob.mockResolvedValue(job('running'));
+    const { result } = renderHook(() =>
+      useProductImage('p1', { ...callbacksOf(), imageVersion: 1, cache }),
+    );
+    await advance(0);
+    expect(result.current.view.phase).toBe('waiting');
+    expect(result.current.view.image).toBeNull();
+    expect(cache.get('p1', 1)).toBeNull();
+  });
+
+  it('job tìm thấy qua /result (có thể là generate trước): sau 400 ms gửi display để nâng ưu tiên, cùng job', async () => {
+    tryonApi.getResult.mockResolvedValue({ state: 'pending', job: { id: 'j1', status: 'queued' } });
+    tryonApi.getJob.mockResolvedValue(job('running'));
+    tryonApi.createJob.mockResolvedValue({ state: 'pending', job: { id: 'j1', status: 'queued' } });
+    renderHook(() => useProductImage('p1', callbacksOf()));
+    await advance(399);
+    expect(tryonApi.createJob).not.toHaveBeenCalled();
+    await advance(1);
+    expect(tryonApi.createJob).toHaveBeenCalledTimes(1);
   });
 });

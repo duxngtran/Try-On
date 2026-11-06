@@ -17,19 +17,22 @@ export const tryonApi = {
   async getCategories({ signal } = {}) {
     return unwrap(await apiClient.get('/try-on/categories', { signal })).categories;
   },
-  async getProducts(categoryId, { signal } = {}) {
-    return unwrap(await apiClient.get(`/try-on/categories/${categoryId}/products`, { signal }));
+  /** Một trong `after`, `before`, `at` (api.md 5.2); con trỏ là chuỗi mờ do server cấp, FE không tự dựng. */
+  async getProducts(categoryId, { after, before, at, signal } = {}) {
+    const params = {};
+    if (after) params.after = after;
+    if (before) params.before = before;
+    if (at) params.at = at;
+    return unwrap(
+      await apiClient.get(`/try-on/categories/${categoryId}/products`, { params, signal }),
+    );
   },
   async getResult(productId, { signal } = {}) {
     return unwrap(await apiClient.get(`/try-on/products/${productId}/result`, { signal }));
   },
-  async createJob(productId, { signal } = {}) {
+  async createJob(productId, { signal, purpose = 'display' } = {}) {
     return unwrap(
-      await apiClient.post(
-        `/try-on/products/${productId}/jobs`,
-        { purpose: 'display' },
-        { signal },
-      ),
+      await apiClient.post(`/try-on/products/${productId}/jobs`, { purpose }, { signal }),
     );
   },
   async getJob(jobId, { signal } = {}) {
