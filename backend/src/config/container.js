@@ -8,6 +8,11 @@ import { createProductImageStorage } from '../services/productImageStorage.js';
 import { createPhotoStorage } from '../services/storage.js';
 import { createCartService } from '../services/cartService.js';
 import { createCartRateLimiter } from '../middlewares/cartRateLimit.js';
+import { createOrderService } from '../services/orderService.js';
+import {
+  createOrderCreateRateLimiter,
+  createOrderReadRateLimiter,
+} from '../middlewares/orderRateLimit.js';
 import { createTryonService } from '../services/tryonService.js';
 import { createProviderFromEnv } from '../services/tryon/providerFactory.js';
 import { createProviderGate } from '../services/tryon/providerGate.js';
@@ -31,6 +36,7 @@ import { createProductWriteRateLimiter } from '../middlewares/productWriteRateLi
  *   categoryRepository?: object,
  *   productRepository?: object,
  *   cartRepository?: object,
+ *   orderRepository?: object,
  *   productImageStorage?: object,
  *   processProductImage?: (buffer: Buffer) => Promise<Buffer>,
  *   photoStorage?: object,
@@ -52,6 +58,7 @@ export async function buildServices(
     categoryRepository,
     productRepository,
     cartRepository,
+    orderRepository,
     productImageStorage,
     processProductImage,
     photoStorage,
@@ -201,6 +208,16 @@ export async function buildServices(
       imageStorage && {
         cartService: createCartService({ cartRepository, imageStorage }),
         cartRateLimiter: createCartRateLimiter({ limitPerMinute: env.CART_REQUESTS_PER_MIN }),
+      },
+    orders: orderRepository &&
+      imageStorage && {
+        orderService: createOrderService({ orderRepository, imageStorage }),
+        orderCreateRateLimiter: createOrderCreateRateLimiter({
+          limitPerHour: env.ORDER_CREATES_PER_HOUR,
+        }),
+        orderReadRateLimiter: createOrderReadRateLimiter({
+          limitPerMinute: env.ORDER_READS_PER_MIN,
+        }),
       },
     profile: {
       profileService: createProfileService({

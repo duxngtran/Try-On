@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 /**
  * Repository giỏ hàng trong bộ nhớ, cùng hợp đồng với cartRepository thật và mô phỏng ngữ nghĩa các hàm SQL
  * của 007_create_cart.sql: khóa theo user (thao tác của một user nối tiếp nhau), sản phẩm xóa mềm vẫn nằm trong giỏ,
@@ -29,6 +31,8 @@ export function createFakeCartRepository({
   const repo = {
     limits,
     lines,
+    /** Cho fakeOrderRepository dùng chung khóa: đặt hàng và thao tác giỏ của một user nối tiếp nhau như ở DB. */
+    withUserLock,
     /** Tên phương thức đã gọi, để test kiểm "không gọi khi chưa qua cổng". */
     calls: [],
     failNext: false,
@@ -61,11 +65,16 @@ export function createFakeCartRepository({
         };
       });
       return {
+        // 32 ký tự hex như md5 của DB, để qua được schema của POST /orders.
         fingerprint: items.length
-          ? items
-              .map((i) => [i.productId, i.quantity, i.priceVnd, i.name, i.available].join('|'))
-              .sort()
-              .join(';')
+          ? createHash('md5')
+              .update(
+                items
+                  .map((i) => [i.productId, i.quantity, i.priceVnd, i.name, i.available].join('|'))
+                  .sort()
+                  .join(';'),
+              )
+              .digest('hex')
           : null,
         totalVnd: items.reduce((sum, i) => sum + i.lineTotalVnd, 0),
         itemCount: items.reduce((sum, i) => sum + i.quantity, 0),
@@ -100,6 +109,30 @@ export function createFakeCartRepository({
         }
         lines.push({ userId, productId, quantity: 1, addedPriceVnd: p.price_vnd, seq: (seq += 1) });
         return { status: 'ok', quantity: 1 };
+      });
+    },
+
+    /** Cùng thứ tự kiểm tra với set_cart_item_quantity: user, giới hạn, có trong giỏ, còn bán. */
+    setQuantity(userId, productId, quantity) {
+      repo.calls.push('setQuantity');
+      return withUserLock(userId, async () => {
+        if (!userRepository.rows.has(userId)) return 'user_not_found';
+        if (quantity < 1 || quantity > limits.maxQuantity) return 'quantity_limit';
+        const line = lines.find((l) => l.userId === userId && l.productId === productId);
+        if (!line) return 'not_in_cart';
+        if (product(productId).deleted_at) return 'unavailable';
+        line.quantity = quantity;
+        return 'ok';
+      });
+    },
+
+    removeItem(userId, productId) {
+      repo.calls.push('removeItem');
+      return withUserLock(userId, async () => {
+        if (!userRepository.rows.has(userId)) return 'user_not_found';
+        const index = lines.findIndex((l) => l.userId === userId && l.productId === productId);
+        if (index >= 0) lines.splice(index, 1);
+        return 'ok';
       });
     },
   };

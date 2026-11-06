@@ -20,6 +20,7 @@
     "fixtures": "node scripts/generate-fixtures.js",
     "format": "prettier --write . --ignore-path ../.prettierignore",
     "format:check": "prettier --check . --ignore-path ../.prettierignore",
+    "verify:orders": "node --env-file-if-exists=.env scripts/verify-orders-live.js",
     "verify:tryon": "node --env-file-if-exists=.env scripts/verify-tryon-live.js",
     "tryon:purge-model": "node --env-file-if-exists=.env scripts/tryon-purge-model.js",
     "tryon:report": "node --env-file-if-exists=.env scripts/tryon-report.js",

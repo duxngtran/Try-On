@@ -40,6 +40,7 @@ Chạy trong `backend/` hoặc `frontend/`:
 | Migrate DB | `npm run migrate` (chỉ backend, cần `DATABASE_URL`) |
 | Tạo bucket Storage | `npm run setup:storage` (chỉ backend; 3 bucket: ảnh hồ sơ, ảnh sản phẩm, ảnh thử đồ) |
 | Kiểm tra thật phòng thử đồ | `npm run verify:tryon` (chỉ backend, chạy trên Supabase dev bằng adapter giả, tự dọn) |
+| Kiểm tra thật giỏ hàng và đơn hàng | `npm run verify:orders` (chỉ backend, Supabase dev, tự dọn bằng `DATABASE_URL`; đọc dòng `result:`) |
 | API test | `npm run test:postman` (chỉ backend, Supabase dev, adapter giả; thêm tên collection để chạy một phần, ví dụ `-- tryon`) |
 | Pilot dịch vụ AI | `npm run tryon:pilot` (chỉ backend). **Gửi ảnh người thật ra bên thứ ba khi `TRYON_PROVIDER=fashn`: chỉ chạy khi chủ dự án cho phép riêng**, kèm `--confirm-people-consented` |
 

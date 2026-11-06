@@ -100,6 +100,17 @@ describe('parseEnv', () => {
     }
   });
 
+  it('biến đơn hàng: mặc định và sai kiểu không khởi động (T-110)', () => {
+    const env = parseEnv(valid);
+    expect([env.ORDER_CREATES_PER_HOUR, env.ORDER_READS_PER_MIN]).toEqual([20, 120]);
+    for (const [name, value] of [
+      ['ORDER_CREATES_PER_HOUR', '0'],
+      ['ORDER_READS_PER_MIN', 'nhieu'],
+    ]) {
+      expect(() => parseEnv({ ...valid, [name]: value })).toThrow(new RegExp(name));
+    }
+  });
+
   it('JWT_SECRET ngắn hơn 32 ký tự bị từ chối', () => {
     expect(() => parseEnv({ ...valid, JWT_SECRET: 'x'.repeat(31) })).toThrow(/JWT_SECRET/);
   });
