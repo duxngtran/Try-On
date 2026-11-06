@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { BOUNCE_MS, SWIPE_MIN_PX } from './tryonConfig.js';
 
 const reducedMotion = () =>
@@ -43,7 +43,8 @@ export function useSwipe({ canPrev, canNext, onPrev, onNext, onEdge }) {
   const start = useRef(null);
   const [bounce, setBounce] = useState(null);
   const latest = useRef({});
-  useEffect(() => {
+  // Layout effect: vùng vuốt nhận thao tác ngay khi hiện, không được đọc `latest` còn rỗng.
+  useLayoutEffect(() => {
     latest.current = { canPrev, canNext, onPrev, onNext, onEdge };
   });
 

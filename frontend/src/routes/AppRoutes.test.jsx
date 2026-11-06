@@ -31,7 +31,7 @@ describe('route guard (AC-08, AC-10, AC-11)', () => {
     const { calls } = renderApp('/admin', { token: 'jwt', routes: me(USER) });
     await h1('Bạn không có quyền truy cập.');
     // Người mua đăng nhập nào cũng tải giỏ một lần (US-07); ngoài ra không có API nào khác.
-    expect(calls.map((c) => c.key)).toEqual(['GET /auth/me', 'GET /cart']);
+    await waitFor(() => expect(calls.map((c) => c.key)).toEqual(['GET /auth/me', 'GET /cart']));
   });
 
   it('admin vào /profile hoặc /login bị chuyển về /admin (D-38, D-33)', async () => {

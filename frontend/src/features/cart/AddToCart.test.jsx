@@ -118,8 +118,8 @@ describe('thêm vào giỏ ở phòng thử đồ (AC-01, AC-02)', () => {
     expect(all.some((c) => c.key.startsWith('GET /try-on/jobs'))).toBe(false);
   });
 
+  // Ảnh đang chờ có test riêng bên dưới: phòng tự POST job hiển thị một lần (D-136), nên không kiểm được "0 POST".
   it.each([
-    ['ảnh đang chờ', { state: 'pending', job: { id: 'j1', status: 'running' } }],
     ['ảnh lỗi', { state: 'failed', errorCode: 'TRYON_FAILED' }],
     ['bị chặn', { state: 'blocked', errorCode: 'TRYON_BLOCKED' }],
   ])('%s: nút vẫn bấm được và thêm thành công', async (_label, result) => {
@@ -167,7 +167,9 @@ describe('thêm vào giỏ ở phòng thử đồ (AC-01, AC-02)', () => {
     await screen.findByText('Đang tạo ảnh bạn mặc sản phẩm này…');
     // Phòng tự POST job hiển thị một lần khi ảnh chưa có (D-136); đợi nó xong rồi mới đo.
     await waitFor(() => expect(jobPosts(all)).toHaveLength(1));
-    await user.click(await addButton());
+    const button = await addButton();
+    expect(button).not.toHaveAttribute('aria-disabled');
+    await user.click(button);
     await screen.findByText('Đã thêm Áo 1 vào giỏ.');
     const before = calls(all, 'GET /try-on/jobs/j1').length;
     await waitFor(() => expect(calls(all, 'GET /try-on/jobs/j1').length).toBeGreaterThan(before), {

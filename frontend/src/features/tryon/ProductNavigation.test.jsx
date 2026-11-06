@@ -113,6 +113,8 @@ describe('mũi tên, đầu và cuối danh sách (AC-01, AC-09, D-84, D-112)', 
       ...readyAll([1, 2]),
     });
     await productHeading('Áo 1');
+    // Đợi ảnh hiện: tên sản phẩm có trước khi `/result` được gọi, chụp `calls` sớm sẽ đếm thiếu.
+    await screen.findByAltText('Ảnh bạn mặc Áo 1, do AI tạo');
     const prev = prevButton();
     expect(prev).toHaveAttribute('aria-disabled', 'true');
     expect(prev).not.toBeDisabled();

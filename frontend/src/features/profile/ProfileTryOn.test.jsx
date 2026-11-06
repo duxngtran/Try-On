@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { USER, fail, ok, renderApp } from '../../test/renderApp.jsx';
 import { TRYON_PROVIDER } from '../tryon/tryonConfig.js';
 
@@ -319,7 +319,8 @@ describe('Hồ sơ: neo từ cổng hồ sơ', () => {
         'GET /try-on/state': ok(aiState(AGREED)),
       },
     });
-    expect(await screen.findByLabelText('Chiều cao')).toHaveFocus();
+    const height = await screen.findByLabelText('Chiều cao');
+    await waitFor(() => expect(height).toHaveFocus());
     first.unmount();
 
     renderApp('/profile#photo', {
@@ -332,6 +333,6 @@ describe('Hồ sơ: neo từ cổng hồ sơ', () => {
     });
     const section = await screen.findByRole('region', { name: 'Ảnh toàn thân' });
     expect(section).toHaveAttribute('id', 'photo');
-    await vi.waitFor(() => expect(section).toHaveFocus());
+    await waitFor(() => expect(section).toHaveFocus());
   });
 });

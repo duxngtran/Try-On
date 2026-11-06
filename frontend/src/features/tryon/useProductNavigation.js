@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { tryonApi } from './tryonApi.js';
 
 const IDLE = { categoryId: null, status: 'idle' };
@@ -52,7 +52,8 @@ export function useProductNavigation(categoryId, productParam) {
   const failedCursor = useRef({ next: null, prev: null });
   const generation = useRef(0); // tăng mỗi lần đổi danh mục, bỏ kết quả của danh mục cũ
 
-  useEffect(() => {
+  // Layout effect: nút vừa hiện là bấm được, `useEffect` chạy muộn hơn nên cú bấm đầu có thể đọc state cũ và bị bỏ.
+  useLayoutEffect(() => {
     stateRef.current = state;
     productParamRef.current = productParam;
   });

@@ -9,5 +9,7 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.js'],
     include: ['src/**/*.test.{js,jsx}'],
     css: false,
+    // Phải lớn hơn asyncUtilTimeout trong src/test/setup.js: một test có thể chờ nhiều lần.
+    testTimeout: 20000,
   },
 });
