@@ -76,7 +76,23 @@ if (await isUp()) {
 // nên nâng rate limit riêng cho tiến trình này.
 const server = spawn(process.execPath, ['--env-file-if-exists=.env', 'src/server.js'], {
   cwd: backendDir,
-  env: { ...process.env, AUTH_RATE_LIMIT_PER_MIN: '500', PRODUCT_WRITES_PER_HOUR: '5000' },
+  env: {
+    ...process.env,
+    AUTH_RATE_LIMIT_PER_MIN: '500',
+    PRODUCT_WRITES_PER_HOUR: '5000',
+    // Chốt chặn chống gọi dịch vụ thật: ghi đè cả backend/.env (node --env-file không đè biến đã có trong môi trường),
+    // để máy đã có key FASHN vẫn không gọi ra ngoài khi chạy API test.
+    TRYON_PROVIDER: 'fake',
+    FASHN_API_KEY: '',
+    TRYON_ENABLED: 'true',
+    TRYON_FAKE_DELAY_MS: '300',
+    TRYON_JOB_CREATES_PER_MIN: '5000',
+    TRYON_READS_PER_MIN: '50000',
+    // API test để lại job và dòng ngân sách trên Supabase dev: đặt ngân sách rất cao để không tự chặn.
+    TRYON_MONTHLY_BUDGET_USD: '1000000',
+    TRYON_DAILY_LIMIT: '1000',
+    TRYON_MONTHLY_LIMIT: '100000',
+  },
   stdio: 'ignore',
 });
 

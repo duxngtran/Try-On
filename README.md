@@ -22,6 +22,10 @@ cp frontend/.env.example frontend/.env
 cp .mcp.json.example .mcp.json   # tùy chọn, cấu hình MCP (chứa token)
 ```
 
+### Phòng thử đồ (sprint 03)
+
+Biến `TRYON_*`, `FASHN_*` có trong `backend/.env.example`. **`TRYON_PROVIDER=fake` là mặc định**: không gọi dịch vụ AI thật, không gửi ảnh ra ngoài. Chỉ đặt `fashn` (kèm `FASHN_API_KEY`) khi chủ dự án cho phép; server từ chối khởi động nếu thiếu key, và từ chối `fashn` khi `NODE_ENV=test`. Worker xử lý job chạy trong tiến trình Express (`npm run dev`).
+
 ## Lệnh thường dùng
 
 Chạy trong `backend/` hoặc `frontend/`:
@@ -34,6 +38,8 @@ Chạy trong `backend/` hoặc `frontend/`:
 | Format | `npm run format` / `npm run format:check` |
 | Build | `npm run build` (chỉ frontend) |
 | Migrate DB | `npm run migrate` (chỉ backend, cần `DATABASE_URL`) |
+| Tạo bucket Storage | `npm run setup:storage` (chỉ backend; 3 bucket: ảnh hồ sơ, ảnh sản phẩm, ảnh thử đồ) |
+| Kiểm tra thật phòng thử đồ | `npm run verify:tryon` (chỉ backend, chạy trên Supabase dev bằng adapter giả, tự dọn) |
 
 ## Tài liệu
 

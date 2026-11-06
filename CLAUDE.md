@@ -78,8 +78,10 @@ Run from the repo root; Node 24 is required. Copy `backend/.env.example` to `bac
 | Migrate (D-19) | `npm run migrate` (needs `DATABASE_URL`; applies `migrations/NNN_*.sql` in order, tracked in `schema_migrations`) | n/a |
 | Image test fixtures | `npm run fixtures` (writes `tests/fixtures/generated/`, gitignored) | n/a |
 | Seed admin (D-32) | `npm run seed:admin` (needs `ADMIN_EMAIL`, `ADMIN_PASSWORD`) | n/a |
-| Setup Storage buckets (D-26, D-46) | `npm run setup:storage` (creates/repairs private bucket `profile-photos` and public read-only bucket `product-images`, idempotent) | n/a |
+| Setup Storage buckets (D-26, D-46, D-78) | `npm run setup:storage` (creates/repairs private buckets `profile-photos` and `tryon-images` and public read-only bucket `product-images`, idempotent) | n/a |
 | Live check on Supabase dev (T-54) | `npm run verify:products` (parallel `create_product` vs `soft_delete_category`, parallel image replace; cleans up after itself; set `SUPABASE_ANON_KEY` in the shell to also run the anon-access checks) | n/a |
+| Live check of try-on on Supabase dev (T-75) | `npm run verify:tryon` (parallel SQL races through PostgREST, then the full consent -> job -> worker -> result -> withdraw flow with the FAKE provider, then access checks; self-cleaning; stop any dev server first; set `SUPABASE_ANON_KEY` in the shell to also run anon checks) | n/a |
+| Try-on ops (T-73) | `npm run tryon:report` (job counts by status, p50/p95, prefetch view rate, estimated cost; no personal data) and `npm run tryon:purge-model` (D-89, deletes try-on images of any model other than the current one) | n/a |
 | API tests on Supabase dev (D-40) | `npm run test:postman` (starts the server, runs newman on `tests/postman/*.collection.json`; port 4000 must be free) | n/a |
 
 Notes: Tailwind v4 is configured in CSS (`frontend/src/index.css`, `@theme` tokens from `design/design-system.md`), there is no `tailwind.config.js`. Vitest uses `vite.config.js` on the frontend and `vitest.config.js` on the backend. Postman workspace "Try-on", collection "Try-on API" and environment "local" are created through Postman MCP. Postman MCP cannot run collections or attach files to form-data requests, so the source of truth for API tests is `backend/tests/postman/`; import those files into the Postman app by hand if needed (D-40).
