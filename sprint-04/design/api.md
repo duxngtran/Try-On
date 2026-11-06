@@ -68,7 +68,7 @@ Mọi endpoint thành công trong mục này trả **cùng một dạng** `data:
 
 ### 4.1 `GET /api/cart`
 
-**200** → `Cart`. Giỏ rỗng: `items: []`, `totalVnd: 0`, `itemCount: 0`, `fingerprint: null`.
+**200** → `Cart`. Giỏ rỗng: `items: []`, `totalVnd: 0`, `itemCount: 0`, `fingerprint: null`, `limits` vẫn có.
 
 Sản phẩm xóa mềm vẫn nằm trong `items`, `available: false` (D-143).
 
@@ -170,7 +170,8 @@ Query như 5.2. **200** `{ "items": [ AdminOrderSummary ], "pagination": ... }`,
   "lineCount": 2,
   "totalVnd": 848000,
   "hasUnavailable": false,
-  "fingerprint": "32 ký tự hex hoặc null"
+  "fingerprint": "32 ký tự hex hoặc null",
+  "limits": { "maxQuantity": 10, "maxLines": 30 }
 }
 ```
 
@@ -179,6 +180,7 @@ Query như 5.2. **200** `{ "items": [ AdminOrderSummary ], "pagination": ... }`,
 | `itemCount` | Tổng số lượng mọi dòng, **kể cả dòng ngừng bán**: số trên header dẫn người mua vào xử lý |
 | `totalVnd` | Do DB tính theo giá hiện tại, không tính dòng ngừng bán |
 | `hasUnavailable` | `true` thì FE tắt nút đặt hàng |
+| `limits` | D-155. `maxQuantity` (`CART_MAX_QUANTITY`), `maxLines` (`CART_MAX_LINES`) lấy từ env, có trong mọi `Cart` kể cả giỏ rỗng. FE dùng để biết giới hạn mà không phải đợi lỗi 409; số 10 và 30 ở ví dụ chỉ là mặc định |
 | `fingerprint` | Client coi là chuỗi mờ. Không phải chốt bảo mật, chỉ để phát hiện thay đổi (D-144) |
 
 ### 7.2 `CartItem`

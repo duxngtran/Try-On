@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { health } from '../controllers/healthController.js';
 import { adminPing, createAuthController } from '../controllers/authController.js';
 import { createCategoryController } from '../controllers/categoryController.js';
+import { createCartController } from '../controllers/cartController.js';
 import { createProductController } from '../controllers/productController.js';
 import { createProfileController, requirePhotoConsent } from '../controllers/profileController.js';
 import { createTryonController } from '../controllers/tryonController.js';
@@ -10,6 +11,7 @@ import { validateBody } from '../middlewares/validate.js';
 import { validateUuidParam } from '../middlewares/validateUuidParam.js';
 import { categoryBodySchema } from '../validation/categorySchemas.js';
 import { loginSchema, registerSchema } from '../validation/authSchemas.js';
+import { addCartItemBodySchema } from '../validation/cartSchemas.js';
 import { consentSchema, measurementsSchema } from '../validation/profileSchemas.js';
 import { consentBodySchema, createJobBodySchema } from '../validation/tryonSchemas.js';
 
@@ -25,6 +27,10 @@ import { consentBodySchema, createJobBodySchema } from '../validation/tryonSchem
  *     productService: ReturnType<import('../services/productService.js').createProductService>,
  *     uploadProductImage: import('express').RequestHandler,
  *     productWriteRateLimiter: import('express').RequestHandler,
+ *   },
+ *   cart?: {
+ *     cartService: ReturnType<import('../services/cartService.js').createCartService>,
+ *     cartRateLimiter: import('express').RequestHandler,
  *   },
  *   profile?: {
  *     profileService: ReturnType<import('../services/profileService.js').createProfileService>,
@@ -43,7 +49,7 @@ export function createApiRouter(services) {
   router.get('/health', health);
   if (!services) return router;
 
-  const { authService, authenticate, authRateLimiter, categories, products, profile, tryon } =
+  const { authService, authenticate, authRateLimiter, categories, products, cart, profile, tryon } =
     services;
   const auth = createAuthController(authService);
 
@@ -101,6 +107,21 @@ export function createApiRouter(services) {
       controller.update,
     );
     router.delete('/admin/products/:id', ...adminOnly, productId, controller.remove);
+  }
+
+  if (cart) {
+    // Chỉ role user (D-14, D-28). Thứ tự: auth -> role -> rate limit (đếm mọi request) -> body (api.md mục 1).
+    const { cartService, cartRateLimiter } = cart;
+    const controller = createCartController(cartService);
+    const userOnly = [authenticate, requireRole('user'), cartRateLimiter];
+
+    router.get('/cart', ...userOnly, controller.get);
+    router.post(
+      '/cart/items',
+      ...userOnly,
+      validateBody(addCartItemBodySchema),
+      controller.addItem,
+    );
   }
 
   if (profile) {

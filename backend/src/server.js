@@ -5,6 +5,7 @@ import { buildServices } from './config/container.js';
 import { createUserRepository } from './repositories/userRepository.js';
 import { createCategoryRepository } from './repositories/categoryRepository.js';
 import { createProductRepository } from './repositories/productRepository.js';
+import { createCartRepository } from './repositories/cartRepository.js';
 import { createProfileRepository } from './repositories/profileRepository.js';
 import { createTryonRepository } from './repositories/tryonRepository.js';
 import { buildTryonConfig } from './services/tryon/config.js';
@@ -23,6 +24,10 @@ const services = await buildServices(env, {
   profileRepository: createProfileRepository(supabase),
   categoryRepository: createCategoryRepository(supabase),
   productRepository: createProductRepository(supabase),
+  cartRepository: createCartRepository(supabase, {
+    maxQuantity: env.CART_MAX_QUANTITY,
+    maxLines: env.CART_MAX_LINES,
+  }),
   tryonRepository: createTryonRepository(supabase, buildTryonConfig(env)),
   supabase,
   startSweeper: true,

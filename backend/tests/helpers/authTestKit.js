@@ -9,6 +9,7 @@ import { createFakeProvider } from '../../src/services/tryon/fakeProvider.js';
 import { buildTryonConfig } from '../../src/services/tryon/config.js';
 import { parseEnv } from '../../src/config/env.js';
 import { createFakeTryonRepository } from './fakeTryonRepository.js';
+import { createFakeCartRepository } from './fakeCartRepository.js';
 
 export const TEST_ENV = Object.freeze({
   JWT_SECRET: 'test-secret-test-secret-test-secret-123',
@@ -424,9 +425,18 @@ export async function createTestApp(
     PRODUCT_IMAGE_MAX_MB: 10,
     PRODUCT_IMAGE_CACHE_SECONDS: 604800,
     PRODUCT_WRITES_PER_HOUR: 1000,
+    CART_MAX_QUANTITY: 10,
+    CART_MAX_LINES: 30,
+    CART_REQUESTS_PER_MIN: 1000,
     ...envOverrides,
   };
   const errorLogger = logger ?? { error: () => {} };
+  const cartRepository = createFakeCartRepository({
+    userRepository,
+    productRepository,
+    categoryRepository,
+    limits: { maxQuantity: env.CART_MAX_QUANTITY, maxLines: env.CART_MAX_LINES },
+  });
 
   let tryonOptions = {};
   let tryonCtx;
@@ -466,6 +476,7 @@ export async function createTestApp(
     profileRepository,
     categoryRepository,
     productRepository,
+    cartRepository,
     productImageStorage: createProductImageStorage({
       client: productSupabase,
       bucket: env.PRODUCT_IMAGE_BUCKET,
@@ -485,6 +496,7 @@ export async function createTestApp(
     profileRepository,
     categoryRepository,
     productRepository,
+    cartRepository,
     supabase,
     productSupabase,
     env,

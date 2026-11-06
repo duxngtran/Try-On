@@ -61,6 +61,10 @@ const baseEnvSchema = z.object({
   TRYON_JOB_RETENTION_DAYS: positiveInt(35),
   TRYON_JOB_CREATES_PER_MIN: positiveInt(30),
   TRYON_READS_PER_MIN: positiveInt(240),
+  // Giỏ hàng (sprint 04, D-140, D-149). Ngưỡng là ước lượng. Số lượng tối đa không vượt CHECK của cột (999).
+  CART_MAX_QUANTITY: z.coerce.number().int().min(1).max(999).default(10),
+  CART_MAX_LINES: positiveInt(30),
+  CART_REQUESTS_PER_MIN: positiveInt(120),
   // Không có default; bắt buộc khi TRYON_PROVIDER=fashn (kiểm ở superRefine bên dưới).
   FASHN_API_KEY: z.string().optional(),
   FASHN_BASE_URL: z.url().default('https://api.fashn.ai/v1'),
