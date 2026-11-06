@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { Alert } from '../../components/Alert.jsx';
 import { Button } from '../../components/Button.jsx';
 import { Silhouette } from '../../components/Silhouette.jsx';
+import { AddToCartButton } from '../cart/AddToCartButton.jsx';
 import { LOW_QUOTA_THRESHOLD } from './tryonConfig.js';
 import {
   formatPriceVnd,
@@ -105,7 +106,7 @@ export function ProductInfo({ product, titleId, quota, position, total, children
         id={titleId}
         tabIndex={-1}
         title={product.name}
-        className="line-clamp-2 font-display text-heading font-semibold focus:outline-none md:text-title"
+        className="line-clamp-2 font-display text-heading font-semibold focus:outline-none md:min-h-16 md:text-title"
       >
         {product.name}
       </h2>
@@ -121,6 +122,8 @@ export function ProductInfo({ product, titleId, quota, position, total, children
           </p>
         </>
       )}
+      {/* Ngay dưới giá ở mọi cỡ màn hình (D-159): vị trí cố định theo giá nên không nhảy khi các thông báo bên dưới đổi. */}
+      <AddToCartButton product={product} />
       {quota && quota.remaining > 0 && quota.remaining <= LOW_QUOTA_THRESHOLD && (
         <Alert variant="info" role="group" className="mt-3">
           <p>

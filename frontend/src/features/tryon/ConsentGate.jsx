@@ -219,8 +219,9 @@ export function ConsentGate({ consent, midway = false, onAccepted, onProfileInco
         </p>
       )}
       <p className="mt-3 text-small text-ink-muted">
-        Nếu không đồng ý, bạn vẫn dùng được các phần khác của Try-on nhưng chưa thể thử đồ. Ảnh hồ
-        sơ của bạn không bị gửi đi.
+        Nếu không đồng ý, bạn vẫn dùng được các phần khác của Try-on nhưng chưa thể thử đồ. Hiện bạn
+        chỉ thêm được sản phẩm vào giỏ ở phòng thử đồ, nên chưa thể mua hàng. Ảnh hồ sơ của bạn
+        không bị gửi đi.
       </p>
     </section>
   );

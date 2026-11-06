@@ -15,6 +15,21 @@ export const ADMIN = {
   profileCompleted: false,
 };
 
+/** Giỏ hàng theo api.md 7.1; `items` là các `CartItem`, các số tổng tính từ đó trừ khi truyền đè. */
+export function makeCart(items = [], overrides = {}) {
+  const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
+  return {
+    items,
+    itemCount,
+    lineCount: items.length,
+    totalVnd: items.reduce((sum, i) => sum + (i.lineTotalVnd ?? 0), 0),
+    hasUnavailable: items.some((i) => i.available === false),
+    fingerprint: items.length ? 'f'.repeat(32) : null,
+    limits: { maxQuantity: 10, maxLines: 30 },
+    ...overrides,
+  };
+}
+
 export const ok = (data, status = 200) => ({ status, data: { success: true, data } });
 export const fail = (status, code, message = 'Lỗi', details) => ({
   status,
@@ -40,9 +55,11 @@ export function renderApp(path, { token, routes = {} } = {}) {
     // FormData (upload ảnh) không phải JSON: ghi lại nguyên đối tượng.
     const body = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
     calls.push({ key, body, params: config.params });
-    const handler = routes[key];
+    // Giỏ rỗng mặc định: người mua nào đăng nhập cũng gọi GET /cart một lần khi vào app.
+    const handler = routes[key] ?? (key === 'GET /cart' ? ok(makeCart()) : undefined);
     if (!handler) throw new Error(`Chưa giả lập ${key}`);
-    const result = typeof handler === 'function' ? handler(body, config) : handler;
+    // Handler có thể trả Promise để giữ response lại (kiểm request chồng nhau, đổi sản phẩm giữa chừng).
+    const result = await (typeof handler === 'function' ? handler(body, config) : handler);
     if (result.networkError) {
       // Mất mạng: axios báo lỗi không có `response`.
       throw Object.assign(new Error('Network Error'), { isAxiosError: true, config });

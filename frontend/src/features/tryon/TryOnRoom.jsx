@@ -46,6 +46,7 @@ function ProductStage({
   onOtherCategory,
   cache,
   focusRequest,
+  cartFocus,
 }) {
   const titleId = useId();
   const rootRef = useRef(null);
@@ -98,6 +99,14 @@ function ProductStage({
     const next = rootRef.current?.querySelector('[data-nav="next"]:not([aria-disabled="true"])');
     (next ?? document.getElementById(titleId))?.focus();
   }, [focusRequest, titleId]);
+
+  // Đổi sản phẩm bằng phím lúc focus ở nút Thêm vào giỏ: nút mount lại theo `key`, khôi phục focus vào nút của sản phẩm
+  // mới thay vì để rơi về body (US-07 AC-13). Đây là khôi phục chứ không tự ý di chuyển focus.
+  useEffect(() => {
+    if (!cartFocus.current) return;
+    cartFocus.current = false;
+    rootRef.current?.parentElement?.querySelector('[data-cart-add]')?.focus();
+  }, [cartFocus]);
 
   // Thông báo vị trí một lần sau khi dừng 400 ms, nên lướt nhanh qua 5 sản phẩm chỉ đọc sản phẩm cuối.
   useEffect(() => {
@@ -213,6 +222,7 @@ export function TryOnRoom({ tryonState, refreshState, onGate, announce }) {
   const cache = useImageCache();
   const chipsRef = useRef(null);
   const focusRequest = useRef(false);
+  const cartFocus = useRef(false); // focus đang ở nút Thêm vào giỏ lúc người mua đổi sản phẩm bằng phím
   const [notice, setNotice] = useState(null); // 'empty' | 'gone': danh mục vừa bị bỏ chọn
   const { reload: reloadCategories } = catalog;
 
@@ -250,11 +260,29 @@ export function TryOnRoom({ tryonState, refreshState, onGate, announce }) {
 
   // `←` `→` chỉ khi đang ở bố cục phòng có sản phẩm.
   const canNavigate = nav.status === 'ready' && Boolean(nav.product);
+  const rememberCartFocus = () => {
+    cartFocus.current = Boolean(document.activeElement?.closest?.('[data-cart-add]'));
+  };
   useArrowKeys({
     enabled: canNavigate,
-    onPrev: () => nav.prev?.(),
-    onNext: () => (nav.hasNext ? nav.next() : announce(END_MESSAGE)),
+    onPrev: () => {
+      rememberCartFocus();
+      nav.prev?.();
+    },
+    onNext: () => {
+      if (!nav.hasNext) return announce(END_MESSAGE);
+      rememberCartFocus();
+      return nav.next();
+    },
   });
+  // Focus chuyển đi nơi khác trong lúc chờ trang kế tải: bỏ yêu cầu khôi phục.
+  useEffect(() => {
+    const onFocusIn = (event) => {
+      if (!event.target.closest?.('[data-cart-add]')) cartFocus.current = false;
+    };
+    document.addEventListener('focusin', onFocusIn);
+    return () => document.removeEventListener('focusin', onFocusIn);
+  }, []);
 
   // E6, E7: danh mục trống hoặc không còn tồn tại thì làm mới danh sách và bỏ chọn nếu nó đã biến mất.
   const { status } = nav;
@@ -365,6 +393,7 @@ export function TryOnRoom({ tryonState, refreshState, onGate, announce }) {
             onOtherCategory={focusChip}
             cache={cache}
             focusRequest={focusRequest}
+            cartFocus={cartFocus}
           />
         ) : (
           <>
