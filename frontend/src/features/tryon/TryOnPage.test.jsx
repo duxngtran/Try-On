@@ -424,6 +424,15 @@ describe('phòng thử đồ (AC-03 → AC-07 phía giao diện)', () => {
     );
   });
 
+  it('lưới của phòng là một cột co được (grid-cols-1), nếu không hàng chip cuộn ngang làm trang tràn ngang ở 360 px', async () => {
+    renderRoom();
+    const chips = await screen.findByRole('group', { name: 'Danh mục' });
+    const grid = chips.closest('.grid');
+    // jsdom không có bố cục: giữ lại lớp CSS đã được kiểm bằng trình duyệt thật (T-81: dư 1039 px khi thiếu lớp này).
+    expect(grid).toHaveClass('grid-cols-1');
+    expect(chips.closest('.min-w-0')).not.toBeNull();
+  });
+
   it('G3: không có danh mục nào thì hiện cửa hàng trống, không sinh ảnh (E5)', async () => {
     renderRoom({ 'GET /try-on/categories': ok({ categories: [] }) });
     expect(

@@ -163,8 +163,8 @@ export function TryOnRoom({ tryonState, refreshState, onGate, announce }) {
   return (
     <div className="mt-6">
       <RoomNotices generation={tryonState.generation} quota={tryonState.quota} />
-      <div className="mt-4 grid gap-6 md:grid-cols-2 md:gap-8">
-        <div className="md:col-start-2 md:row-start-1">
+      <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2 md:grid-rows-[auto_1fr] md:gap-8">
+        <div className="min-w-0 md:col-start-2 md:row-start-1">
           <CategoryChips
             categories={catalog.categories}
             selectedId={categoryId}

@@ -15,7 +15,10 @@ import { SHIMMER, StageFrame } from './StageFrame.jsx';
 /** Skeleton lúc tải `/state` lần đầu: không hiện cổng nào trước khi biết kết quả (tránh nháy). */
 export function RoomSkeleton() {
   return (
-    <div aria-busy="true" className="mt-6 grid gap-6 md:grid-cols-2 md:gap-8">
+    <div
+      aria-busy="true"
+      className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 md:grid-rows-[auto_1fr] md:gap-8"
+    >
       <p role="status" className="sr-only">
         Đang tải phòng thử đồ
       </p>
@@ -36,7 +39,7 @@ export function RoomSkeleton() {
 
 export function InfoSkeleton() {
   return (
-    <div aria-hidden="true" className="space-y-3 md:col-start-2 md:row-start-2">
+    <div aria-hidden="true" className="space-y-3 md:col-start-2 md:row-start-2 md:self-start">
       <div className={`h-6 w-3/4 rounded-md ${SHIMMER}`} />
       <div className={`h-4 w-1/3 rounded-md ${SHIMMER}`} />
       <div className={`h-6 w-1/4 rounded-md ${SHIMMER}`} />
@@ -97,7 +100,7 @@ export function StageIdle() {
 /** Thông tin sản phẩm: hiện ngay, không chờ API ảnh (US-06 §4.1.2), kể cả khi ảnh lỗi. */
 export function ProductInfo({ product, titleId, quota }) {
   return (
-    <div className="space-y-1 md:col-start-2 md:row-start-2">
+    <div className="min-w-0 space-y-1 md:col-start-2 md:row-start-2 md:self-start">
       <h2
         id={titleId}
         title={product.name}
