@@ -38,6 +38,9 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 - **Test hook với fake timer:** effect đặt timer chỉ chạy sau khi React flush. **Sửa:** `advance(0)` trước rồi mới tiến đồng hồ. (sprint-03)
 - **Lưới một cột thiếu `grid-cols-1`, con cuộn ngang làm rộng trang** khoảng 1040 px ở 360 px; chỉ lộ ở trình duyệt thật. **Sửa:** thêm `grid-cols-1`, kiểm tràn ngang bằng trình duyệt. (sprint-03)
 
+- **Playwright `isDisabled()` trả `true` với `aria-disabled`;** phải kiểm `el.disabled` qua `evaluate`. `waitFor` visible không tính `opacity: 0`, nên ảnh đang mờ vẫn coi là hiện. (sprint-03)
+- **Updater của `setState` chạy sau `finally`,** nên không được đọc ref cờ bên trong updater. (sprint-03)
+
 ## Backend / API
 - **429 chỉ có `retryAfterSeconds` trong body, thiếu header `Retry-After`.** **Sửa:** đặt header ở error handler chung. (sprint-01)
 - **`page` vượt tổng số dòng làm PostgREST trả 416 (PGRST103) và API thành 500;** repository giả không bắt được, chỉ Postman trên DB thật lộ ra. **Sửa:** bắt PGRST103 rồi đếm riêng; kiểm biên "page vượt quá" trên DB thật. (sprint-02)

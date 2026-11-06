@@ -150,15 +150,15 @@ Không đổi (D-02).
 
 | ID | Task | Phụ thuộc | Ước lượng | Definition of Done | TT |
 |---|---|---|---|---|---|
-| T-84 | Hook điều hướng: danh sách theo con trỏ cả hai chiều, trạng thái trên URL, `at` khi tải lại, vị trí "3 / 12" | T-83 | M | US-06 AC-11, AC-17 | [ ] |
-| T-85 | Mũi tên, vuốt (≥ 50 px và ngang > dọc), phím ←/→ (không khi đang gõ), đầu và cuối danh sách, `aria-label`, thông báo `aria-live` | T-84, Màn hình bước 4 | M | AC-01, AC-09, AC-18, mục 9 Usability | [ ] |
-| T-86 | Chờ dừng 400 ms, gắn lại job đang chạy, chỉ kết quả đúng sản phẩm mới đổi ảnh, khóa bộ nhớ tạm có `image.version`, tải trước ảnh liền kề | T-84 | M | AC-02, AC-05, AC-06, AC-10 | [ ] |
-| T-87 | Generate trước phía FE theo `flows/tryon-prefetch.md`: dừng ≥ 1 giây, các điều kiện dừng, lỗi im lặng, nâng lên `display` khi chuyển tới | T-86 | S | AC-03, AC-04; `prefetchAllowed = false` không gửi | [ ] |
-| T-88 | Lỗi điều hướng E1–E10: xóa giữa chừng có nút chuyển tiếp, danh mục trống, hết lượt vẫn lướt, consent hết hiệu lực gỡ ảnh | T-86 | M | AC-12 → AC-16 | [ ] |
-| T-89 | Test FE: rút gọn chuyển nhanh, kết quả về trễ, con trỏ, vuốt dọc không chuyển, điều kiện generate trước | T-85 → T-88 | M | Pass | [ ] |
-| T-90 | Test BE và API test bổ sung vào `tryon.collection.json`: `prefetch` bị từ chối khi còn ≤ 3 lượt, đủ 2 job, ≥ 80% ngân sách, gọi thẳng API (AC-04, AC-08); con trỏ khi thêm, xóa sản phẩm (AC-11); job chưa gửi bị hủy, không tính lượt (AC-07) | T-83 | M | `npm run test:postman` pass cả bộ | [ ] |
-| T-91 | Kiểm tra trình duyệt thật ở 360, 768, 1280 px: lướt nhanh, vuốt trên màn hình cảm ứng giả lập, hết lượt giữa chừng | T-85 → T-88 | S | Không lỗi console; khung ảnh không xê dịch | [ ] |
-| T-92 | Review + user xác nhận → `/merge`, ghi `PROGRESS.md`; main agent chạy `/wrap-up` | T-89, T-90, T-91 | S | `main` có US-06, toàn bộ test sprint pass với adapter giả. **Mức A đạt** | [ ] |
+| T-84 | Hook điều hướng: danh sách theo con trỏ cả hai chiều, trạng thái trên URL, `at` khi tải lại, vị trí "3 / 12" | T-83 | M | US-06 AC-11, AC-17 | [x] |
+| T-85 | Mũi tên, vuốt (≥ 50 px và ngang > dọc), phím ←/→ (không khi đang gõ), đầu và cuối danh sách, `aria-label`, thông báo `aria-live` | T-84, Màn hình bước 4 | M | AC-01, AC-09, AC-18, mục 9 Usability | [x] |
+| T-86 | Chờ dừng 400 ms, gắn lại job đang chạy, chỉ kết quả đúng sản phẩm mới đổi ảnh, khóa bộ nhớ tạm có `image.version`, tải trước ảnh liền kề | T-84 | M | AC-02, AC-05, AC-06, AC-10 | [x] |
+| T-87 | Generate trước phía FE theo `flows/tryon-prefetch.md`: dừng ≥ 1 giây, các điều kiện dừng, lỗi im lặng, nâng lên `display` khi chuyển tới | T-86 | S | AC-03, AC-04; `prefetchAllowed = false` không gửi | [x] |
+| T-88 | Lỗi điều hướng E1–E10: xóa giữa chừng có nút chuyển tiếp, danh mục trống, hết lượt vẫn lướt, consent hết hiệu lực gỡ ảnh | T-86 | M | AC-12 → AC-16 | [x] |
+| T-89 | Test FE: rút gọn chuyển nhanh, kết quả về trễ, con trỏ, vuốt dọc không chuyển, điều kiện generate trước | T-85 → T-88 | M | Pass | [x] |
+| T-90 | Test BE và API test bổ sung vào `tryon.collection.json`: `prefetch` bị từ chối khi còn ≤ 3 lượt, đủ 2 job, ≥ 80% ngân sách, gọi thẳng API (AC-04, AC-08); con trỏ khi thêm, xóa sản phẩm (AC-11); job chưa gửi bị hủy, không tính lượt (AC-07) | T-83 | M | `npm run test:postman` pass cả bộ | [x] |
+| T-91 | Kiểm tra trình duyệt thật ở 360, 768, 1280 px: lướt nhanh, vuốt trên màn hình cảm ứng giả lập, hết lượt giữa chừng | T-85 → T-88 | S | Không lỗi console; khung ảnh không xê dịch | [x] |
+| T-92 | Review + user xác nhận → `/merge`, ghi `PROGRESS.md`; main agent chạy `/wrap-up` | T-89, T-90, T-91 | S | `main` có US-06, toàn bộ test sprint pass với adapter giả. **Mức A đạt** | [x] |
 
 ### 5.3 Chờ user: dịch vụ thật (mức B)
 
