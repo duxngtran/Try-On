@@ -16,6 +16,8 @@ const allPasses = [
     collections: ['system', 'auth', 'profile', 'categories', 'products', 'tryon'],
     env: {},
   },
+  // Giỏ hàng: giới hạn dòng nhỏ để kiểm CART_FULL bằng vài sản phẩm, rate limit thấp để kiểm 429 (D-149).
+  { collections: ['cart'], env: { CART_MAX_LINES: '3', CART_REQUESTS_PER_MIN: '30' } },
   { collections: ['tryon-quota'], env: { TRYON_DAILY_LIMIT: '1' } },
   // Ngân sách nhỏ hơn giá một ảnh: mọi job mới bị từ chối bất kể sổ ngân sách đang có gì.
   { collections: ['tryon-budget'], env: { TRYON_MONTHLY_BUDGET_USD: '0.01' } },

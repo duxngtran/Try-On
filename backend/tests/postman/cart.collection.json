@@ -1,0 +1,2669 @@
+{
+  "info": {
+    "name": "Cart",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Setup - đăng nhập admin",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const tag = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);",
+                  "pm.environment.set('tag', tag);",
+                  "pm.environment.set('prefix', 'POSTMAN-' + tag);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.user.role).to.eql('admin');",
+                  "pm.environment.set('adminToken', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{ADMIN_EMAIL}}\",\n  \"password\": \"{{ADMIN_PASSWORD}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - đăng ký người mua A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('tokenA', pm.response.json().data.token);",
+                  "pm.environment.set('idA', pm.response.json().data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pm-cart-a-{{tag}}@example.com\",\n  \"password\": \"Test1234x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - đăng ký người mua B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('tokenB', pm.response.json().data.token);",
+                  "pm.environment.set('idB', pm.response.json().data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pm-cart-b-{{tag}}@example.com\",\n  \"password\": \"Test1234x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - đăng ký người mua C",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('tokenC', pm.response.json().data.token);",
+                  "pm.environment.set('idC', pm.response.json().data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pm-cart-c-{{tag}}@example.com\",\n  \"password\": \"Test1234x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - đăng ký người mua D",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('tokenD', pm.response.json().data.token);",
+                  "pm.environment.set('idD', pm.response.json().data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pm-cart-d-{{tag}}@example.com\",\n  \"password\": \"Test1234x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - đăng ký người mua E",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('tokenE', pm.response.json().data.token);",
+                  "pm.environment.set('idE', pm.response.json().data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pm-cart-e-{{tag}}@example.com\",\n  \"password\": \"Test1234x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - đăng ký người mua F",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('tokenF', pm.response.json().data.token);",
+                  "pm.environment.set('idF', pm.response.json().data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pm-cart-f-{{tag}}@example.com\",\n  \"password\": \"Test1234x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo danh mục",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('cat', pm.response.json().data.category.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-Giỏ\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm P1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product;",
+                  "pm.environment.set('p1', p.id);",
+                  "pm.environment.set('p1Name', p.name);",
+                  "pm.environment.set('p1Url', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo P1",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "100000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{cat}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-800x800-gps.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm P2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product;",
+                  "pm.environment.set('p2', p.id);",
+                  "pm.environment.set('p2Name', p.name);",
+                  "pm.environment.set('p2Url', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo P2",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "100000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{cat}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-800x800-gps.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm P3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product;",
+                  "pm.environment.set('p3', p.id);",
+                  "pm.environment.set('p3Name', p.name);",
+                  "pm.environment.set('p3Url', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo P3",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "100000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{cat}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-800x800-gps.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm P4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product;",
+                  "pm.environment.set('p4', p.id);",
+                  "pm.environment.set('p4Name', p.name);",
+                  "pm.environment.set('p4Url', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo P4",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "100000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{cat}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-800x800-gps.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm P5",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product;",
+                  "pm.environment.set('p5', p.id);",
+                  "pm.environment.set('p5Name', p.name);",
+                  "pm.environment.set('p5Url', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo P5",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "100000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{cat}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-800x800-gps.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm P6",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product;",
+                  "pm.environment.set('p6', p.id);",
+                  "pm.environment.set('p6Name', p.name);",
+                  "pm.environment.set('p6Url', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo P6",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "100000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{cat}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-800x800-gps.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-10 GET /cart không token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "{ const b = pm.response.json(); pm.test('error UNAUTHORIZED', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('UNAUTHORIZED');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "AC-10 GET /cart token admin -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error FORBIDDEN', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('FORBIDDEN');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "AC-10 POST /cart/items không token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "{ const b = pm.response.json(); pm.test('error UNAUTHORIZED', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('UNAUTHORIZED');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p1}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-10 POST /cart/items token admin -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error FORBIDDEN', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('FORBIDDEN');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p1}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-09 người mua chưa có hồ sơ, consent: GET /cart rỗng, có limits",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "pm.test('giỏ rỗng, fingerprint null, limits từ env', () => {",
+                  "  pm.expect(c.items).to.eql([]);",
+                  "  pm.expect([c.itemCount, c.lineCount, c.totalVnd, c.hasUnavailable]).to.eql([0, 0, 0, false]);",
+                  "  pm.expect(c.fingerprint).to.eql(null);",
+                  "  pm.expect(c.limits.maxQuantity).to.be.a('number');",
+                  "  pm.expect(c.limits.maxLines).to.eql(3);",
+                  "  pm.environment.set('maxQuantity', c.limits.maxQuantity);",
+                  "  pm.environment.set('maxLines', c.limits.maxLines);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "AC-09 tài khoản chưa đủ hồ sơ (state xác nhận)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const s = pm.response.json().data;",
+                  "pm.test('hồ sơ chưa đủ, chưa consent', () => {",
+                  "  pm.expect(s.profile.completed).to.eql(false);",
+                  "  pm.expect(s.consent.accepted).to.eql(false);",
+                  "});",
+                  "pm.environment.set('quotaBefore', JSON.stringify({ q: s.quota, g: s.generation }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/try-on/state",
+              "host": ["{{baseUrl}}"],
+              "path": ["try-on", "state"]
+            }
+          }
+        },
+        {
+          "name": "AC-01 thêm P1 -> 200, một dòng số lượng 1, đúng hình dạng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "pm.test('Cart đúng hình dạng', () => {",
+                  "  pm.expect(c.itemCount).to.eql(1);",
+                  "  pm.expect(c.lineCount).to.eql(1);",
+                  "  pm.expect(c.totalVnd).to.eql(100000);",
+                  "  pm.expect(c.hasUnavailable).to.eql(false);",
+                  "  pm.expect(c.fingerprint).to.match(/^[0-9a-f]{32}$/);",
+                  "  pm.expect(c.limits.maxLines).to.eql(3);",
+                  "});",
+                  "const i = c.items[0];",
+                  "pm.test('CartItem đúng hình dạng, số là number', () => {",
+                  "  pm.expect(i.productId).to.eql(pm.environment.get('p1'));",
+                  "  pm.expect(i.name).to.eql(pm.environment.get('p1Name'));",
+                  "  pm.expect(i.category.id).to.eql(pm.environment.get('cat'));",
+                  "  pm.expect(i.image.url).to.eql(pm.environment.get('p1Url'));",
+                  "  pm.expect(i.image.version).to.eql(1);",
+                  "  pm.expect([i.quantity, i.priceVnd, i.lineTotalVnd]).to.eql([1, 100000, 100000]);",
+                  "  pm.expect(i.priceChangedFrom).to.eql(null);",
+                  "  pm.expect(i.available).to.eql(true);",
+                  "});",
+                  "pm.test('không lộ image_path, giá lúc thêm, user_id', () => {",
+                  "  const t = JSON.stringify(c);",
+                  "  ['image_path', 'imagePath', 'added', 'user_id', 'userId'].forEach((k) => pm.expect(t).to.not.include(k));",
+                  "});",
+                  "pm.environment.set('fingerprint1', c.fingerprint);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p1}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-04 thêm P1 lần nữa -> vẫn một dòng, số lượng 2, fingerprint đổi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "pm.test('một dòng, số lượng 2', () => {",
+                  "  pm.expect(c.lineCount).to.eql(1);",
+                  "  pm.expect(c.items[0].quantity).to.eql(2);",
+                  "  pm.expect(c.itemCount).to.eql(2);",
+                  "  pm.expect(c.totalVnd).to.eql(200000);",
+                  "  pm.expect(c.fingerprint).to.not.eql(pm.environment.get('fingerprint1'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p1}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-03 thêm P1 (lần 1/3 trong chuỗi, tổng 5 lần thêm P1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p1}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-03 thêm P1 (lần 2/3 trong chuỗi, tổng 5 lần thêm P1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p1}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-03 thêm P1 (lần 3/3 trong chuỗi, tổng 5 lần thêm P1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p1}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-03 lượt, ngân sách, tạo ảnh không đổi sau 5 lần thêm giỏ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const s = pm.response.json().data;",
+                  "pm.test('quota và generation y hệt trước khi thêm', () => {",
+                  "  pm.expect(JSON.stringify({ q: s.quota, g: s.generation })).to.eql(pm.environment.get('quotaBefore'));",
+                  "  pm.expect(s.quota.dailyUsed).to.eql(0);",
+                  "  pm.expect(s.quota.held).to.eql(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/try-on/state",
+              "host": ["{{baseUrl}}"],
+              "path": ["try-on", "state"]
+            }
+          }
+        },
+        {
+          "name": "AC-04 giỏ có số lượng 5 sau 5 lần thêm",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "pm.test('P1 số lượng 5', () => {",
+                  "  pm.expect(c.lineCount).to.eql(1);",
+                  "  pm.expect(c.items[0].quantity).to.eql(5);",
+                  "  pm.expect(c.totalVnd).to.eql(500000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "Validate thiếu productId -> 400 VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error VALIDATION_ERROR', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }",
+                  "pm.test('chỉ ra trường productId', () => {",
+                  "  const d = pm.response.json().error.details;",
+                  "  if (d) pm.expect(d[0].field).to.eql('productId');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Validate productId \"abc\" -> 400 VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error VALIDATION_ERROR', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }",
+                  "pm.test('chỉ ra trường productId', () => {",
+                  "  const d = pm.response.json().error.details;",
+                  "  if (d) pm.expect(d[0].field).to.eql('productId');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"abc\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Validate productId là số -> 400 VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error VALIDATION_ERROR', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }",
+                  "pm.test('chỉ ra trường productId', () => {",
+                  "  const d = pm.response.json().error.details;",
+                  "  if (d) pm.expect(d[0].field).to.eql('productId');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": 12 }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Validate productId null -> 400 VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error VALIDATION_ERROR', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }",
+                  "pm.test('chỉ ra trường productId', () => {",
+                  "  const d = pm.response.json().error.details;",
+                  "  if (d) pm.expect(d[0].field).to.eql('productId');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": null }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Validate body rỗng -> 400 VALIDATION_ERROR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error VALIDATION_ERROR', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }",
+                  "pm.test('chỉ ra trường productId', () => {",
+                  "  const d = pm.response.json().error.details;",
+                  "  if (d) pm.expect(d[0].field).to.eql('productId');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            }
+          }
+        },
+        {
+          "name": "Trường thừa (userId, quantity, priceVnd) bị bỏ qua",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "const line = c.items.find((i) => i.productId === pm.environment.get('p2'));",
+                  "pm.test('số lượng 1, giá thật, không thêm vào giỏ B', () => {",
+                  "  pm.expect(line.quantity).to.eql(1);",
+                  "  pm.expect(line.priceVnd).to.eql(100000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p2}}\", \"userId\": \"{{idB}}\", \"quantity\": 9, \"priceVnd\": 1 }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-10 người mua B chưa thêm gì: giỏ rỗng dù A có hàng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "pm.test('giỏ B rỗng', () => {",
+                  "  pm.expect(c.items).to.eql([]);",
+                  "  pm.expect(c.itemCount).to.eql(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "AC-10 B thêm P1 -> chỉ có số lượng 1 của B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "pm.test('B có đúng một món', () => {",
+                  "  pm.expect(c.itemCount).to.eql(1);",
+                  "  pm.expect(c.items[0].quantity).to.eql(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p1}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-10 giỏ của A không đổi sau khi B thêm",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "pm.test('A vẫn 5 P1 và 1 P2', () => {",
+                  "  pm.expect(c.itemCount).to.eql(6);",
+                  "  pm.expect(c.lineCount).to.eql(2);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "AC-12 A đăng nhập lại (phiên mới)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('tokenA2', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pm-cart-a-{{tag}}@example.com\",\n  \"password\": \"Test1234x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-12 giỏ vẫn còn ở phiên mới",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "pm.test('giỏ giữ nguyên', () => {",
+                  "  pm.expect(c.itemCount).to.eql(6);",
+                  "  pm.expect(c.items.map((i) => i.quantity).sort()).to.eql([1, 5]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "AC-11 F thêm P3 (giá 100.000)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('giá 100.000', () => pm.expect(pm.response.json().data.items[0].priceVnd).to.eql(100000));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenF}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p3}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-11 admin đổi giá P3 thành 150.000",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p3}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p3}}"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "priceVnd",
+                  "value": "150000",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-11 F thêm P3 khi giao diện còn giá cũ -> thành công, giá hiện tại 150.000",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "pm.test('giá mới, tổng theo giá mới, không còn báo giá đã đổi (người mua vừa thấy giá hiện tại)', () => {",
+                  "  pm.expect(c.items[0].priceVnd).to.eql(150000);",
+                  "  pm.expect(c.items[0].quantity).to.eql(2);",
+                  "  pm.expect(c.totalVnd).to.eql(300000);",
+                  "  pm.expect(c.items[0].priceChangedFrom).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenF}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p3}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-11 C thêm P3 rồi admin đổi giá: GET báo giá cũ, tổng theo giá mới",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p3}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-11 admin đổi giá P3 thành 175.000",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p3}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p3}}"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "priceVnd",
+                  "value": "175000",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-11 GET /cart của C: priceChangedFrom 150.000, tổng 175.000",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "pm.test('giá hiện tại và giá lúc thêm', () => {",
+                  "  pm.expect(c.items[0].priceVnd).to.eql(175000);",
+                  "  pm.expect(c.items[0].priceChangedFrom).to.eql(150000);",
+                  "  pm.expect(c.totalVnd).to.eql(175000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "AC-07 F thêm P4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenF}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p4}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-07 admin xóa mềm P4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p4}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p4}}"]
+            }
+          }
+        },
+        {
+          "name": "AC-07 thêm P4 đã xóa -> 404 NOT_FOUND \"Sản phẩm này không còn bán.\"",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "{ const b = pm.response.json(); pm.test('error NOT_FOUND', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('NOT_FOUND');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }",
+                  "pm.test('thông báo đúng', () => pm.expect(pm.response.json().error.message).to.eql('Sản phẩm này không còn bán.'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenF}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{p4}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-07 giỏ không đổi; dòng P4 ngừng bán nhưng vẫn tính số món (D-143)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "const gone = c.items.find((i) => i.productId === pm.environment.get('p4'));",
+                  "pm.test('dòng ngừng bán', () => {",
+                  "  pm.expect(gone.quantity).to.eql(1);",
+                  "  pm.expect(gone.available).to.eql(false);",
+                  "  pm.expect(gone.priceVnd).to.eql(null);",
+                  "  pm.expect(gone.lineTotalVnd).to.eql(0);",
+                  "  pm.expect(gone.priceChangedFrom).to.eql(null);",
+                  "  pm.expect(gone.name).to.eql(pm.environment.get('p4Name'));",
+                  "  pm.expect(gone.image.url).to.be.a('string');",
+                  "});",
+                  "pm.test('tổng không tính dòng ngừng bán, số món có', () => {",
+                  "  // P3 đã đổi giá thành 175.000 ở bước AC-11 sau lượt thêm cuối của F: 2 x 175.000.",
+                  "  pm.expect(c.hasUnavailable).to.eql(true);",
+                  "  pm.expect(c.totalVnd).to.eql(350000);",
+                  "  pm.expect(c.itemCount).to.eql(3);",
+                  "  pm.expect(c.lineCount).to.eql(2);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenF}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "AC-07 sản phẩm không tồn tại -> 404 NOT_FOUND",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "{ const b = pm.response.json(); pm.test('error NOT_FOUND', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('NOT_FOUND');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenF}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"00000000-0000-4000-8000-000000000000\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-08 20 request song song cùng sản phẩm: đúng maxQuantity thành công, phần còn lại 409 CART_QUANTITY_LIMIT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const base = pm.environment.get('baseUrl');",
+                  "const max = Number(pm.environment.get('maxQuantity'));",
+                  "const token = pm.environment.get('tokenC');",
+                  "const productId = pm.environment.get('p5');",
+                  "const total = 20;",
+                  "const results = [];",
+                  "for (let n = 0; n < total; n += 1) {",
+                  "  pm.sendRequest(",
+                  "    {",
+                  "      url: base + '/cart/items',",
+                  "      method: 'POST',",
+                  "      header: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },",
+                  "      body: { mode: 'raw', raw: JSON.stringify({ productId }) },",
+                  "    },",
+                  "    (err, res) => {",
+                  "      results.push(err ? { status: 0 } : { status: res.code, body: res.json() });",
+                  "      if (results.length === total) {",
+                  "        const ok = results.filter((r) => r.status === 200);",
+                  "        const full = results.filter((r) => r.status === 409);",
+                  "        pm.test('đúng ' + max + ' thành công, ' + (total - max) + ' bị từ chối, không có lỗi khác', () => {",
+                  "          pm.expect(ok.length).to.eql(max);",
+                  "          pm.expect(full.length).to.eql(total - max);",
+                  "        });",
+                  "        pm.test('mọi lần từ chối là CART_QUANTITY_LIMIT kèm maxQuantity', () => {",
+                  "          full.forEach((r) => {",
+                  "            pm.expect(r.body.error.code).to.eql('CART_QUANTITY_LIMIT');",
+                  "            pm.expect(r.body.error.details.maxQuantity).to.eql(max);",
+                  "          });",
+                  "        });",
+                  "      }",
+                  "    },",
+                  "  );",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 số lượng cuối cùng đúng bằng giới hạn, một dòng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "const line = c.items.find((i) => i.productId === pm.environment.get('p5'));",
+                  "pm.test('số lượng bằng giới hạn, không vượt', () => {",
+                  "  pm.expect(line.quantity).to.eql(Number(pm.environment.get('maxQuantity')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 giới hạn dòng: 5 sản phẩm song song vào giỏ trống, đúng maxLines thành công, còn lại 409 CART_FULL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const base = pm.environment.get('baseUrl');",
+                  "const maxLines = Number(pm.environment.get('maxLines'));",
+                  "const token = pm.environment.get('tokenD');",
+                  "const ids = ['p1', 'p2', 'p3', 'p5', 'p6'].map((k) => pm.environment.get(k));",
+                  "const results = [];",
+                  "ids.forEach((productId) => {",
+                  "  pm.sendRequest(",
+                  "    {",
+                  "      url: base + '/cart/items',",
+                  "      method: 'POST',",
+                  "      header: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },",
+                  "      body: { mode: 'raw', raw: JSON.stringify({ productId }) },",
+                  "    },",
+                  "    (err, res) => {",
+                  "      results.push(err ? { status: 0, productId } : { status: res.code, productId, body: res.json() });",
+                  "      if (results.length === ids.length) {",
+                  "        const ok = results.filter((r) => r.status === 200);",
+                  "        const full = results.filter((r) => r.status === 409);",
+                  "        pm.test('đúng ' + maxLines + ' dòng được thêm, ' + (ids.length - maxLines) + ' bị từ chối', () => {",
+                  "          pm.expect(ok.length).to.eql(maxLines);",
+                  "          pm.expect(full.length).to.eql(ids.length - maxLines);",
+                  "        });",
+                  "        pm.test('mọi lần từ chối là CART_FULL kèm maxLines', () => {",
+                  "          full.forEach((r) => {",
+                  "            pm.expect(r.body.error.code).to.eql('CART_FULL');",
+                  "            pm.expect(r.body.error.details.maxLines).to.eql(maxLines);",
+                  "          });",
+                  "        });",
+                  "        pm.environment.set('dInCart', ok[0].productId);",
+                  "        pm.environment.set('dRejected', full[0].productId);",
+                  "        pm.environment.set('dDeleteMe', ok.map((r) => r.productId).includes(pm.environment.get('p6')) ? 'p6' : 'p5');",
+                  "      }",
+                  "    },",
+                  "  );",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 giỏ D có đúng maxLines dòng; thêm sản phẩm đã có vẫn tăng số lượng được",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data;",
+                  "pm.test('vẫn maxLines dòng, một dòng có số lượng 2', () => {",
+                  "  pm.expect(c.lineCount).to.eql(Number(pm.environment.get('maxLines')));",
+                  "  pm.expect(c.items.some((i) => i.quantity === 2)).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{dInCart}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-08 thêm sản phẩm mới khi giỏ đầy -> 409 CART_FULL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 409', () => pm.response.to.have.status(409));",
+                  "{ const b = pm.response.json(); pm.test('error CART_FULL', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('CART_FULL');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }",
+                  "pm.test('kèm maxLines', () => pm.expect(pm.response.json().error.details.maxLines).to.eql(Number(pm.environment.get('maxLines'))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{dRejected}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-08 dòng ngừng bán vẫn tính vào số dòng: xóa mềm một sản phẩm trong giỏ D",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{dInCart}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{dInCart}}"]
+            }
+          }
+        },
+        {
+          "name": "AC-08 giỏ D vẫn đầy dù một dòng đã ngừng bán -> 409 CART_FULL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 409', () => pm.response.to.have.status(409));",
+                  "{ const b = pm.response.json(); pm.test('error CART_FULL', () => {",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.error.code).to.eql('CART_FULL');",
+                  "  pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i);",
+                  "}); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenD}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "items"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productId\": \"{{dRejected}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "D-149 vượt rate limit giỏ -> 429 kèm retryAfterSeconds và Retry-After; người khác không bị ảnh hưởng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const base = pm.environment.get('baseUrl');",
+                  "const token = pm.environment.get('tokenE');",
+                  "const total = 35;",
+                  "const results = [];",
+                  "for (let n = 0; n < total; n += 1) {",
+                  "  pm.sendRequest({ url: base + '/cart', method: 'GET', header: { Authorization: 'Bearer ' + token } }, (err, res) => {",
+                  "    results.push(err ? { status: 0 } : { status: res.code, res });",
+                  "    if (results.length === total) {",
+                  "      const limited = results.filter((r) => r.status === 429);",
+                  "      pm.test('có request bị 429, phần còn lại 200', () => {",
+                  "        pm.expect(limited.length).to.be.above(0);",
+                  "        pm.expect(results.filter((r) => r.status === 200).length + limited.length).to.eql(total);",
+                  "      });",
+                  "      pm.test('429 có retryAfterSeconds và header Retry-After', () => {",
+                  "        const r = limited[0].res;",
+                  "        pm.expect(r.json().error.code).to.eql('TOO_MANY_REQUESTS');",
+                  "        pm.expect(r.json().error.details.retryAfterSeconds).to.be.above(0);",
+                  "        pm.expect(r.headers.get('Retry-After')).to.be.ok;",
+                  "      });",
+                  "    }",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenE}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "D-149 rate limit theo người dùng: người mua B vẫn dùng được",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa P1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('đã xóa hoặc đã xóa trước đó', () => pm.expect([200, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p1}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa P2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('đã xóa hoặc đã xóa trước đó', () => pm.expect([200, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p2}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p2}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa P3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('đã xóa hoặc đã xóa trước đó', () => pm.expect([200, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p3}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p3}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa P5",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('đã xóa hoặc đã xóa trước đó', () => pm.expect([200, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p5}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p5}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa P6",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('đã xóa hoặc đã xóa trước đó', () => pm.expect([200, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{p6}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{p6}}"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - xóa danh mục",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories/{{cat}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories", "{{cat}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

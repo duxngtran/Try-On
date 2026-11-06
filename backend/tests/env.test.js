@@ -84,6 +84,22 @@ describe('parseEnv', () => {
     );
   });
 
+  it('biến giỏ hàng: mặc định, sai kiểu và vượt CHECK của cột đều không khởi động (T-98)', () => {
+    const env = parseEnv(valid);
+    expect([env.CART_MAX_QUANTITY, env.CART_MAX_LINES, env.CART_REQUESTS_PER_MIN]).toEqual([
+      10, 30, 120,
+    ]);
+    expect(parseEnv({ ...valid, CART_MAX_QUANTITY: '999' }).CART_MAX_QUANTITY).toBe(999);
+    for (const [name, value] of [
+      ['CART_MAX_QUANTITY', '1000'],
+      ['CART_MAX_QUANTITY', '0'],
+      ['CART_MAX_LINES', 'nhieu'],
+      ['CART_REQUESTS_PER_MIN', '0'],
+    ]) {
+      expect(() => parseEnv({ ...valid, [name]: value })).toThrow(new RegExp(name));
+    }
+  });
+
   it('JWT_SECRET ngắn hơn 32 ký tự bị từ chối', () => {
     expect(() => parseEnv({ ...valid, JWT_SECRET: 'x'.repeat(31) })).toThrow(/JWT_SECRET/);
   });

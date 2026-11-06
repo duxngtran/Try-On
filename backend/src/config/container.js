@@ -6,6 +6,8 @@ import { createProfileService } from '../services/profileService.js';
 import { createProductService } from '../services/productService.js';
 import { createProductImageStorage } from '../services/productImageStorage.js';
 import { createPhotoStorage } from '../services/storage.js';
+import { createCartService } from '../services/cartService.js';
+import { createCartRateLimiter } from '../middlewares/cartRateLimit.js';
 import { createTryonService } from '../services/tryonService.js';
 import { createProviderFromEnv } from '../services/tryon/providerFactory.js';
 import { createProviderGate } from '../services/tryon/providerGate.js';
@@ -28,6 +30,7 @@ import { createProductWriteRateLimiter } from '../middlewares/productWriteRateLi
  *   profileRepository: object,
  *   categoryRepository?: object,
  *   productRepository?: object,
+ *   cartRepository?: object,
  *   productImageStorage?: object,
  *   processProductImage?: (buffer: Buffer) => Promise<Buffer>,
  *   photoStorage?: object,
@@ -48,6 +51,7 @@ export async function buildServices(
     profileRepository,
     categoryRepository,
     productRepository,
+    cartRepository,
     productImageStorage,
     processProductImage,
     photoStorage,
@@ -193,6 +197,11 @@ export async function buildServices(
         limitPerHour: env.PRODUCT_WRITES_PER_HOUR,
       }),
     },
+    cart: cartRepository &&
+      imageStorage && {
+        cartService: createCartService({ cartRepository, imageStorage }),
+        cartRateLimiter: createCartRateLimiter({ limitPerMinute: env.CART_REQUESTS_PER_MIN }),
+      },
     profile: {
       profileService: createProfileService({
         profileRepository,

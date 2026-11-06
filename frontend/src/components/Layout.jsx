@@ -1,6 +1,8 @@
 import { Shirt } from 'lucide-react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { useAuth } from '../features/auth/authContext.js';
+import { CartIndicator } from '../features/cart/CartIndicator.jsx';
+import { CartNotice } from '../features/cart/CartNotice.jsx';
 import { AccountMenu } from './AccountMenu.jsx';
 
 const NAV_BASE =
@@ -64,6 +66,7 @@ function HeaderActions() {
           </>
         )}
       </nav>
+      {user.role === 'user' && <CartIndicator />}
       <AccountMenu />
     </div>
   );
@@ -102,6 +105,7 @@ export function Layout() {
       >
         <Outlet />
       </main>
+      <CartNotice />
       <footer className="border-t border-line py-6 text-center text-small text-ink-muted">
         © Try-on
       </footer>

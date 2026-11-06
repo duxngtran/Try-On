@@ -66,18 +66,18 @@ Nâng `CART_REQUESTS_PER_MIN`, `ORDER_CREATES_PER_HOUR` cho server test, như c�
 
 | ID | Task | Phụ thuộc | Ước lượng | Definition of Done | TT |
 |---|---|---|---|---|---|
-| T-98 | Thêm 3 biến `CART_*` vào `.env.example`, `env.js` | — | S | Test env: default, sai kiểu | [ ] |
-| T-99 | Chép `design/db/007_create_cart.sql` sang `migrations/`, `npm run migrate` trên Supabase dev | T-98, Thiết kế DB | S | `get_advisors` security không có cảnh báo mới; REST `cart_items`, `/rpc/add_cart_item` bằng anon key bị chặn; test cũ vẫn pass | [ ] |
-| T-100 | `repositories/cartRepository.js` bọc `get_cart`, `add_cart_item`, `set_cart_item_quantity`, `remove_cart_item`; `out_total_vnd` là số, không phải chuỗi | T-99 | S | Service không biết tới `rpc`; giới hạn từ env truyền một chỗ | [ ] |
-| T-101 | `services/cartService.js`, `validation/cartSchemas.js`: `getCart`, `addItem`. Map dòng sang `CartItem` theo `api.md` mục 7: `image_path` thành URL public, dòng ngừng bán `priceVnd: null`, tính `priceChangedFrom`. Map `out_status` sang HTTP | T-100 | M | Test: mọi `out_status`; response không có `image_path`, `added_price_vnd`, `userId` | [ ] |
-| T-102 | `controllers/cartController.js`, route `GET /cart`, `POST /cart/items`, rate limit, lắp vào `container.js`. Thứ tự auth → role → rate limit → body | T-101 | S | Khớp `api.md`; admin 403 | [ ] |
-| T-103 | Test BE tập trung rủi ro (Supertest, repository giả): AC-03 không gọi repository try-on hay provider; AC-07; AC-09; AC-10; AC-11 | T-102 | M | Pass; không có test trivia | [ ] |
-| T-104 | `features/cart/`: `cartApi.js`, `CartProvider` giữ giỏ trong bộ nhớ, tải khi role `user` đăng nhập, xóa khi đăng xuất. Nhiều request chồng nhau thì sau khi hết request gọi `GET /cart` một lần. Số trên header (chưa có link ở story này, T-116 bật link, như D-62) | T-102, Màn hình bước 4 | M | AC-12; admin không gọi API giỏ; provider đổi không làm mount lại `ProductStage` | [ ] |
-| T-105 | `AddToCartButton` trong `ProductInfo`: `productId` lấy lúc bấm, khóa theo từng sản phẩm, "Trong giỏ: N", thông báo qua `announce` và toast, lỗi theo `error.code`, so `priceVnd` để báo giá đã cũ. Giữ focus khi đổi sản phẩm bằng phím | T-104 | M | AC-01, AC-02, AC-05, AC-06, AC-07, AC-11, AC-13; mọi trạng thái ảnh ở `try-on-states.md` vẫn bấm được | [ ] |
-| T-106 | Test FE: chuyển sản phẩm khi request đang chạy, bấm đúp, không gọi `/jobs`, poll không dừng, lỗi theo mã | T-105 | S | Pass | [ ] |
-| T-107 | API test `cart.collection.json`, thêm vào `run.js`: AC-03 (đếm lượt qua `/try-on/state`; đếm job thuộc T-103), AC-04, AC-07 → AC-11 | T-102 | M | `npm run test:postman` pass cả bộ; chạy lần 2 vẫn pass | [ ] |
-| T-108 | Trình duyệt thật 360, 768, 1280 px với adapter giả: thêm khi đang chờ, lỗi, hết lượt, tạm dừng; vuốt và bấm; bàn phím | T-105 | S | Không lỗi console, không tràn ngang, khung ảnh không xê dịch | [ ] |
-| T-109 | Review → user xác nhận → `/merge`, ghi `PROGRESS.md` | T-103, T-106 → T-108 | S | `main` có US-07, test pass sau merge | [ ] |
+| T-98 | Thêm 3 biến `CART_*` vào `.env.example`, `env.js` | — | S | Test env: default, sai kiểu | [x] |
+| T-99 | Chép `design/db/007_create_cart.sql` sang `migrations/`, `npm run migrate` trên Supabase dev | T-98, Thiết kế DB | S | `get_advisors` security không có cảnh báo mới; REST `cart_items`, `/rpc/add_cart_item` bằng anon key bị chặn; test cũ vẫn pass | [x] |
+| T-100 | `repositories/cartRepository.js` bọc `get_cart`, `add_cart_item`, `set_cart_item_quantity`, `remove_cart_item`; `out_total_vnd` là số, không phải chuỗi | T-99 | S | Service không biết tới `rpc`; giới hạn từ env truyền một chỗ | [x] |
+| T-101 | `services/cartService.js`, `validation/cartSchemas.js`: `getCart`, `addItem`. Map dòng sang `CartItem` theo `api.md` mục 7: `image_path` thành URL public, dòng ngừng bán `priceVnd: null`, tính `priceChangedFrom`. Map `out_status` sang HTTP | T-100 | M | Test: mọi `out_status`; response không có `image_path`, `added_price_vnd`, `userId` | [x] |
+| T-102 | `controllers/cartController.js`, route `GET /cart`, `POST /cart/items`, rate limit, lắp vào `container.js`. Thứ tự auth → role → rate limit → body | T-101 | S | Khớp `api.md`; admin 403 | [x] |
+| T-103 | Test BE tập trung rủi ro (Supertest, repository giả): AC-03 không gọi repository try-on hay provider; AC-07; AC-09; AC-10; AC-11 | T-102 | M | Pass; không có test trivia | [x] |
+| T-104 | `features/cart/`: `cartApi.js`, `CartProvider` giữ giỏ trong bộ nhớ, tải khi role `user` đăng nhập, xóa khi đăng xuất. Nhiều request chồng nhau thì sau khi hết request gọi `GET /cart` một lần. Số trên header (chưa có link ở story này, T-116 bật link, như D-62) | T-102, Màn hình bước 4 | M | AC-12; admin không gọi API giỏ; provider đổi không làm mount lại `ProductStage` | [x] |
+| T-105 | `AddToCartButton` trong `ProductInfo`: `productId` lấy lúc bấm, khóa theo từng sản phẩm, "Trong giỏ: N", thông báo qua `announce` và toast, lỗi theo `error.code`, so `priceVnd` để báo giá đã cũ. Giữ focus khi đổi sản phẩm bằng phím | T-104 | M | AC-01, AC-02, AC-05, AC-06, AC-07, AC-11, AC-13; mọi trạng thái ảnh ở `try-on-states.md` vẫn bấm được | [x] |
+| T-106 | Test FE: chuyển sản phẩm khi request đang chạy, bấm đúp, không gọi `/jobs`, poll không dừng, lỗi theo mã | T-105 | S | Pass | [x] |
+| T-107 | API test `cart.collection.json`, thêm vào `run.js`: AC-03 (đếm lượt qua `/try-on/state`; đếm job thuộc T-103), AC-04, AC-07 → AC-11 | T-102 | M | `npm run test:postman` pass cả bộ; chạy lần 2 vẫn pass | [x] |
+| T-108 | Trình duyệt thật 360, 768, 1280 px với adapter giả: thêm khi đang chờ, lỗi, hết lượt, tạm dừng; vuốt và bấm; bàn phím | T-105 | S | Không lỗi console, không tràn ngang, khung ảnh không xê dịch | [x] |
+| T-109 | Review → user xác nhận → `/merge`, ghi `PROGRESS.md` | T-103, T-106 → T-108 | S | `main` có US-07, test pass sau merge | [x] |
 
 ### 5.2 US-08 — Giỏ, tổng tiền, đặt hàng (branch `feature/US-08-cart-checkout`, tạo sau T-109)
 

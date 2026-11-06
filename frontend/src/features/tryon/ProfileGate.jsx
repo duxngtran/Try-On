@@ -45,6 +45,11 @@ export function ProfileGate({ missing, midway = false }) {
       <p className="mt-2 text-body text-ink-muted">
         Chúng tôi cần ảnh toàn thân của bạn để tạo ảnh bạn mặc thử sản phẩm.
       </p>
+      {/* D-163: nói thẳng điều kiện mua hàng, vì hiện chỉ thêm được vào giỏ ở phòng thử đồ (D-147). */}
+      <p className="mt-2 text-body text-ink-muted">
+        Hiện bạn chỉ thêm được sản phẩm vào giỏ ở phòng thử đồ, nên cần hoàn thiện hồ sơ trước khi
+        mua hàng.
+      </p>
       <ul className="mt-4 space-y-3">
         {shown.map((key) => (
           <li key={key}>

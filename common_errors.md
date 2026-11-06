@@ -41,6 +41,11 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 - **Playwright `isDisabled()` trả `true` với `aria-disabled`;** phải kiểm `el.disabled` qua `evaluate`. `waitFor` visible không tính `opacity: 0`, nên ảnh đang mờ vẫn coi là hiện. (sprint-03)
 - **Updater của `setState` chạy sau `finally`,** nên không được đọc ref cờ bên trong updater. (sprint-03)
 
+- **Test FE chỉ đạt khi máy rảnh:** agent báo 493/493, chạy song song với việc khác thì 4–11 test fail. Gồm: so khớp đúng danh sách request ngay sau khi trang hiện (`GET /cart` chưa kịp gửi), chụp `calls.length` trước khi request tải xong, `toHaveFocus` ngay sau `findBy`, và kiểm "0 POST job" trong khi phòng tự POST (D-136). **Sửa:** dùng `waitFor`, đợi dấu hiệu đã tải xong rồi mới đo; chạy nhiều lượt song song trước khi merge. (sprint-04)
+- **Cú bấm đầu bị bỏ qua:** ref cập nhật trong `useEffect`, nút đã hiện nhưng handler đọc state cũ. **Sửa:** cập nhật ref trong `useLayoutEffect` (D-168). (sprint-04)
+- **Lọc output newman qua pipe rồi đọc exit code:** chỉ thấy vài collection cuối, exit code là của pipeline. **Sửa:** ghi toàn bộ ra file, lấy `$?` của chính lệnh, đọc đủ dòng `assertions`. (sprint-04)
+- **Báo cáo chỉ nêu lượt e2e cuối cùng:** 139/139 che việc các lượt trước fail chập chờn. **Sửa:** đọc log mọi lượt; tra DB để xác nhận 404 thuộc sản phẩm vừa bị xóa trong kịch bản, không nới bộ lọc mù. (sprint-04)
+
 ## Backend / API
 - **429 chỉ có `retryAfterSeconds` trong body, thiếu header `Retry-After`.** **Sửa:** đặt header ở error handler chung. (sprint-01)
 - **`page` vượt tổng số dòng làm PostgREST trả 416 (PGRST103) và API thành 500;** repository giả không bắt được, chỉ Postman trên DB thật lộ ra. **Sửa:** bắt PGRST103 rồi đếm riêng; kiểm biên "page vượt quá" trên DB thật. (sprint-02)

@@ -29,7 +29,8 @@ describe('Trang Danh mục: phân quyền và tải (AC-01, AC-09, E8)', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Bạn không có quyền truy cập.' }),
     ).toBeInTheDocument();
-    expect(calls.map((c) => c.key)).toEqual(['GET /auth/me']);
+    // Người mua đăng nhập nào cũng tải giỏ một lần (US-07); ngoài ra không có API nào khác.
+    await waitFor(() => expect(calls.map((c) => c.key)).toEqual(['GET /auth/me', 'GET /cart']));
   });
 
   it('giữ thứ tự server trả, số sản phẩm đúng', async () => {

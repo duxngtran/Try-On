@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { Alert } from '../../components/Alert.jsx';
 import { Button } from '../../components/Button.jsx';
 import { Silhouette } from '../../components/Silhouette.jsx';
+import { AddToCartButton } from '../cart/AddToCartButton.jsx';
 import { LOW_QUOTA_THRESHOLD } from './tryonConfig.js';
 import {
   formatPriceVnd,
@@ -98,14 +99,22 @@ export function StageIdle() {
 }
 
 /** Thông tin sản phẩm: hiện ngay, không chờ API ảnh (US-06 §4.1.2), kể cả khi ảnh lỗi. */
-export function ProductInfo({ product, titleId, quota, position, total, children }) {
+export function ProductInfo({
+  product,
+  titleId,
+  quota,
+  position,
+  total,
+  stageGone = false,
+  children,
+}) {
   return (
     <div className="min-w-0 space-y-1 md:col-start-2 md:row-start-2 md:self-start">
       <h2
         id={titleId}
         tabIndex={-1}
         title={product.name}
-        className="line-clamp-2 font-display text-heading font-semibold focus:outline-none md:text-title"
+        className="line-clamp-2 font-display text-heading font-semibold focus:outline-none md:min-h-16 md:text-title"
       >
         {product.name}
       </h2>
@@ -121,6 +130,8 @@ export function ProductInfo({ product, titleId, quota, position, total, children
           </p>
         </>
       )}
+      {/* Ngay dưới giá ở mọi cỡ màn hình (D-159): vị trí cố định theo giá nên không nhảy khi các thông báo bên dưới đổi. */}
+      <AddToCartButton product={product} stageGone={stageGone} />
       {quota && quota.remaining > 0 && quota.remaining <= LOW_QUOTA_THRESHOLD && (
         <Alert variant="info" role="group" className="mt-3">
           <p>

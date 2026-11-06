@@ -19,6 +19,8 @@ const STRIPE = {
   warning: 'border-l-warning text-warning',
   info: 'border-l-accent text-accent-strong',
 };
+/** Id của lớp phủ S14: nút Thêm vào giỏ trỏ `aria-describedby` vào đây, không lặp lại câu "không còn bán". */
+export const STAGE_GONE_ID = 'stage-gone-body';
 const CARD =
   'absolute inset-x-3 bottom-3 max-h-[45%] overflow-y-auto rounded-lg border border-line bg-surface px-4 py-3 shadow-card';
 
@@ -121,7 +123,7 @@ export function MessageOverlay({ overlay, onAction }) {
     <div role={overlay.role} className={`${CARD} border-l-4 ${STRIPE[overlay.variant]}`}>
       <div className="flex items-start gap-3 text-small text-ink">
         <Icon size={20} aria-hidden="true" className="mt-0.5 shrink-0" />
-        <div id={bodyId} className="min-w-0">
+        <div id={overlay.id === 'deleted' ? STAGE_GONE_ID : bodyId} className="min-w-0">
           {overlay.title && <p className="font-semibold">{overlay.title}</p>}
           <p>{overlay.body}</p>
           {overlay.detail && <p className="mt-1 text-ink-muted">{overlay.detail}</p>}

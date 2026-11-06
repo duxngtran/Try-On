@@ -6,7 +6,7 @@
 | sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Xong | US-01 và US-02 đã merge vào `main` |
 | sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Xong | US-03 và US-04 đã merge vào `main` |
 | sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Xong mức A | US-05, US-06 đã merge, dùng adapter giả. Mức B (T-93 → T-97) chờ user. User ủy quyền duyệt cả sprint, trừ pilot FASHN |
-| sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Đang làm | Bước 1–4 xong; bước 5: US-07 trên `feature/US-07-add-to-cart`. User phê duyệt mọi quyết định của main agent, kể cả merge khi test đạt (2026-11-06) |
+| sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Đang làm | Bước 1–4 xong; bước 5: US-07 đã merge, tiếp theo US-08. User phê duyệt mọi quyết định của main agent, kể cả merge khi test đạt (2026-11-06) |
 
 ## Sprint 01 — chi tiết
 - [x] Bước 1: User stories (`sprint-01/US-01.md`, `sprint-01/US-02.md`) — xong, user xác nhận giả định (D-04 → D-15) (2026-11-04)
@@ -34,7 +34,7 @@
 - [x] Bước 2: Sprint backlog (`sprint-04/sprint-backlog.md`, 32 task T-98 → T-129) — xong (2026-11-06)
 - [x] Bước 3: Thiết kế nghiệp vụ (`sprint-04/design/`: 5 luồng, `api.md`, `db/`) — xong; SQL 007, 008 chưa áp dụng lên Supabase; D-137 → D-154 (2026-11-06)
 - [x] Bước 4: UI/UX (7 file `sprint-04/screens/`, mục 7.13 trong `design/design-system.md`) — xong, không có mockup; D-155 → D-164 (2026-11-06)
-- [ ] Bước 5: Implement + test — US-07 đang làm
+- [ ] Bước 5: Implement + test — US-07 (T-98 → T-109) đã merge; migration 007 đã áp dụng trên Supabase dev, 008 chưa. US-08 đang làm
 
 ## Merge log
 - 2026-11-04: `chore/sprint-01-setup` → `main` (merge commit `3a8d178`). Setup T-01, T-03→T-06, T-08 + Prettier, .gitattributes, README. Test BE 20/20, FE 8/8, lint, format:check, build đều pass. T-07, T-09 còn chờ Supabase.
@@ -44,6 +44,7 @@
 - 2026-11-05: `feature/US-04-products` → `main` (merge commit `8860e9d`), user cho phép merge khi test đạt. Trước merge: test BE 331/331, FE 283/283, lint, format:check, build pass; newman `System` 2/5, `Auth` 26/66, `Profile` 111/244, `Categories` 34/68, `Products` 89/149 (request/assertion), đều 0 fail. Số request của `Profile` đổi theo số lần poll (D-39). Agent-coder báo `verify:products` (T-54) 60 lượt RPC song song 0 vi phạm, AC-08 đạt; T-59 đạt ở 360/768/1280 px (main agent chưa chạy lại hai kiểm tra này). Bucket public `product-images` đã tạo trên Supabase dev. Chưa kiểm: `whitespace-nowrap` của `AdminNav` trên trình duyệt (commit sau khi chụp T-59; lệnh chạy lại e2e bị bộ kiểm soát quyền chặn), p95, 429 đếm ngược trên trình duyệt, mobile thật/Safari.
 - 2026-11-06: `feature/US-05-tryon-room` → `main` (merge commit `e8cefc3`), user ủy quyền merge. Trước merge (main agent tự chạy): test BE 505/505, FE 405/405, lint, format:check, build pass; newman `System` 2/5, `Auth` 26/66, `Profile` 111/244, `Categories` 34/68, `Products` 89/149, `Tryon` 216/221, `Tryon-quota` 29/26, `Tryon-budget` 16/21 (request/assertion), đều 0 fail, đều dùng adapter giả. Agent-coder báo T-81 đạt 120/120 kiểm tra trình duyệt ở 360/768/1280 px (main agent chưa chạy lại). Chưa kiểm: FASHN thật, độ trễ p95 (T-94, D-106), `tryon:pilot` chưa chạy lần nào, `prefers-reduced-motion`, trình đọc màn hình, Firefox/Safari, cross-fade từng khung hình. Câu chữ nhắc mũi tên, vuốt tạm đổi cho tới T-85.
 - 2026-11-06: `feature/US-06-product-navigation` → `main` (merge commit `db3203c`), user ủy quyền merge. Trước merge (main agent tự chạy): test BE 506/506, FE 453/453, lint, format:check, build pass; newman `System` 2/5, `Auth` 26/66, `Profile` 110/244, `Categories` 34/68, `Products` 89/149, `Tryon` 283/284, `Tryon-quota` 32/30, `Tryon-budget` 16/21 (request/assertion), đều 0 fail, đều dùng adapter giả. Agent-coder báo T-91 đạt 116/116 kiểm tra trình duyệt ở 360/768/1280 px và số job đếm trên DB đúng (main agent chưa chạy lại). Chưa kiểm: FASHN thật, AC-12, AC-13, AC-16 trên trình duyệt thật (chỉ test FE), `prefers-reduced-motion`, trình đọc màn hình, tỉ lệ ảnh generate trước được xem.
+- 2026-11-06: `feature/US-07-add-to-cart` → `main` (merge commit `MERGE_HASH`), user ủy quyền merge. Trước merge (main agent tự chạy): test BE 524/524, FE 492/492 (thêm 10 lượt liên tiếp khi máy bận, đều đạt), lint, format:check, build pass; newman 9 collection, 974 assertion, 0 fail, gồm `Cart` 107, adapter giả. Trình duyệt thật ở 360/768/1280 px, main agent chạy lại sau lần sửa cuối: 138/139; dòng fail là 404 `/result` của sản phẩm P4 bị xóa ngay trong kịch bản AC-07 (đã tra DB), hành vi đúng, bộ lọc của script thiếu đường dẫn này. Agent-coder báo `live-concurrency` 9/9 (main agent chưa chạy lại). Main agent sửa thêm: test chập chờn và cú bấm đầu bị bỏ qua (D-168); xóa 1 ảnh hồ sơ test mồ côi do lượt e2e bị crash. Chưa kiểm: thiết bị thật, Safari, `get_advisors` performance; AC-03 chưa kiểm dòng ngân sách trên DB (đã kiểm job, ảnh, lượt).
 
 ## Blockers
 - Mức B của sprint 3 (T-93 → T-97): cần user cấp API key FASHN và cho phép pilot với ảnh người thật (D-91); không chặn sprint 4
