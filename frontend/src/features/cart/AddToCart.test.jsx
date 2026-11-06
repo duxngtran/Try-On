@@ -369,6 +369,22 @@ describe('lỗi theo mã (US-07 E1 → E5, D-119)', () => {
     expect(await addButton()).not.toHaveAttribute('aria-disabled');
   });
 
+  it('S14 đang hiện (sản phẩm đã xóa): không lặp câu "không còn bán" thành Alert thứ hai, nút trỏ mô tả vào lớp phủ', async () => {
+    const { user } = renderRoom({
+      'GET /try-on/products/p1/result': ok({ state: 'none' }),
+      'POST /try-on/products/p1/jobs': fail(404, 'NOT_FOUND'),
+      'POST /cart/items': () => fail(404, 'NOT_FOUND'),
+    });
+    await productHeading('Áo 1');
+    const overlay = await screen.findByRole('alert');
+    expect(overlay).toHaveTextContent('Sản phẩm này không còn bán.');
+    const button = await addButton();
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).toHaveAccessibleDescription('Sản phẩm này không còn bán.');
+    await user.click(button);
+    expect(screen.getAllByRole('alert')).toHaveLength(1);
+  });
+
   it('429: khóa nút theo retryAfterSeconds, hiển thị đếm ngược, không đọc từng giây', async () => {
     const { user, calls: all } = renderRoom(
       failing(fail(429, 'TOO_MANY_REQUESTS', SERVER_TEXT, { retryAfterSeconds: 30 })),

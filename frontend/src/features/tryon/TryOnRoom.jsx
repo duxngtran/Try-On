@@ -181,6 +181,7 @@ function ProductStage({
         quota={tryonState.quota}
         position={position}
         total={total}
+        stageGone={phase === 'overlay' && image.view.overlayId === 'deleted'}
       >
         <NavNotices
           atEnd={!hasNext}

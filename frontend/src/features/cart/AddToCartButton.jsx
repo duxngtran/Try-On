@@ -3,6 +3,7 @@ import { Check, Info, ShoppingBag } from 'lucide-react';
 import { Alert } from '../../components/Alert.jsx';
 import { Button } from '../../components/Button.jsx';
 import { useCountdown } from '../../hooks/useCountdown.js';
+import { STAGE_GONE_ID } from '../tryon/StageOverlay.jsx';
 import { describeInlineError } from './cartMessages.js';
 import { useCart } from './cartContext.js';
 
@@ -16,7 +17,7 @@ import { useCart } from './cartContext.js';
  *
  * @param {{ product: { id: string, name: string, priceVnd: number } }} props
  */
-export function AddToCartButton({ product }) {
+export function AddToCartButton({ product, stageGone = false }) {
   const { cart, isAdding, addItem } = useCart();
   const noteId = useId();
   const alertId = useId();
@@ -41,7 +42,9 @@ export function AddToCartButton({ product }) {
   const locked = countdown.state === 'running';
   const rateLimited = error?.code === 'TOO_MANY_REQUESTS';
   const expired = rateLimited && countdown.state === 'finished';
-  const shownError = error && !expired ? error : null;
+  // Lớp phủ S14 đang hiện cùng câu "không còn bán": không lặp lại thành Alert thứ hai (add-to-cart.md).
+  const hideGoneAlert = stageGone && error?.code === 'NOT_FOUND';
+  const shownError = error && !expired && !hideGoneAlert ? error : null;
 
   const click = async () => {
     setError(null);
@@ -64,13 +67,14 @@ export function AddToCartButton({ product }) {
     if (described.retrySeconds) countdown.start(described.retrySeconds);
   };
 
-  const soft = gone || atMax || locked;
+  const soft = gone || stageGone || atMax || locked;
   let describedBy;
-  if (gone && shownError) describedBy = alertId;
+  if (stageGone) describedBy = STAGE_GONE_ID;
+  else if (gone && shownError) describedBy = alertId;
   else if (gone || quantity > 0 || atMax) describedBy = noteId;
 
   return (
-    <div className="mt-3 space-y-2">
+    <div className="mt-3 flex flex-col gap-2">
       <Button
         size="lg"
         fullWidth
@@ -86,15 +90,15 @@ export function AddToCartButton({ product }) {
         Thêm vào giỏ
       </Button>
 
-      {((gone && !shownError) || quantity > 0 || atMax) && (
+      {((gone && !shownError && !stageGone) || quantity > 0 || atMax) && (
         <p
           id={noteId}
           key={flash}
-          className={`inline-flex items-center gap-1.5 rounded-sm text-small text-ink-muted ${
+          className={`inline-flex items-center gap-1.5 self-start rounded-sm text-small text-ink-muted ${
             flash > 0 ? 'motion-safe:animate-note-flash' : ''
           }`}
         >
-          {gone ? (
+          {gone && !stageGone ? (
             <>
               <Info size={16} aria-hidden="true" className="shrink-0 text-accent-strong" />
               Sản phẩm này không còn bán.
