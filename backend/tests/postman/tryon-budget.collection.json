@@ -1,0 +1,554 @@
+{
+  "info": {
+    "name": "Try-on budget",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Try-on budget",
+      "item": [
+        {
+          "name": "Setup - register user A",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const tag = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);",
+                  "pm.environment.set('tag', tag);",
+                  "pm.environment.set('prefix', 'PM-TRYON-' + tag);",
+                  "pm.environment.set('password', 'abcdefg1');",
+                  "['A', 'B', 'C'].forEach((l) => pm.environment.set('email' + l, 'pm-tryon-budget-' + tag + '-' + l.toLowerCase() + '@example.com'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json(); pm.expect(b.data.token).to.be.a('string');",
+                  "pm.environment.set('tokenA', b.data.token); pm.environment.set('idA', b.data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailA}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.user.role).to.eql('admin');",
+                  "pm.environment.set('adminToken', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{ADMIN_EMAIL}}\",\n  \"password\": \"{{ADMIN_PASSWORD}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo danh mục G",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('catG', pm.response.json().data.category.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/categories",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-G\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm Áo ngân sách",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product; pm.environment.set('pG1', p.id); pm.environment.set('pG1Url', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo ngân sách",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catG}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - A nhập số đo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/measurements",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165,\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - A đồng ý lưu ảnh",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo-consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - A tải ảnh toàn thân",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.profile.profileCompleted).to.eql(true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-1080x1920.png"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - A đồng ý gửi ảnh cho dịch vụ AI",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.consent.accepted).to.eql(true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-17 /state: generation.available = false khi ngân sách không đủ, không lộ số tiền",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('tạm dừng', () => pm.expect(d.generation.available).to.eql(false));",
+                  "pm.test('prefetchAllowed = false', () => pm.expect(d.generation.prefetchAllowed).to.eql(false));",
+                  "pm.test('không lộ số tiền hay ngân sách', () => pm.expect(JSON.stringify(d)).to.not.match(/budget|usd|cost/i));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "AC-17 hết ngân sách -> 503 TRYON_UNAVAILABLE, không nêu lý do hay số tiền",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 503', () => pm.response.to.have.status(503));",
+                  "{ const b = pm.response.json(); pm.test('error format TRYON_UNAVAILABLE', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('TRYON_UNAVAILABLE'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }",
+                  "pm.test('không lộ số tiền, ngân sách, nhà cung cấp', () => pm.expect(pm.response.text()).to.not.match(/budget|ngân sách|usd|\\$|fashn|credit/i));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pG1}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-17 GET result vẫn hoạt động (chỉ đọc), chưa có ảnh -> none",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'none' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pG1}}/result"
+          }
+        },
+        {
+          "name": "AC-17 generate trước bị bỏ qua im lặng: 200 skipped, không phải lỗi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data; pm.expect(d.state).to.eql('skipped'); pm.expect(d.reason).to.be.oneOf(['budget', 'disabled', 'low_quota', 'busy']);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pG1}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"prefetch\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cleanup - A rút consent (xóa ảnh try-on khỏi tryon-images)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.consent.accepted).to.eql(false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent"
+          }
+        },
+        {
+          "name": "Cleanup - A xóa ảnh hồ sơ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu chưa có ảnh', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo"
+          }
+        },
+        {
+          "name": "Cleanup - xóa sản phẩm pG1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pG1}}"
+          }
+        },
+        {
+          "name": "Cleanup - xóa danh mục catG",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/categories/{{catG}}"
+          }
+        }
+      ]
+    }
+  ]
+}

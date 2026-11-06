@@ -4,7 +4,11 @@ import { Loader2 } from 'lucide-react';
 export function Spinner({ size = 16, label = 'Đang tải' }) {
   return (
     <>
-      <Loader2 size={size} aria-hidden="true" className="animate-spin text-accent" />
+      <Loader2
+        size={size}
+        aria-hidden="true"
+        className="animate-spin text-accent motion-reduce:animate-none"
+      />
       {label && <span className="sr-only">{label}</span>}
     </>
   );

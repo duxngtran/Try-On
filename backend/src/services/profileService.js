@@ -16,6 +16,7 @@ const CONSENT_REQUIRED = () =>
  *   profileRepository: ReturnType<import('../repositories/profileRepository.js').createProfileRepository>,
  *   photoStorage: ReturnType<import('./storage.js').createPhotoStorage>,
  *   processPhoto?: (buffer: Buffer) => Promise<Buffer>,
+ *   tryonCleanup?: { kick(): unknown },
  *   logger?: Pick<Console, 'error'>,
  * }} deps
  */
@@ -23,8 +24,18 @@ export function createProfileService({
   profileRepository,
   photoStorage,
   processPhoto = processProfilePhoto,
+  tryonCleanup,
   logger = console,
 }) {
+  /** Trigger DB đã xóa ảnh try-on cùng transaction đổi ảnh; kick để xóa file sớm. Best-effort, không làm lỗi request. */
+  const kickTryonCleanup = () => {
+    try {
+      void tryonCleanup?.kick();
+    } catch {
+      // hàng đợi xóa file sẽ tự chạy ở tick kế tiếp
+    }
+  };
+
   const requireProfile = async (userId) => {
     const row = await profileRepository.findByUserId(userId);
     // Trigger DB bảo đảm mỗi user có đúng 1 hồ sơ; thiếu là lỗi hệ thống, không phải lỗi của client.
@@ -86,6 +97,7 @@ export function createProfileService({
         await removeBestEffort(newPath, userId);
         throw err;
       }
+      kickTryonCleanup();
       if (result.oldPath) await removeBestEffort(result.oldPath, userId);
       return buildDto(await requireProfile(userId));
     },
@@ -93,6 +105,7 @@ export function createProfileService({
     /** Idempotent: chưa có ảnh vẫn trả hồ sơ, không tăng version. */
     async deletePhoto(userId) {
       const result = await profileRepository.setPhoto(userId, null);
+      kickTryonCleanup();
       if (result.oldPath) await removeBestEffort(result.oldPath, userId);
       return buildDto(await requireProfile(userId));
     },

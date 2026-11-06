@@ -7,6 +7,7 @@ import { Spinner } from '../../components/Spinner.jsx';
 import { GeneralStatus } from '../auth/AuthFormStatus.jsx';
 import { useCountdown } from '../../hooks/useCountdown.js';
 import { ConsentBlock } from './ConsentBlock.jsx';
+import { hasEverConsented } from './useAiConsent.js';
 import { loadImage } from './imageLoader.js';
 import {
   PHOTO_ACCEPT,
@@ -28,7 +29,15 @@ const CHECKLIST = [
 const dateTime = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
 
 /** Card ① Ảnh toàn thân: consent, chọn/xem trước/tải lên/thay/xóa (profile-photo-*.md). */
-export function PhotoCard({ profile, applyProfile, reload, onToast, sectionRef, showGuide }) {
+export function PhotoCard({
+  profile,
+  applyProfile,
+  reload,
+  onToast,
+  sectionRef,
+  showGuide,
+  aiConsent,
+}) {
   const { photo, consent } = profile;
   const inputRef = useRef(null);
   const chooseRef = useRef(null);
@@ -52,10 +61,12 @@ export function PhotoCard({ profile, applyProfile, reload, onToast, sectionRef, 
   const [focusRequest, setFocusRequest] = useState(null); // 'replace' | 'choose' | 'consent'
 
   const locked = !consent.accepted;
+  const everSentToAi = hasEverConsented(aiConsent);
   const busy = phase !== 'idle';
   const coolingDown = countdown.state === 'running';
   const pickDisabled = locked || busy || coolingDown;
   const lockReasonId = 'photo-lock-reason';
+  const replaceNoteId = 'photo-replace-note';
   const processing = phase === 'uploading' && progress >= 100;
 
   const setPreviewUrl = (next) => {
@@ -143,6 +154,7 @@ export function PhotoCard({ profile, applyProfile, reload, onToast, sectionRef, 
 
   const upload = async () => {
     if (!preview || busy || coolingDown) return;
+    const hadPhoto = Boolean(photo);
     const controller = new AbortController();
     abortRef.current = controller;
     setError(null);
@@ -157,7 +169,7 @@ export function PhotoCard({ profile, applyProfile, reload, onToast, sectionRef, 
       });
       applyProfile(next);
       setPreviewUrl(null);
-      onToast('Đã cập nhật ảnh');
+      onToast(hadPhoto ? 'Đã cập nhật ảnh. Các ảnh thử đồ cũ đã được xóa.' : 'Đã cập nhật ảnh');
       setFocusRequest('replace');
     } catch (err) {
       if (err.code === 'CANCELED') return; // user hủy: về trạng thái xem trước, không báo lỗi
@@ -183,7 +195,7 @@ export function PhotoCard({ profile, applyProfile, reload, onToast, sectionRef, 
     try {
       applyProfile(await profileApi.deletePhoto());
       setDeleteOpen(false);
-      onToast('Đã xóa ảnh');
+      onToast('Đã xóa ảnh. Các ảnh thử đồ của bạn cũng đã được xóa.');
       setFocusRequest('choose');
     } catch (err) {
       if (err.code === 'CANCELED') return;
@@ -264,6 +276,7 @@ export function PhotoCard({ profile, applyProfile, reload, onToast, sectionRef, 
   return (
     <section
       ref={sectionRef}
+      id="photo"
       tabIndex={-1}
       aria-labelledby="photo-title"
       className="rounded-xl border border-line bg-surface p-5 shadow-card focus:outline-none"
@@ -374,6 +387,15 @@ export function PhotoCard({ profile, applyProfile, reload, onToast, sectionRef, 
         </fieldset>
       )}
 
+      {preview && photo && (
+        <Alert variant="info" role="status" className="mt-4">
+          <p id={replaceNoteId}>
+            Khi bạn lưu ảnh mới, các ảnh thử đồ cũ sẽ bị xóa và phải tạo lại. Việc này dùng lượt tạo
+            ảnh của bạn.
+          </p>
+        </Alert>
+      )}
+
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         {preview ? (
           <>
@@ -382,6 +404,7 @@ export function PhotoCard({ profile, applyProfile, reload, onToast, sectionRef, 
               loading={phase === 'uploading'}
               loadingText="Đang tải…"
               softDisabled={coolingDown}
+              aria-describedby={photo ? replaceNoteId : undefined}
             >
               Lưu ảnh
             </Button>
@@ -460,17 +483,25 @@ export function PhotoCard({ profile, applyProfile, reload, onToast, sectionRef, 
               Hủy
             </Button>
             <Button
+              variant="danger"
               loading={deleting}
               loadingText="Đang xóa…"
               onClick={confirmDelete}
-              className="!bg-danger !text-ink-inverse"
             >
               Xóa ảnh
             </Button>
           </>
         }
       >
-        Ảnh sẽ bị xóa vĩnh viễn và bạn sẽ không thể dùng phòng thử đồ cho đến khi tải ảnh mới.
+        <p>
+          Ảnh toàn thân sẽ bị xóa khỏi Try-on. Các ảnh thử đồ đã tạo từ ảnh này cũng sẽ bị xóa, và
+          bạn sẽ không thể dùng phòng thử đồ cho đến khi tải ảnh mới.
+        </p>
+        {everSentToAi && (
+          <p className="mt-3 text-small text-ink-muted">
+            Việc xóa không thu hồi được những ảnh đã được gửi tới dịch vụ AI trước đây.
+          </p>
+        )}
       </Modal>
     </section>
   );

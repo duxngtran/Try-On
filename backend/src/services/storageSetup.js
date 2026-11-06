@@ -53,3 +53,7 @@ export const ensureProfilePhotoBucket = (client, { name, maxMb }) =>
 /** Bucket ảnh sản phẩm: luôn public (D-46). */
 export const ensureProductImageBucket = (client, { name, maxMb }) =>
   ensureBucket(client, { name, maxMb, public: true });
+
+/** Bucket ảnh try-on (ảnh thân thể người dùng, D-78): luôn private. */
+export const ensureTryonImageBucket = (client, { name, maxMb }) =>
+  ensureBucket(client, { name, maxMb, public: false });

@@ -9,24 +9,45 @@ import { AppError } from '../utils/AppError.js';
 export function createPhotoStorage({ client, bucket, signedUrlTtlSeconds }) {
   const files = () => client.storage.from(bucket);
 
+  const newPath = (userId) => `${userId}/${randomUUID()}.jpg`;
+
+  /** Tải lên đúng đường dẫn cho trước (không ghi đè). Lỗi -> 500 UPLOAD_FAILED. */
+  const uploadAt = async (path, jpegBuffer) => {
+    let error;
+    try {
+      ({ error } = await files().upload(path, jpegBuffer, {
+        contentType: 'image/jpeg',
+        upsert: false,
+      }));
+    } catch (err) {
+      error = err;
+    }
+    if (error) {
+      throw new AppError(500, 'UPLOAD_FAILED', 'Tải ảnh thất bại, vui lòng thử lại.');
+    }
+    return path;
+  };
+
   return {
-    /** Tải ảnh lên với tên ngẫu nhiên do server sinh; không bao giờ ghi đè. */
-    async upload(userId, jpegBuffer) {
-      const path = `${userId}/${randomUUID()}.jpg`;
-      let error;
-      try {
-        ({ error } = await files().upload(path, jpegBuffer, {
-          contentType: 'image/jpeg',
-          upsert: false,
-        }));
-      } catch (err) {
-        error = err;
-      }
-      if (error) {
-        throw new AppError(500, 'UPLOAD_FAILED', 'Tải ảnh thất bại, vui lòng thử lại.');
-      }
-      return path;
+    newPath,
+    uploadAt,
+
+    /** Đọc nội dung file bằng service role (worker try-on lấy ảnh hồ sơ). Lỗi thì ném. */
+    async download(path) {
+      const { data, error } = await files().download(path);
+      if (error || !data) throw error ?? new Error('download trả về rỗng');
+      return Buffer.from(await data.arrayBuffer());
     },
+
+    /** Xóa nhiều file một lần. File không tồn tại không phải lỗi. Lỗi Storage thì ném. */
+    async removeMany(paths) {
+      if (paths.length === 0) return;
+      const { error } = await files().remove(paths);
+      if (error) throw error;
+    },
+
+    /** Tải ảnh lên với tên ngẫu nhiên do server sinh; không bao giờ ghi đè. */
+    upload: (userId, jpegBuffer) => uploadAt(newPath(userId), jpegBuffer),
 
     /** Xóa một file. Ném lỗi nếu Storage báo lỗi (người gọi quyết định thử lại/ghi log). */
     async remove(path) {

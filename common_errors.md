@@ -8,6 +8,9 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 - **`Set-Location` trong PowerShell làm đổi thư mục cho các lệnh sau** → lệnh tiếp theo chạy nhầm thư mục, đường dẫn tương đối báo sai (ví dụ `.env exists: False`). **Sửa:** dùng đường dẫn tuyệt đối hoặc `npm --prefix`, `git -C`. (sprint-01)
 - **`git merge -F -` lỗi `could not read file '-'`:** `git merge` không đọc message từ stdin. **Sửa:** dùng nhiều cờ `-m`. (sprint-01)
 - **`python -` với heredoc trong Git Bash bị treo đến timeout.** **Sửa:** không pipe stdin vào python; ghi script ra file rồi chạy. (sprint-01)
+- **`TaskStop` không giết tiến trình `node` con,** chạy lại script bị chồng chéo và để lại dữ liệu test. **Sửa:** kiểm `Get-CimInstance Win32_Process` khi dừng; script live phải tự dọn theo tiền tố ở đầu mỗi lần chạy. (sprint-03)
+- **Heredoc Bash trong template literal làm mất backtick và backslash.** **Sửa:** dùng Edit hoặc Write thay vì `node -e` với chuỗi nhiều lớp escape. (sprint-03)
+- **`format:check` báo lỗi vì `backend/.claude/settings.local.json` (file local).** **Sửa:** thêm `.claude` vào `.prettierignore`. (sprint-03)
 
 ## Test (Vitest / Testing Library / Supertest)
 - **Render của test trước còn trong DOM** (ví dụ 2 thẻ `h1`): Vitest không bật `globals` nên `@testing-library/react` không tự cleanup. **Sửa:** `afterEach(cleanup)` trong `frontend/src/test/setup.js`. (sprint-01)
@@ -29,6 +32,11 @@ Lỗi đã gặp và cách sửa, nhóm theo loại. Thêm mục mới vào đú
 - **Test race luôn ra một kết quả nên không thử được nhánh còn lại:** tạo sản phẩm song song xóa danh mục ở mức service cho 30/30 xóa thắng vì xử lý ảnh chậm. **Sửa:** tải ảnh trước, chạy RPC song song với độ lệch ngẫu nhiên, kiểm cả hai nhánh đều xuất hiện. (sprint-02)
 - **Ảnh chụp e2e cũ hơn commit sửa cuối:** T-59 chụp lúc 17:55, sửa nhãn tab lúc 18:01. **Sửa:** so thời gian ảnh với commit và chạy lại e2e sau khi sửa UI. (sprint-02)
 - **`getByRole` báo nhiều phần tử khi cùng một link xuất hiện 2 lần** (`AdminNav` + link quay lại). **Sửa:** thu hẹp phạm vi tìm. jsdom báo "Not implemented: scrollTo": stub `window.scrollTo` trong `test/setup.js`. (sprint-02)
+
+- **Playwright coi `aria-disabled="true"` là không bấm được,** `click()` treo 30 giây. **Sửa:** dùng `click({ force: true })` khi cố ý bấm nút khóa mềm. (sprint-03)
+- **Hai đoạn trong cùng script Postman cùng khai báo `const s`** gây `SyntaxError` lúc chạy. **Sửa:** đổi tên hoặc bọc trong block. (sprint-03)
+- **Test hook với fake timer:** effect đặt timer chỉ chạy sau khi React flush. **Sửa:** `advance(0)` trước rồi mới tiến đồng hồ. (sprint-03)
+- **Lưới một cột thiếu `grid-cols-1`, con cuộn ngang làm rộng trang** khoảng 1040 px ở 360 px; chỉ lộ ở trình duyệt thật. **Sửa:** thêm `grid-cols-1`, kiểm tràn ngang bằng trình duyệt. (sprint-03)
 
 ## Backend / API
 - **429 chỉ có `retryAfterSeconds` trong body, thiếu header `Retry-After`.** **Sửa:** đặt header ở error handler chung. (sprint-01)

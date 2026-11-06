@@ -109,6 +109,9 @@ export function AccountMenu() {
               <Link role="menuitem" to="/" className={ITEM} onClick={closeAndRestoreFocus}>
                 Trang chủ
               </Link>
+              <Link role="menuitem" to="/try-on" className={ITEM} onClick={closeAndRestoreFocus}>
+                Thử đồ
+              </Link>
               <Link role="menuitem" to="/profile" className={ITEM} onClick={closeAndRestoreFocus}>
                 Hồ sơ
                 {incomplete && (

@@ -1,9 +1,9 @@
-import { Shirt } from 'lucide-react';
 import { Link } from 'react-router';
+import { Silhouette } from '../components/Silhouette.jsx';
 import { useAuth } from '../features/auth/authContext.js';
 import { usePageTitle } from '../hooks/usePageTitle.js';
 
-/** Placeholder (screens/home.md): Phòng thử đồ thật thuộc US-05. */
+/** Trang chủ (screens/home.md, entry-points.md): card Phòng thử đồ dẫn tới /try-on. */
 export function HomePage() {
   const { user } = useAuth();
   usePageTitle('Trang chủ');
@@ -27,28 +27,23 @@ export function HomePage() {
         </div>
       )}
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-line bg-gradient-to-br from-surface-muted to-accent-soft p-6">
-        <Shirt size={32} aria-hidden="true" className="text-ink-muted" />
-        <div className="mt-4 flex items-center gap-3">
+      <div className="mt-6 flex items-center gap-6 overflow-hidden rounded-lg border border-line bg-gradient-to-br from-surface-muted to-accent-soft p-6">
+        <div className="min-w-0 flex-1">
           <h2 className="text-title font-semibold">Phòng thử đồ</h2>
-          <span className="text-caption font-semibold uppercase tracking-wider text-ink-muted">
-            Sắp ra mắt
-          </span>
+          <p className="mt-2 max-w-prose text-body text-ink-muted">
+            Chọn danh mục để xem bạn mặc thử sản phẩm.
+          </p>
+          <Link
+            to="/try-on"
+            className="mt-4 inline-flex h-11 items-center rounded-md bg-ink px-5 text-small font-semibold text-ink-inverse hover:bg-[#333]"
+          >
+            Vào phòng thử đồ
+          </Link>
+          {user.profileCompleted && (
+            <p className="mt-3 text-small text-success">Hồ sơ của bạn đã sẵn sàng.</p>
+          )}
         </div>
-        <p id="try-on-soon" className="mt-2 max-w-prose text-body text-ink-muted">
-          Chọn danh mục, vuốt để xem bạn mặc từng sản phẩm. Tính năng đang được hoàn thiện.
-        </p>
-        <button
-          type="button"
-          aria-disabled="true"
-          aria-describedby="try-on-soon"
-          className="mt-4 h-11 cursor-not-allowed rounded-md bg-disabled-bg px-5 text-small font-semibold text-disabled-ink"
-        >
-          Vào phòng thử đồ
-        </button>
-        {user.profileCompleted && (
-          <p className="mt-3 text-small text-success">Hồ sơ của bạn đã sẵn sàng.</p>
-        )}
+        <Silhouette className="hidden h-32 shrink-0 sm:block" />
       </div>
     </section>
   );

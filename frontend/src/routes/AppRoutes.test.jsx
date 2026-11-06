@@ -191,8 +191,8 @@ describe('đăng ký (AC-01, AC-02, AC-03, AC-04)', () => {
     await h1(REGISTER);
     await fillRegister(user);
     await h1('Hồ sơ của bạn');
-    // Sau khi vào /profile trang tự gọi GET /profile (không có body); chỉ kiểm payload đăng ký.
-    expect(calls.filter((c) => c.key !== 'GET /profile')).toEqual([
+    // Sau khi vào /profile trang tự gọi GET /profile và GET /try-on/state (không có body); chỉ kiểm payload đăng ký.
+    expect(calls.filter((c) => !c.key.startsWith('GET /'))).toEqual([
       { key: 'POST /auth/register', body: { email: 'new@example.com', password: 'abcdefg1' } },
     ]);
     expect(localStorage.getItem(TOKEN_KEY)).toBe('jwt');
