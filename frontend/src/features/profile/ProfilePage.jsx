@@ -80,7 +80,8 @@ export function ProfilePage() {
     <div aria-busy={status === 'loading'} className="mx-auto max-w-2xl py-8 lg:max-w-5xl">
       <h1 className="font-display text-display font-semibold">Hồ sơ của bạn</h1>
       <p className="mb-6 mt-1 hidden text-body text-ink-muted sm:block">
-        Ảnh và số đo giúp chúng tôi tạo ảnh thử đồ giống bạn nhất.
+        Ảnh toàn thân giúp chúng tôi tạo ảnh thử đồ giống bạn nhất. Số đo chưa ảnh hưởng đến ảnh thử
+        đồ.
       </p>
 
       {status === 'loading' && !profile && (

@@ -155,7 +155,8 @@ export function MeasurementsCard({ profile, applyProfile, onSaved, heightRef }) 
         </div>
         <p className="flex items-center gap-1.5 text-small text-ink-muted">
           <Lock size={14} aria-hidden="true" className="shrink-0" />
-          Số đo chỉ dùng để tạo ảnh thử đồ và không hiển thị cho người khác.
+          Số đo chưa ảnh hưởng đến ảnh thử đồ, không được gửi tới dịch vụ AI và không hiển thị cho
+          người khác.
         </p>
       </form>
     </section>

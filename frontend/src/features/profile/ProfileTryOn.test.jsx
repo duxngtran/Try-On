@@ -294,6 +294,21 @@ describe('Hồ sơ: câu chữ về ảnh thử đồ và việc gửi ảnh (D-
   });
 });
 
+describe('Hồ sơ: câu về số đo (D-82, D-95)', () => {
+  it('nói đúng: số đo chưa ảnh hưởng ảnh thử đồ và không gửi tới dịch vụ AI; không còn câu nói số đo dùng để tạo ảnh', async () => {
+    renderProfile();
+    await screen.findByLabelText('Chiều cao');
+    expect(
+      screen.getByText(
+        'Số đo chưa ảnh hưởng đến ảnh thử đồ, không được gửi tới dịch vụ AI và không hiển thị cho người khác.',
+      ),
+    ).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(
+      /Số đo chỉ dùng để tạo ảnh|số đo giúp chúng tôi tạo ảnh/,
+    );
+  });
+});
+
 describe('Hồ sơ: neo từ cổng hồ sơ', () => {
   it('#measurements đưa focus vào ô Chiều cao; #photo đưa focus vào card ảnh', async () => {
     const first = renderApp('/profile#measurements', {
