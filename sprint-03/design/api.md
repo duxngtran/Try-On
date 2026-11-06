@@ -205,7 +205,7 @@ Idempotent theo khóa cache: gọi lặp lại không sinh trùng (D-75, AC-06).
 | Đã có ảnh | 200 | `{ "state": "ready", "image": TryOnImage }` |
 | Đã có job cùng khóa. `display` nâng ưu tiên của generate trước | 202 | `{ "state": "pending", "job": { "id", "status" } }` |
 | Tạo job mới | 202 | như trên, `status: "queued"` |
-| Khóa đã bị chặn | 200 | `{ "state": "blocked", "errorCode": "TRYON_BLOCKED" }` |
+| Khóa đã bị chặn | 200 | `{ "state": "blocked", "errorCode": "TRYON_BLOCKED" }` hoặc `"TRYON_PHOTO_UNUSABLE"` (D-121) |
 | `prefetch` không chạy (US-06 mục 4.3) | 200 | `{ "state": "skipped", "reason": "low_quota" \| "busy" \| "budget" \| "disabled" }` |
 
 Generate trước không chạy là **kết quả bình thường**, không phải lỗi: không có gì hiện cho người mua.

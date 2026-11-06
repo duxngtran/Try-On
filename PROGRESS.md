@@ -5,7 +5,7 @@
 |---|---|---|---|
 | sprint-01 | Epic 1: Thiết lập hồ sơ khách hàng (US-01, US-02) | Xong | US-01 và US-02 đã merge vào `main` |
 | sprint-02 | Epic 2: Quản lý kho hàng (US-03, US-04) | Xong | US-03 và US-04 đã merge vào `main` |
-| sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Đang làm | Bước 1–3 xong; đang làm bước 4 (UI/UX). User ủy quyền duyệt cả sprint, trừ pilot FASHN |
+| sprint-03 | Epic 3: Phòng thử đồ (US-05, US-06) | Đang làm | Bước 1–4 xong; đang làm bước 5, US-05 trên `feature/US-05-tryon-room`. User ủy quyền duyệt cả sprint, trừ pilot FASHN |
 | sprint-04 | Epic 4: Mua sắm & Giỏ hàng (US-07, US-08, US-09) | Chưa bắt đầu | — |
 
 ## Sprint 01 — chi tiết
@@ -26,7 +26,7 @@
 - [x] Bước 1: User stories (`sprint-03/US-05.md`, `sprint-03/US-06.md`) — xong, user chốt Q1–Q5 (D-71 → D-96) (2026-11-05)
 - [x] Bước 2: Sprint backlog (`sprint-03/sprint-backlog.md`, 37 task T-61 → T-97) — xong (2026-11-06)
 - [x] Bước 3: Thiết kế nghiệp vụ (`sprint-03/design/`: 11 luồng, `api.md`, `tryon-provider.md`, `db/`) — xong; SQL 005, 006 chưa áp dụng lên Supabase; D-97 → D-110 do user ủy quyền duyệt (2026-11-06)
-- [ ] Bước 4: UI/UX — đang làm
+- [x] Bước 4: UI/UX (5 file `sprint-03/screens/`, mục 7.12 trong `design/design-system.md`) — xong, không có mockup; D-111 → D-126 do user ủy quyền duyệt (2026-11-06)
 - [ ] Bước 5: Implement + test — mức A dùng adapter giả (T-61 → T-92). Mức B (T-93 → T-97: API key, pilot, ngân sách thật, pháp lý) chờ user cho phép riêng (D-91, D-96)
 
 ## Merge log

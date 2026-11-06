@@ -159,6 +159,18 @@ Mỗi component dưới đây là nguồn chuẩn cho agent-coder; đặt tại 
 - **Dropzone dạng nút chọn ảnh vuông** (biến thể 7.5 cho ảnh sản phẩm): cùng cấu trúc, khung 1:1 thay vì 3:4, `max-w-xs`.
 - **Toast** (7.4) dùng ở cả trang quản trị: đặt provider ở cấp layout dùng chung thay vì riêng trang Hồ sơ.
 
+### 7.12 Thành phần cho Phòng thử đồ (thêm ở Sprint 03)
+
+> Không thêm hay đổi token màu/font/radius/shadow; chỉ ghép từ token sẵn có. Chi tiết dùng ở `sprint-03/screens/`.
+
+- **Chip danh mục**: nút `min-h-11`, padding ngang 16px, radius `full`, chữ `small` 600, viền `line-strong`, nền `surface`. Chọn: nền `ink`, chữ `ink-inverse`, kèm icon `Check` 16px và `aria-pressed="true"` (không chỉ dựa vào màu). Nhóm chip cuộn ngang ở mobile (có dải mờ `canvas` ở mép), xuống dòng ở lg.
+- **Nút mũi tên (icon tròn)**: 48 × 48px, `rounded-full`, nền `surface`, viền `line-strong`, `shadow-card`, icon `ChevronLeft`/`ChevronRight` 24px. Trạng thái vô hiệu dùng `aria-disabled="true"` + kiểu `disabled-bg`/`disabled-ink`, **không** dùng thuộc tính `disabled`, để người dùng bàn phím không mất focus khi tới đầu/cuối danh sách.
+- **Khung ảnh thử đồ (stage frame)**: tỉ lệ **3:4** cố định, radius `xl`, nền `surface-muted`, ảnh `object-contain`. Kích thước khung không đổi giữa ảnh trải phẳng, ảnh thử đồ, skeleton và lỗi. Nhãn góc "ẢNH SẢN PHẨM" (`caption`, nền `surface`, viền `line`, radius `sm`) phân biệt ảnh trải phẳng với ảnh của người dùng.
+- **Lớp phủ trạng thái (StageOverlay)**: thẻ trong khung, sát đáy, cách mép 12px, nền `surface`, viền `line`, radius `lg`, `shadow-card`; kiểu *chờ* (Spinner + một dòng `small`) và kiểu *thông báo* (icon + nội dung + tối đa 2 nút). Màu theo biến thể Alert (`danger`/`warning`/`info`), luôn kèm icon và chữ.
+- **Nhãn AI**: dòng `small` `ink-muted` có icon `Sparkles`, đặt dưới khung ảnh thử đồ, là văn bản thật (không chỉ nằm trong `alt`).
+- **Cross-fade ảnh**: 300ms `opacity` (trải phẳng → thử đồ); chuyển sản phẩm 200ms `opacity` + `translateX` 12px. Reduced motion: đổi tức thì.
+- **Thẻ consent**: card `max-w-xl`, danh sách "điều cần biết" mỗi dòng icon 20px `accent` + tiêu đề `small` 700 + nội dung `small`; luôn hiển thị đầy đủ, không thu gọn.
+
 ## 8. Accessibility (tối thiểu WCAG 2.1 AA)
 
 1. **Tương phản**: chữ thường ≥ 4,5:1, chữ lớn (≥ 24px hoặc ≥ 18,66px đậm) và thành phần UI (viền input, icon quan trọng) ≥ 3:1 — dùng đúng các token ở mục 1 (đã tính sẵn).
