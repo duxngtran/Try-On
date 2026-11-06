@@ -1,0 +1,4458 @@
+{
+  "info": {
+    "name": "Try-on",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Try-on",
+      "item": [
+        {
+          "name": "Setup - register user A",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const tag = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);",
+                  "pm.environment.set('tag', tag);",
+                  "pm.environment.set('prefix', 'PM-TRYON-' + tag);",
+                  "pm.environment.set('password', 'abcdefg1');",
+                  "['A', 'B', 'C'].forEach((l) => pm.environment.set('email' + l, 'pm-tryon-' + tag + '-' + l.toLowerCase() + '@example.com'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json(); pm.expect(b.data.token).to.be.a('string');",
+                  "pm.environment.set('tokenA', b.data.token); pm.environment.set('idA', b.data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailA}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - register user B",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": []
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json(); pm.expect(b.data.token).to.be.a('string');",
+                  "pm.environment.set('tokenB', b.data.token); pm.environment.set('idB', b.data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailB}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - register user C",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": []
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json(); pm.expect(b.data.token).to.be.a('string');",
+                  "pm.environment.set('tokenC', b.data.token); pm.environment.set('idC', b.data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailC}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.user.role).to.eql('admin');",
+                  "pm.environment.set('adminToken', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{ADMIN_EMAIL}}\",\n  \"password\": \"{{ADMIN_PASSWORD}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo danh mục T",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('catT', pm.response.json().data.category.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/categories",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-T\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo danh mục E",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('catE', pm.response.json().data.category.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/categories",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{prefix}}-E\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm Áo cũ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product; pm.environment.set('pOld', p.id); pm.environment.set('pOldUrl', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo cũ",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catT}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm FAKE-BLOCKED",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product; pm.environment.set('pBlocked', p.id); pm.environment.set('pBlockedUrl', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "FAKE-BLOCKED-{{tag}}",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catT}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm FAKE-POSE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product; pm.environment.set('pPose', p.id); pm.environment.set('pPoseUrl', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "FAKE-POSE-{{tag}}",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catT}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm FAKE-TRANSIENT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product; pm.environment.set('pTransient', p.id); pm.environment.set('pTransientUrl', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "FAKE-TRANSIENT-{{tag}}",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catT}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm FAKE-TRANSIENT-ONCE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product; pm.environment.set('pOnce', p.id); pm.environment.set('pOnceUrl', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "FAKE-TRANSIENT-ONCE-{{tag}}",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catT}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm Áo chính",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product; pm.environment.set('pMain', p.id); pm.environment.set('pMainUrl', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo chính",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catT}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - tạo sản phẩm Áo sẽ xóa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json().data.product; pm.environment.set('pGhost', p.id); pm.environment.set('pGhostUrl', p.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo sẽ xóa",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "199000",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{catT}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-512x512.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - xóa sản phẩm mới nhất (pGhost) để kiểm AC-05",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pGhost}}"
+          }
+        },
+        {
+          "name": "Setup - A nhập số đo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/measurements",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165,\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - A đồng ý lưu ảnh",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo-consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - A tải ảnh toàn thân",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.profile.profileCompleted).to.eql(true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-1080x1920.png"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - B nhập số đo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/measurements",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165,\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - B đồng ý lưu ảnh",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo-consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Setup - B tải ảnh toàn thân",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.profile.profileCompleted).to.eql(true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-1080x1920.png"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup - C nhập số đo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/measurements",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heightCm\": 165,\n  \"weightKg\": 52.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-21 không token -> 401: GET /try-on/state",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "{ const b = pm.response.json(); pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "AC-21 không token -> 401: POST /try-on/consent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "{ const b = pm.response.json(); pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-21 không token -> 401: DELETE /try-on/consent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "{ const b = pm.response.json(); pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/try-on/consent"
+          }
+        },
+        {
+          "name": "AC-21 không token -> 401: GET /try-on/categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "{ const b = pm.response.json(); pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/try-on/categories"
+          }
+        },
+        {
+          "name": "AC-21 không token -> 401: GET /try-on/categories/:id/products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "{ const b = pm.response.json(); pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/try-on/categories/{{catT}}/products"
+          }
+        },
+        {
+          "name": "AC-21 không token -> 401: GET /try-on/products/:id/result",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "{ const b = pm.response.json(); pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-21 không token -> 401: POST /try-on/products/:id/jobs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "{ const b = pm.response.json(); pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-21 không token -> 401: GET /try-on/jobs/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "{ const b = pm.response.json(); pm.test('error format UNAUTHORIZED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('UNAUTHORIZED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/try-on/jobs/{{pMain}}"
+          }
+        },
+        {
+          "name": "AC-21 token admin -> 403: GET /try-on/state",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error format FORBIDDEN', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FORBIDDEN'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "AC-21 token admin -> 403: GET /try-on/categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error format FORBIDDEN', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FORBIDDEN'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories"
+          }
+        },
+        {
+          "name": "AC-21 token admin -> 403: GET /try-on/products/:id/result",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error format FORBIDDEN', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FORBIDDEN'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-21 token admin -> 403: POST /try-on/products/:id/jobs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error format FORBIDDEN', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FORBIDDEN'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-21 id \"abc\" -> 404 (không phải 500): GET /try-on/categories/abc/products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "{ const b = pm.response.json(); pm.test('error format NOT_FOUND', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('NOT_FOUND'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/abc/products"
+          }
+        },
+        {
+          "name": "AC-21 id \"abc\" -> 404 (không phải 500): GET /try-on/products/abc/result",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "{ const b = pm.response.json(); pm.test('error format NOT_FOUND', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('NOT_FOUND'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/abc/result"
+          }
+        },
+        {
+          "name": "AC-21 id \"abc\" -> 404 (không phải 500): POST /try-on/products/abc/jobs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "{ const b = pm.response.json(); pm.test('error format NOT_FOUND', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('NOT_FOUND'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/abc/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-21 id \"abc\" -> 404 (không phải 500): GET /try-on/jobs/abc",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "{ const b = pm.response.json(); pm.test('error format NOT_FOUND', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('NOT_FOUND'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/abc"
+          }
+        },
+        {
+          "name": "AC-01 C: /state báo thiếu ảnh, không tạo gì",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('profile chưa đủ, thiếu photo', () => { pm.expect(d.profile.completed).to.eql(false); pm.expect(d.profile.missing).to.eql(['photo']); });",
+                  "pm.test('consent chưa có', () => pm.expect(d.consent.accepted).to.eql(false));",
+                  "pm.test('không lộ số tiền, ngân sách', () => pm.expect(JSON.stringify(d)).to.not.match(/budget|usd|cost/i));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "AC-01 C: GET result -> 409 PROFILE_INCOMPLETE kèm phần thiếu",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 409', () => pm.response.to.have.status(409));",
+                  "{ const b = pm.response.json(); pm.test('error format PROFILE_INCOMPLETE', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('PROFILE_INCOMPLETE'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }",
+                  "pm.test('details.missing = [photo]', () => pm.expect(pm.response.json().error.details.missing).to.eql(['photo']));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-01 C: POST jobs -> 409 PROFILE_INCOMPLETE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 409', () => pm.response.to.have.status(409));",
+                  "{ const b = pm.response.json(); pm.test('error format PROFILE_INCOMPLETE', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('PROFILE_INCOMPLETE'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-02 A: hồ sơ đủ nhưng consent AI chưa có",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('hồ sơ đủ, consent chưa có', () => { pm.expect(d.profile.completed).to.eql(true); pm.expect(d.consent.accepted).to.eql(false); pm.expect(d.consent.acceptedAt).to.eql(null); });",
+                  "pm.test('generation sẵn sàng', () => pm.expect(d.generation.available).to.eql(true));",
+                  "pm.test('quota đủ trường', () => { ['dailyLimit','dailyUsed','dailyResetsAt','monthlyLimit','monthlyUsed','monthlyResetsAt','held','remaining'].forEach((k) => pm.expect(d.quota).to.have.property(k)); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "AC-02 A: GET result chưa consent -> 403 TRYON_CONSENT_REQUIRED",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error format TRYON_CONSENT_REQUIRED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('TRYON_CONSENT_REQUIRED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-02 A: POST jobs chưa consent -> 403, không tạo job",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error format TRYON_CONSENT_REQUIRED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('TRYON_CONSENT_REQUIRED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-02 A: ảnh hồ sơ không bị xóa sau khi bị từ chối",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.profile.photo).to.be.an('object');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile"
+          }
+        },
+        {
+          "name": "AC-02 POST consent accepted:false -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-02 POST consent accepted:\"true\" (chuỗi) -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": \"true\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-02 POST consent thiếu accepted -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-02 POST consent accepted:true -> 200, trường thừa bị bỏ qua",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data.consent;",
+                  "pm.test('đã đồng ý đúng phiên bản của server', () => { pm.expect(c.accepted).to.eql(true); pm.expect(c.version).to.eql(c.requiredVersion); pm.expect(c.withdrawnAt).to.eql(null); });",
+                  "pm.environment.set('consentAt', c.acceptedAt);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true,\n  \"userId\": \"{{idB}}\",\n  \"version\": 99\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-02 POST consent lặp lại giữ nguyên thời điểm (idempotent)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.consent.acceptedAt).to.eql(pm.environment.get('consentAt'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-02 consent của A không lan sang B (B chưa đồng ý)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error format TRYON_CONSENT_REQUIRED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('TRYON_CONSENT_REQUIRED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-07 GET categories: chỉ danh mục có sản phẩm, danh mục rỗng bị ẩn",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const list = pm.response.json().data.categories;",
+                  "const t = list.find((c) => c.id === pm.environment.get('catT'));",
+                  "pm.test('danh mục có sản phẩm hiện, productCount = 6 (không đếm sản phẩm đã xóa)', () => { pm.expect(t).to.be.an('object'); pm.expect(t.productCount).to.eql(6); pm.expect(Object.keys(t).sort()).to.eql(['id','name','productCount']); });",
+                  "pm.test('danh mục rỗng bị ẩn (D-73)', () => pm.expect(list.some((c) => c.id === pm.environment.get('catE'))).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories"
+          }
+        },
+        {
+          "name": "AC-05 sản phẩm đầu tiên là mới nhất chưa xóa (pMain, không phải pGhost đã xóa)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('items[0] = pMain, total = 6, position 1', () => { pm.expect(d.items[0].id).to.eql(pm.environment.get('pMain')); pm.expect(d.total).to.eql(6); pm.expect(d.items[0].position).to.eql(1); });",
+                  "pm.test('không có pGhost đã xóa', () => pm.expect(d.items.some((p) => p.id === pm.environment.get('pGhost'))).to.eql(false));",
+                  "pm.test('thứ tự mới -> cũ: pMain, pOnce, pTransient, pPose, pBlocked, pOld', () => pm.expect(d.items.map((p) => p.id)).to.eql(['pMain','pOnce','pTransient','pPose','pBlocked','pOld'].map((k) => pm.environment.get(k))));",
+                  "pm.test('không lộ createdAt, đường dẫn Storage; ảnh sản phẩm là URL public', () => { const s = JSON.stringify(d); pm.expect(s).to.not.match(/createdAt|image_path|imagePath/); pm.expect(d.items[0].image.url).to.include('/object/public/product-images/'); pm.expect(d.items[0].image.version).to.eql(1); pm.expect(d.items[0].category.id).to.eql(pm.environment.get('catT')); });",
+                  "pm.test('cursor null ở hai đầu', () => { pm.expect(d.prevCursor).to.eql(null); pm.expect(d.nextCursor).to.eql(null); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catT}}/products"
+          }
+        },
+        {
+          "name": "AC-05 phân trang bằng con trỏ: limit=2 rồi after=nextCursor không lặp, không sót",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('2 sản phẩm đầu, còn trang sau', () => { pm.expect(d.items).to.have.length(2); pm.expect(d.nextCursor).to.be.a('string'); });",
+                  "pm.environment.set('cursor1', d.nextCursor);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catT}}/products?limit=2"
+          }
+        },
+        {
+          "name": "AC-05 trang kế theo con trỏ tiếp nối đúng thứ tự",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('tiếp nối: pTransient, pPose; position 3, 4', () => { pm.expect(d.items.map((p) => p.id)).to.eql(['pTransient','pPose'].map((k) => pm.environment.get(k))); pm.expect(d.items.map((p) => p.position)).to.eql([3, 4]); pm.expect(d.prevCursor).to.be.a('string'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catT}}/products?limit=2&after={{cursor1}}"
+          }
+        },
+        {
+          "name": "AC-07 danh mục rỗng: 200, items [], total 0",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data; pm.expect(d.items).to.eql([]); pm.expect(d.total).to.eql(0);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catE}}/products"
+          }
+        },
+        {
+          "name": "AC-07 danh mục không tồn tại (UUID lạ) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "{ const b = pm.response.json(); pm.test('error format NOT_FOUND', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('NOT_FOUND'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/00000000-0000-4000-8000-000000000000/products"
+          }
+        },
+        {
+          "name": "AC-07 tham số sai: limit=0 -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catT}}/products?limit=0"
+          }
+        },
+        {
+          "name": "AC-07 tham số sai: con trỏ hỏng -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catT}}/products?after=khong-phai-con-tro"
+          }
+        },
+        {
+          "name": "AC-07 tham số sai: after cùng before -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catT}}/products?after={{cursor1}}&before={{cursor1}}"
+          }
+        },
+        {
+          "name": "AC-03 A: lượt trước khi sinh",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const stateData = pm.response.json().data;",
+                  "pm.environment.set('a0Used', stateData.quota.dailyUsed);",
+                  "pm.environment.set('a0Remaining', stateData.quota.remaining);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "AC-03 A: GET result khi chưa có ảnh -> none (không tạo job, không tốn lượt)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'none' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-03 A: POST jobs -> 202 pending kèm job id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('pending, có job id, không lộ id nhà cung cấp', () => { pm.expect(d.state).to.eql('pending'); pm.expect(d.job.id).to.be.a('string'); pm.expect(JSON.stringify(d)).to.not.match(/provider/i); });",
+                  "pm.environment.set('jobA', d.job.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-06 A: gọi lặp lại cùng khóa -> cùng job, không sinh trùng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.expect(pm.response.json().data.job.id).to.eql(pm.environment.get('jobA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-06 A: GET result lúc đang chạy -> pending cùng job",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('pending hoặc ready (nếu worker đã xong)', () => { const d = pm.response.json().data; pm.expect(d.state).to.be.oneOf(['pending', 'ready']); if (d.state === 'pending') pm.expect(d.job.id).to.eql(pm.environment.get('jobA')); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-03 A: job xong -> succeeded, có ảnh, không có lỗi",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = pm.environment.get('jobA');",
+                  "const token = pm.environment.get('tokenA');",
+                  "const deadline = Date.now() + 40000;",
+                  "const poll = () => pm.sendRequest({ url: pm.environment.get('baseUrl') + '/try-on/jobs/' + id, method: 'GET', header: { Authorization: 'Bearer ' + token } }, (err, res) => {",
+                  "  const st = res && res.code === 200 ? res.json().data.job.status : null;",
+                  "  if ((st && st !== 'queued' && st !== 'running') || Date.now() > deadline) return;",
+                  "  setTimeout(poll, 400);",
+                  "});",
+                  "poll();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data.job;",
+                  "pm.test('succeeded, đúng sản phẩm, purpose display', () => { pm.expect(j.status).to.eql('succeeded'); pm.expect(j.productId).to.eql(pm.environment.get('pMain')); pm.expect(j.purpose).to.eql('display'); pm.expect(j.error).to.eql(null); });",
+                  "pm.test('ảnh có url ký, hạn, kích thước; không lộ đường dẫn Storage', () => { pm.expect(j.image.url).to.include('/object/sign/tryon-images/'); pm.expect(Date.parse(j.image.expiresAt)).to.be.above(Date.now()); pm.expect(j.image.width).to.be.a('number'); pm.expect(j.image.height).to.be.a('number'); pm.expect(Object.keys(j.image).sort()).to.eql(['expiresAt','height','url','width']); });",
+                  "pm.environment.set('imgA1Url', j.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{jobA}}"
+          }
+        },
+        {
+          "name": "AC-03 ảnh try-on mở được bằng signed URL, là JPEG",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('JPEG', () => pm.expect(pm.response.headers.get('content-type')).to.eql('image/jpeg'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{imgA1Url}}"
+          }
+        },
+        {
+          "name": "AC-18 đường dẫn public của file try-on bị từ chối (bucket private)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const url = pm.environment.get('imgA1Url');",
+                  "pm.variables.set('publicUrl', url.replace('/object/sign/', '/object/public/').split('?')[0]);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('không đọc được qua đường dẫn public (4xx)', () => pm.expect(pm.response.code).to.be.within(400, 499));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicUrl}}"
+          }
+        },
+        {
+          "name": "AC-03 lượt tăng đúng 1 sau khi sinh thành công",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const s = pm.response.json().data;",
+                  "pm.test('dailyUsed tăng 1, không còn lượt đang giữ', () => { pm.expect(s.quota.dailyUsed).to.eql(pm.environment.get('a0Used') + 1); pm.expect(s.quota.held).to.eql(0); });",
+                  "const stateData = pm.response.json().data;",
+                  "pm.environment.set('a1Used', stateData.quota.dailyUsed);",
+                  "pm.environment.set('a1Remaining', stateData.quota.remaining);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "AC-04 A: GET result khi đã có ảnh -> ready, không tốn thêm",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('ready kèm ảnh', () => { pm.expect(d.state).to.eql('ready'); pm.expect(d.image.url).to.include('/object/sign/tryon-images/'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-04 A: POST jobs khi đã có ảnh -> 200 ready, không tạo job mới",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.state).to.eql('ready');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-04 lượt không đổi sau khi xem lại",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.quota.dailyUsed).to.eql(pm.environment.get('a1Used'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "AC-18 B (đã có consent) GET job của A -> 404 như không tồn tại",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": []
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "{ const b = pm.response.json(); pm.test('error format NOT_FOUND', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('NOT_FOUND'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{jobA}}"
+          }
+        },
+        {
+          "name": "AC-18 admin GET job của A -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error format FORBIDDEN', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('FORBIDDEN'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{jobA}}"
+          }
+        },
+        {
+          "name": "AC-18 job id lạ (UUID hợp lệ) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "{ const b = pm.response.json(); pm.test('error format NOT_FOUND', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('NOT_FOUND'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/00000000-0000-4000-8000-000000000000"
+          }
+        },
+        {
+          "name": "AC-18 Setup - B đồng ý gửi ảnh cho dịch vụ AI",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.consent.accepted).to.eql(true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-18 B GET result cùng sản phẩm -> none (không thấy ảnh của A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'none' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-18 client gửi userId, version, url: bị bỏ qua, khóa do backend đọc từ DB",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('vẫn trả ảnh của A theo khóa trong DB (không tạo job mới)', () => pm.expect(pm.response.json().data.state).to.eql('ready'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\",\n  \"userId\": \"{{idB}}\",\n  \"photoVersion\": 99,\n  \"imageVersion\": 99,\n  \"url\": \"https://example.com/x.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-03 purpose không hợp lệ -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "{ const b = pm.response.json(); pm.test('error format VALIDATION_ERROR', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('VALIDATION_ERROR'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"foo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-16 bị bộ lọc an toàn: POST jobs -> 202",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.environment.set('job_pBlocked', pm.response.json().data.job.id);",
+                  "pm.environment.set('pBlockedBefore', pm.environment.get('a1Used'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pBlocked}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-16 bị bộ lọc an toàn: job failed TRYON_BLOCKED",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = pm.environment.get('job_pBlocked');",
+                  "const token = pm.environment.get('tokenA');",
+                  "const deadline = Date.now() + 40000;",
+                  "const poll = () => pm.sendRequest({ url: pm.environment.get('baseUrl') + '/try-on/jobs/' + id, method: 'GET', header: { Authorization: 'Bearer ' + token } }, (err, res) => {",
+                  "  const st = res && res.code === 200 ? res.json().data.job.status : null;",
+                  "  if ((st && st !== 'queued' && st !== 'running') || Date.now() > deadline) return;",
+                  "  setTimeout(poll, 400);",
+                  "});",
+                  "poll();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data.job;",
+                  "pm.test('failed TRYON_BLOCKED, không có ảnh', () => { pm.expect(j.status).to.eql('failed'); pm.expect(j.error.code).to.eql('TRYON_BLOCKED'); pm.expect(j.image).to.eql(null); });",
+                  "pm.test('không lộ chi tiết nhà cung cấp', () => pm.expect(JSON.stringify(j)).to.not.match(/ContentModeration|PoseError|ThirdParty|fashn/i));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{job_pBlocked}}"
+          }
+        },
+        {
+          "name": "AC-16 bị chặn: GET result ghi nhớ theo khóa -> blocked, không có Thử lại",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'blocked', errorCode: 'TRYON_BLOCKED' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pBlocked}}/result"
+          }
+        },
+        {
+          "name": "AC-16 bị chặn: POST jobs lần sau -> 200 blocked, không tạo job, không gọi dịch vụ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'blocked', errorCode: 'TRYON_BLOCKED' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pBlocked}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-16 ảnh người chưa phù hợp: POST jobs -> 202",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.environment.set('job_pPose', pm.response.json().data.job.id);",
+                  "pm.environment.set('pPoseBefore', pm.environment.get('a1Used'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pPose}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-16 ảnh người chưa phù hợp: job failed TRYON_PHOTO_UNUSABLE",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = pm.environment.get('job_pPose');",
+                  "const token = pm.environment.get('tokenA');",
+                  "const deadline = Date.now() + 40000;",
+                  "const poll = () => pm.sendRequest({ url: pm.environment.get('baseUrl') + '/try-on/jobs/' + id, method: 'GET', header: { Authorization: 'Bearer ' + token } }, (err, res) => {",
+                  "  const st = res && res.code === 200 ? res.json().data.job.status : null;",
+                  "  if ((st && st !== 'queued' && st !== 'running') || Date.now() > deadline) return;",
+                  "  setTimeout(poll, 400);",
+                  "});",
+                  "poll();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data.job;",
+                  "pm.test('failed TRYON_PHOTO_UNUSABLE, không có ảnh', () => { pm.expect(j.status).to.eql('failed'); pm.expect(j.error.code).to.eql('TRYON_PHOTO_UNUSABLE'); pm.expect(j.image).to.eql(null); });",
+                  "pm.test('không lộ chi tiết nhà cung cấp', () => pm.expect(JSON.stringify(j)).to.not.match(/ContentModeration|PoseError|ThirdParty|fashn/i));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{job_pPose}}"
+          }
+        },
+        {
+          "name": "AC-16 tư thế: GET result -> blocked TRYON_PHOTO_UNUSABLE (D-121)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'blocked', errorCode: 'TRYON_PHOTO_UNUSABLE' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pPose}}/result"
+          }
+        },
+        {
+          "name": "AC-16 tư thế: POST jobs lần sau -> 200 blocked",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'blocked', errorCode: 'TRYON_PHOTO_UNUSABLE' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pPose}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-16 lỗi tạm thời cả hai lần: POST jobs -> 202",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.environment.set('job_pTransient', pm.response.json().data.job.id);",
+                  "pm.environment.set('pTransientBefore', pm.environment.get('a1Used'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pTransient}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-16 lỗi tạm thời cả hai lần: job failed TRYON_FAILED",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = pm.environment.get('job_pTransient');",
+                  "const token = pm.environment.get('tokenA');",
+                  "const deadline = Date.now() + 40000;",
+                  "const poll = () => pm.sendRequest({ url: pm.environment.get('baseUrl') + '/try-on/jobs/' + id, method: 'GET', header: { Authorization: 'Bearer ' + token } }, (err, res) => {",
+                  "  const st = res && res.code === 200 ? res.json().data.job.status : null;",
+                  "  if ((st && st !== 'queued' && st !== 'running') || Date.now() > deadline) return;",
+                  "  setTimeout(poll, 400);",
+                  "});",
+                  "poll();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data.job;",
+                  "pm.test('failed TRYON_FAILED, không có ảnh', () => { pm.expect(j.status).to.eql('failed'); pm.expect(j.error.code).to.eql('TRYON_FAILED'); pm.expect(j.image).to.eql(null); });",
+                  "pm.test('không lộ chi tiết nhà cung cấp', () => pm.expect(JSON.stringify(j)).to.not.match(/ContentModeration|PoseError|ThirdParty|fashn/i));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{job_pTransient}}"
+          }
+        },
+        {
+          "name": "AC-16 sau 3 lần thất bại không tính lượt nào",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const s = pm.response.json().data;",
+                  "pm.test('dailyUsed không đổi, không còn lượt bị giữ (không tính lượt khi lỗi)', () => { pm.expect(s.quota.dailyUsed).to.eql(pm.environment.get('a1Used')); pm.expect(s.quota.held).to.eql(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "AC-16 lỗi tạm thời: GET result -> none, Thử lại sinh job mới (khác job cũ)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.test('job mới', () => pm.expect(pm.response.json().data.job.id).to.not.eql(pm.environment.get('job_pTransient')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pTransient}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-16 lỗi tạm thời một lần rồi thành công: POST jobs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.environment.set('job_pOnce', pm.response.json().data.job.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pOnce}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-16 lỗi tạm thời một lần rồi thành công: tự thử lại, ảnh hiện",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = pm.environment.get('job_pOnce');",
+                  "const token = pm.environment.get('tokenA');",
+                  "const deadline = Date.now() + 40000;",
+                  "const poll = () => pm.sendRequest({ url: pm.environment.get('baseUrl') + '/try-on/jobs/' + id, method: 'GET', header: { Authorization: 'Bearer ' + token } }, (err, res) => {",
+                  "  const st = res && res.code === 200 ? res.json().data.job.status : null;",
+                  "  if ((st && st !== 'queued' && st !== 'running') || Date.now() > deadline) return;",
+                  "  setTimeout(poll, 400);",
+                  "});",
+                  "poll();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data.job;",
+                  "pm.test('succeeded sau khi tự thử lại', () => { pm.expect(j.status).to.eql('succeeded'); pm.expect(j.image.url).to.be.a('string'); });",
+                  "pm.environment.set('imgOnceUrl', j.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{job_pOnce}}"
+          }
+        },
+        {
+          "name": "AC-10 B: sinh ảnh cho pMain",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.environment.set('jobB1', pm.response.json().data.job.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-10 B: ảnh sẵn sàng",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = pm.environment.get('jobB1');",
+                  "const token = pm.environment.get('tokenB');",
+                  "const deadline = Date.now() + 40000;",
+                  "const poll = () => pm.sendRequest({ url: pm.environment.get('baseUrl') + '/try-on/jobs/' + id, method: 'GET', header: { Authorization: 'Bearer ' + token } }, (err, res) => {",
+                  "  const st = res && res.code === 200 ? res.json().data.job.status : null;",
+                  "  if ((st && st !== 'queued' && st !== 'running') || Date.now() > deadline) return;",
+                  "  setTimeout(poll, 400);",
+                  "});",
+                  "poll();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data.job; pm.expect(j.status).to.eql('succeeded'); pm.environment.set('imgB1Url', j.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{jobB1}}"
+          }
+        },
+        {
+          "name": "AC-10 B rút consent -> 200, accepted false, withdrawnAt có giá trị",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data.consent;",
+                  "pm.test('đã rút', () => { pm.expect(c.accepted).to.eql(false); pm.expect(c.withdrawnAt).to.be.a('string'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent"
+          }
+        },
+        {
+          "name": "AC-10 B rút consent lần 2 -> 200 (idempotent)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.consent.accepted).to.eql(false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent"
+          }
+        },
+        {
+          "name": "AC-10 B: GET result sau khi rút -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error format TRYON_CONSENT_REQUIRED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('TRYON_CONSENT_REQUIRED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-10 B: POST jobs sau khi rút -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "{ const b = pm.response.json(); pm.test('error format TRYON_CONSENT_REQUIRED', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('TRYON_CONSENT_REQUIRED'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-10 B: ảnh hồ sơ còn nguyên sau khi rút consent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.profile; pm.expect(p.photo).to.be.an('object'); pm.expect(p.profileCompleted).to.eql(true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile"
+          }
+        },
+        {
+          "name": "AC-10 B: /state báo đã rút",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().data.consent; pm.expect(c.accepted).to.eql(false); pm.expect(c.withdrawnAt).to.be.a('string');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "AC-10 B đồng ý lại",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.consent.accepted).to.eql(true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-10 B: sau khi đồng ý lại, ảnh cũ đã bị xóa thật -> none",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'none' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-11 B: tạo job rồi rút consent ngay",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.environment.set('jobB2', pm.response.json().data.job.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-11 B: rút consent khi job đang chạy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent"
+          }
+        },
+        {
+          "name": "AC-11 B: job hết hiệu lực -> discarded hoặc canceled, không có ảnh",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["setTimeout(() => {}, 2500);"]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data.job;",
+                  "pm.test('hết hiệu lực, kết quả không hiện cho người mua', () => { pm.expect(j.status).to.be.oneOf(['discarded', 'canceled']); pm.expect(j.image).to.eql(null); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{jobB2}}"
+          }
+        },
+        {
+          "name": "AC-11 B: đồng ý lại, vẫn không có ảnh (kết quả muộn không được lưu)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["setTimeout(() => {}, 2500);"]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-11 B: result sau khi kết quả muộn về -> none",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.state).to.be.oneOf(['none', 'pending']);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-12 admin đổi tên và giá pMain -> ảnh try-on vẫn dùng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pMain}}",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "{{prefix}} Áo chính đổi tên",
+                  "type": "text"
+                },
+                {
+                  "key": "priceVnd",
+                  "value": "249000",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-12 sau đổi tên, giá: ảnh try-on của pMain còn nguyên, không gọi dịch vụ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.state).to.eql('ready');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-12 admin thay ảnh pOnce -> version 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.product.image.version).to.eql(2);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pOnce}}",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "product-800x800.webp"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-12 sau thay ảnh sản phẩm: ảnh try-on cũ không còn (none), version 2 ở danh sách",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'none' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pOnce}}/result"
+          }
+        },
+        {
+          "name": "AC-12 danh sách người mua báo image.version = 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.items.find((x) => x.id === pm.environment.get('pOnce'));",
+                  "pm.test('version 2', () => pm.expect(p.image.version).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catT}}/products"
+          }
+        },
+        {
+          "name": "AC-13 A: sinh ảnh cho pOld",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.environment.set('job_pOld', pm.response.json().data.job.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pOld}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-13 A: ảnh pOld sẵn sàng",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = pm.environment.get('job_pOld');",
+                  "const token = pm.environment.get('tokenA');",
+                  "const deadline = Date.now() + 40000;",
+                  "const poll = () => pm.sendRequest({ url: pm.environment.get('baseUrl') + '/try-on/jobs/' + id, method: 'GET', header: { Authorization: 'Bearer ' + token } }, (err, res) => {",
+                  "  const st = res && res.code === 200 ? res.json().data.job.status : null;",
+                  "  if ((st && st !== 'queued' && st !== 'running') || Date.now() > deadline) return;",
+                  "  setTimeout(poll, 400);",
+                  "});",
+                  "poll();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data.job; pm.expect(j.status).to.eql('succeeded'); pm.environment.set('imgOldUrl', j.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{job_pOld}}"
+          }
+        },
+        {
+          "name": "AC-13 admin xóa pOld -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pOld}}"
+          }
+        },
+        {
+          "name": "AC-13 A: GET result sản phẩm đã xóa -> 404, không lộ ảnh cũ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "{ const b = pm.response.json(); pm.test('error format NOT_FOUND', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('NOT_FOUND'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pOld}}/result"
+          }
+        },
+        {
+          "name": "AC-13 A: POST jobs sản phẩm đã xóa -> 404, không tạo job",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "{ const b = pm.response.json(); pm.test('error format NOT_FOUND', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('NOT_FOUND'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pOld}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-13 sản phẩm đã xóa không còn ở danh sách; productCount giảm",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('không còn pOld, total = 5', () => { pm.expect(d.items.some((p) => p.id === pm.environment.get('pOld'))).to.eql(false); pm.expect(d.total).to.eql(5); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/categories/{{catT}}/products"
+          }
+        },
+        {
+          "name": "AC-08 A thay ảnh hồ sơ -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.profile.profileCompleted).to.eql(true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "valid-1080x1920.webp"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AC-08 sau khi thay ảnh: ảnh try-on cũ không hiện nữa (none), consent AI còn hiệu lực",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data).to.eql({ state: 'none' });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "AC-08 sinh lại chỉ khi xem đúng sản phẩm đó và tính thêm 1 lượt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 202', () => pm.response.to.have.status(202));",
+                  "pm.environment.set('jobA2', pm.response.json().data.job.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "AC-08 ảnh mới sẵn sàng",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = pm.environment.get('jobA2');",
+                  "const token = pm.environment.get('tokenA');",
+                  "const deadline = Date.now() + 40000;",
+                  "const poll = () => pm.sendRequest({ url: pm.environment.get('baseUrl') + '/try-on/jobs/' + id, method: 'GET', header: { Authorization: 'Bearer ' + token } }, (err, res) => {",
+                  "  const st = res && res.code === 200 ? res.json().data.job.status : null;",
+                  "  if ((st && st !== 'queued' && st !== 'running') || Date.now() > deadline) return;",
+                  "  setTimeout(poll, 400);",
+                  "});",
+                  "poll();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data.job; pm.expect(j.status).to.eql('succeeded'); pm.test('URL khác ảnh cũ', () => pm.expect(j.image.url).to.not.eql(pm.environment.get('imgA1Url'))); pm.environment.set('imgA2Url', j.image.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/jobs/{{jobA2}}"
+          }
+        },
+        {
+          "name": "AC-08 chỉ sinh lại sản phẩm đã xem: sản phẩm khác (pPose) vẫn ở trạng thái chưa sinh",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('khóa mới (ảnh hồ sơ đổi) nên kết quả bị chặn cũ không còn: none', () => pm.expect(pm.response.json().data).to.eql({ state: 'none' }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pBlocked}}/result"
+          }
+        },
+        {
+          "name": "AC-09 A xóa ảnh hồ sơ -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.profile.photo).to.eql(null);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo"
+          }
+        },
+        {
+          "name": "AC-09 /state báo thiếu ảnh (lời nhắc hoàn thiện hồ sơ)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().data; pm.expect(d.profile.completed).to.eql(false); pm.expect(d.profile.missing).to.eql(['photo']);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/state"
+          }
+        },
+        {
+          "name": "AC-09 GET result sau khi xóa ảnh -> 409 PROFILE_INCOMPLETE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 409', () => pm.response.to.have.status(409));",
+                  "{ const b = pm.response.json(); pm.test('error format PROFILE_INCOMPLETE', () => { pm.expect(b.success).to.eql(false); pm.expect(b.error.code).to.eql('PROFILE_INCOMPLETE'); pm.expect(b.error.message).to.be.a('string').and.not.empty; pm.expect(JSON.stringify(b)).to.not.match(/stack|postgres|supabase|service_role/i); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/products/{{pMain}}/result"
+          }
+        },
+        {
+          "name": "Cleanup - A rút consent (xóa ảnh try-on khỏi tryon-images)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.consent.accepted).to.eql(false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent"
+          }
+        },
+        {
+          "name": "Cleanup - A xóa ảnh hồ sơ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu chưa có ảnh', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenA}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo"
+          }
+        },
+        {
+          "name": "Cleanup - B rút consent (xóa ảnh try-on khỏi tryon-images)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.consent.accepted).to.eql(false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent"
+          }
+        },
+        {
+          "name": "Cleanup - B xóa ảnh hồ sơ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu chưa có ảnh', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenB}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo"
+          }
+        },
+        {
+          "name": "Cleanup - C rút consent (xóa ảnh try-on khỏi tryon-images)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().data.consent.accepted).to.eql(false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              }
+            ],
+            "url": "{{baseUrl}}/try-on/consent"
+          }
+        },
+        {
+          "name": "Cleanup - C xóa ảnh hồ sơ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu chưa có ảnh', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenC}}"
+              }
+            ],
+            "url": "{{baseUrl}}/profile/photo"
+          }
+        },
+        {
+          "name": "Cleanup - xóa sản phẩm pBlocked",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pBlocked}}"
+          }
+        },
+        {
+          "name": "Cleanup - xóa sản phẩm pPose",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pPose}}"
+          }
+        },
+        {
+          "name": "Cleanup - xóa sản phẩm pTransient",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pTransient}}"
+          }
+        },
+        {
+          "name": "Cleanup - xóa sản phẩm pOnce",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pOnce}}"
+          }
+        },
+        {
+          "name": "Cleanup - xóa sản phẩm pMain",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404 nếu đã xóa', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/products/{{pMain}}"
+          }
+        },
+        {
+          "name": "Cleanup - xóa danh mục catT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/categories/{{catT}}"
+          }
+        },
+        {
+          "name": "Cleanup - xóa danh mục catE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 hoặc 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/categories/{{catE}}"
+          }
+        },
+        {
+          "name": "AC-08..AC-13 mọi file try-on cũ đã bị xóa khỏi Storage (signed URL cũ bị từ chối)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// D-39: Supabase CDN vẫn phục vụ signed URL cũ tới ~45s sau khi xóa file; poll song song tới khi mọi URL bị từ chối hoặc hết 90s.",
+                  "const names = ['imgA1Url', 'imgB1Url', 'imgOldUrl', 'imgOnceUrl', 'imgA2Url'];",
+                  "const deadline = Date.now() + 90000;",
+                  "const pending = new Set(names);",
+                  "const check = (name) => pm.sendRequest(pm.environment.get(name) + '&cb=' + Date.now(), (err, res) => {",
+                  "  pm.environment.set('gone_' + name, res ? res.code : 0);",
+                  "  if (res && res.code >= 400 && res.code < 500) pending.delete(name);",
+                  "});",
+                  "const round = () => {",
+                  "  [...pending].forEach(check);",
+                  "  setTimeout(() => { if (pending.size > 0 && Date.now() < deadline) round(); }, 3000);",
+                  "};",
+                  "round();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "['imgA1Url', 'imgB1Url', 'imgOldUrl', 'imgOnceUrl', 'imgA2Url'].forEach((n) => pm.test('file bị xóa (4xx): ' + n, () => pm.expect(Number(pm.environment.get('gone_' + n))).to.be.within(400, 499)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          }
+        }
+      ]
+    }
+  ]
+}
