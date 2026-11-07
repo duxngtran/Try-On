@@ -3,6 +3,7 @@ import { health } from '../controllers/healthController.js';
 import { adminPing, createAuthController } from '../controllers/authController.js';
 import { createCategoryController } from '../controllers/categoryController.js';
 import { createCartController } from '../controllers/cartController.js';
+import { createOrderController, noStore } from '../controllers/orderController.js';
 import { createProductController } from '../controllers/productController.js';
 import { createProfileController, requirePhotoConsent } from '../controllers/profileController.js';
 import { createTryonController } from '../controllers/tryonController.js';
@@ -11,7 +12,8 @@ import { validateBody } from '../middlewares/validate.js';
 import { validateUuidParam } from '../middlewares/validateUuidParam.js';
 import { categoryBodySchema } from '../validation/categorySchemas.js';
 import { loginSchema, registerSchema } from '../validation/authSchemas.js';
-import { addCartItemBodySchema } from '../validation/cartSchemas.js';
+import { addCartItemBodySchema, setCartItemQuantityBodySchema } from '../validation/cartSchemas.js';
+import { placeOrderBodySchema } from '../validation/orderSchemas.js';
 import { consentSchema, measurementsSchema } from '../validation/profileSchemas.js';
 import { consentBodySchema, createJobBodySchema } from '../validation/tryonSchemas.js';
 
@@ -32,6 +34,11 @@ import { consentBodySchema, createJobBodySchema } from '../validation/tryonSchem
  *     cartService: ReturnType<import('../services/cartService.js').createCartService>,
  *     cartRateLimiter: import('express').RequestHandler,
  *   },
+ *   orders?: {
+ *     orderService: ReturnType<import('../services/orderService.js').createOrderService>,
+ *     orderCreateRateLimiter: import('express').RequestHandler,
+ *     orderReadRateLimiter: import('express').RequestHandler,
+ *   },
  *   profile?: {
  *     profileService: ReturnType<import('../services/profileService.js').createProfileService>,
  *     uploadPhoto: import('express').RequestHandler,
@@ -49,8 +56,17 @@ export function createApiRouter(services) {
   router.get('/health', health);
   if (!services) return router;
 
-  const { authService, authenticate, authRateLimiter, categories, products, cart, profile, tryon } =
-    services;
+  const {
+    authService,
+    authenticate,
+    authRateLimiter,
+    categories,
+    products,
+    cart,
+    orders,
+    profile,
+    tryon,
+  } = services;
   const auth = createAuthController(authService);
 
   router.post('/auth/register', authRateLimiter, validateBody(registerSchema), auth.register);
@@ -110,18 +126,53 @@ export function createApiRouter(services) {
   }
 
   if (cart) {
-    // Chỉ role user (D-14, D-28). Thứ tự: auth -> role -> rate limit (đếm mọi request) -> body (api.md mục 1).
+    // Chỉ role user (D-14, D-28). Thứ tự: auth -> role -> uuid (404) -> rate limit (đếm mọi request) -> body (api.md mục 1).
     const { cartService, cartRateLimiter } = cart;
     const controller = createCartController(cartService);
-    const userOnly = [authenticate, requireRole('user'), cartRateLimiter];
+    const userOnly = [authenticate, requireRole('user')];
+    const productId = validateUuidParam('Sản phẩm này không còn trong giỏ.', 'productId');
 
-    router.get('/cart', ...userOnly, controller.get);
+    router.get('/cart', ...userOnly, cartRateLimiter, controller.get);
     router.post(
       '/cart/items',
       ...userOnly,
+      cartRateLimiter,
       validateBody(addCartItemBodySchema),
       controller.addItem,
     );
+    router.patch(
+      '/cart/items/:productId',
+      ...userOnly,
+      productId,
+      cartRateLimiter,
+      validateBody(setCartItemQuantityBodySchema),
+      controller.setQuantity,
+    );
+    router.delete(
+      '/cart/items/:productId',
+      ...userOnly,
+      productId,
+      cartRateLimiter,
+      controller.removeItem,
+    );
+  }
+
+  if (orders) {
+    // Chỉ role user (D-14, D-28, D-151). Thứ tự: auth -> role -> uuid (404) -> rate limit (đếm mọi request) -> body.
+    const { orderService, orderCreateRateLimiter, orderReadRateLimiter } = orders;
+    const controller = createOrderController(orderService);
+    const userOnly = [authenticate, requireRole('user'), noStore];
+    const orderId = validateUuidParam('Không tìm thấy đơn hàng.');
+
+    router.post(
+      '/orders',
+      ...userOnly,
+      orderCreateRateLimiter,
+      validateBody(placeOrderBodySchema),
+      controller.place,
+    );
+    router.get('/orders', ...userOnly, orderReadRateLimiter, controller.list);
+    router.get('/orders/:id', ...userOnly, orderId, orderReadRateLimiter, controller.get);
   }
 
   if (profile) {

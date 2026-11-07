@@ -13,11 +13,16 @@ const fixturesDir = path.join(backendDir, 'tests/fixtures/generated');
 // nếu không, API test phải sửa env của server đang chạy, hoặc bỏ AC-17 khỏi bộ API test.
 const allPasses = [
   {
-    collections: ['system', 'auth', 'profile', 'categories', 'products', 'tryon'],
+    collections: ['system', 'auth', 'profile', 'categories', 'products', 'tryon', 'orders'],
     env: {},
   },
   // Giỏ hàng: giới hạn dòng nhỏ để kiểm CART_FULL bằng vài sản phẩm, rate limit thấp để kiểm 429 (D-149).
   { collections: ['cart'], env: { CART_MAX_LINES: '3', CART_REQUESTS_PER_MIN: '30' } },
+  // Đơn hàng: ngưỡng tạo đơn rất thấp để kiểm 429 qua HTTP thật (D-148), cách của D-132. Các request bị 400 vẫn bị đếm (D-31).
+  {
+    collections: ['orders-ratelimit'],
+    env: { ORDER_CREATES_PER_HOUR: '3', ORDER_READS_PER_MIN: '30' },
+  },
   { collections: ['tryon-quota'], env: { TRYON_DAILY_LIMIT: '1' } },
   // Ngân sách nhỏ hơn giá một ảnh: mọi job mới bị từ chối bất kể sổ ngân sách đang có gì.
   { collections: ['tryon-budget'], env: { TRYON_MONTHLY_BUDGET_USD: '0.01' } },
@@ -98,6 +103,9 @@ const baseServerEnv = {
   ...process.env,
   AUTH_RATE_LIMIT_PER_MIN: '500',
   PRODUCT_WRITES_PER_HOUR: '5000',
+  // Collection orders đặt hàng song song (20 request cùng khóa) và 25 đơn của một người: nâng giới hạn mặc định (20/giờ).
+  ORDER_CREATES_PER_HOUR: '5000',
+  ORDER_READS_PER_MIN: '5000',
   // Chốt chặn chống gọi dịch vụ thật: ghi đè cả backend/.env (node --env-file không đè biến đã có trong môi trường),
   // để máy đã có key FASHN vẫn không gọi ra ngoài khi chạy API test.
   TRYON_PROVIDER: 'fake',

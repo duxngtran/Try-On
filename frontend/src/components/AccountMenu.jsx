@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { useAuth } from '../features/auth/authContext.js';
+import { useCart } from '../features/cart/cartContext.js';
 
 const ITEM =
   'flex min-h-12 w-full items-center justify-between gap-2 px-4 text-left text-small font-semibold text-ink hover:bg-surface-muted focus-visible:bg-surface-muted';
@@ -12,6 +13,7 @@ const ITEM =
  */
 export function AccountMenu() {
   const { user, logout } = useAuth();
+  const { cart } = useCart();
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const buttonRef = useRef(null);
@@ -111,6 +113,17 @@ export function AccountMenu() {
               </Link>
               <Link role="menuitem" to="/try-on" className={ITEM} onClick={closeAndRestoreFocus}>
                 Thử đồ
+              </Link>
+              <Link role="menuitem" to="/cart" className={ITEM} onClick={closeAndRestoreFocus}>
+                Giỏ hàng
+                {cart?.itemCount > 0 && (
+                  <span className="text-small font-normal text-ink-muted">
+                    {cart.itemCount} món
+                  </span>
+                )}
+              </Link>
+              <Link role="menuitem" to="/orders" className={ITEM} onClick={closeAndRestoreFocus}>
+                Đơn của tôi
               </Link>
               <Link role="menuitem" to="/profile" className={ITEM} onClick={closeAndRestoreFocus}>
                 Hồ sơ

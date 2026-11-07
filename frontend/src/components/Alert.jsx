@@ -8,12 +8,22 @@ const VARIANTS = {
 };
 
 /** Alert nội tuyến (design-system 7.4). `role` do nơi dùng quyết định (alert cho lỗi, status cho thông tin). */
-export function Alert({ variant = 'info', role = 'status', onClose, children, className = '' }) {
+export function Alert({
+  variant = 'info',
+  role = 'status',
+  onClose,
+  children,
+  className = '',
+  ref,
+  ...rest
+}) {
   const { box, icon: Icon, color } = VARIANTS[variant];
   return (
     <div
+      ref={ref}
       role={role}
-      className={`flex items-start gap-3 rounded-md border-l-4 p-3 text-small ${box} ${className}`}
+      className={`flex items-start gap-3 rounded-md border-l-4 p-3 text-small outline-none ${box} ${className}`}
+      {...rest}
     >
       <Icon size={20} aria-hidden="true" className={`mt-0.5 shrink-0 ${color}`} />
       <div className="min-w-0 flex-1 text-ink">{children}</div>

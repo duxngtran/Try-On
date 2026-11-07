@@ -71,5 +71,44 @@ export function createCartService({ cartRepository, imageStorage }) {
           throw new Error(`add_cart_item trả trạng thái lạ: ${status}`);
       }
     },
+
+    /**
+     * Đặt số lượng tuyệt đối (gửi lại không cộng dồn). Dòng đã bị bỏ ở tab khác hoặc sản phẩm vừa ngừng bán đều 404:
+     * FE tải lại giỏ để biết là trường hợp nào (E1, E2).
+     */
+    async setQuantity(userId, productId, quantity) {
+      const status = await cartRepository.setQuantity(userId, productId, quantity);
+      switch (status) {
+        case 'ok':
+          return readCart(userId);
+        case 'not_in_cart':
+        case 'unavailable':
+          throw new AppError(404, 'NOT_FOUND', 'Sản phẩm này không còn trong giỏ.');
+        case 'quantity_limit':
+          throw new AppError(
+            409,
+            'CART_QUANTITY_LIMIT',
+            'Số lượng của sản phẩm này đã đạt mức tối đa.',
+            { maxQuantity: limits.maxQuantity },
+          );
+        case 'user_not_found':
+          throw new AppError(401, 'UNAUTHORIZED', 'Vui lòng đăng nhập.');
+        default:
+          throw new Error(`set_cart_item_quantity trả trạng thái lạ: ${status}`);
+      }
+    },
+
+    /** Bỏ dòng, kể cả dòng ngừng bán. Idempotent: dòng đã mất vẫn trả giỏ hiện tại. */
+    async removeItem(userId, productId) {
+      const status = await cartRepository.removeItem(userId, productId);
+      switch (status) {
+        case 'ok':
+          return readCart(userId);
+        case 'user_not_found':
+          throw new AppError(401, 'UNAUTHORIZED', 'Vui lòng đăng nhập.');
+        default:
+          throw new Error(`remove_cart_item trả trạng thái lạ: ${status}`);
+      }
+    },
   };
 }

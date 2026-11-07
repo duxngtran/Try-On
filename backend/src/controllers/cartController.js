@@ -9,5 +9,9 @@ export function createCartController(cartService) {
     get: async (req, res) => ok(res, await cartService.getCart(req.user.id)),
     addItem: async (req, res) =>
       ok(res, await cartService.addItem(req.user.id, req.body.productId)),
+    setQuantity: async (req, res) =>
+      ok(res, await cartService.setQuantity(req.user.id, req.params.productId, req.body.quantity)),
+    removeItem: async (req, res) =>
+      ok(res, await cartService.removeItem(req.user.id, req.params.productId)),
   };
 }

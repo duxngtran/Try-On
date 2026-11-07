@@ -1,5 +1,6 @@
 import { getSupabase } from '../config/supabase.js';
 
+const MAX_SQL_INTEGER = 2_147_483_647;
 const rows = (data) => (Array.isArray(data) ? data : data == null ? [] : [data]);
 const firstRow = (data) => rows(data)[0] ?? null;
 
@@ -90,7 +91,8 @@ export function createCartRepository(client = getSupabase(), limits) {
         await rpc('set', 'set_cart_item_quantity', {
           p_user_id: userId,
           p_product_id: productId,
-          p_quantity: quantity,
+          // Số vượt kiểu integer của hàm SQL sẽ thành lỗi 22003 (500); kẹp lại để vẫn ra quantity_limit (409).
+          p_quantity: Math.min(quantity, MAX_SQL_INTEGER),
           p_max_quantity: limits.maxQuantity,
         }),
       );

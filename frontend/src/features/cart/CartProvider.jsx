@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router';
 import { useAuth } from '../auth/authContext.js';
 import { cartApi } from './cartApi.js';
 import { CartContext } from './cartContext.js';
@@ -22,6 +23,12 @@ const REFRESH_AFTER = new Set(['CART_QUANTITY_LIMIT', 'CART_FULL', 'NOT_FOUND'])
 export function CartProvider({ children }) {
   const { status: authStatus, user } = useAuth();
   const userId = authStatus === 'authenticated' && user?.role === 'user' ? user.id : null;
+  // Ở /checkout không làm mới ngầm: người mua không được xác nhận một giỏ họ chưa xem (D-144, D-158).
+  const { pathname } = useLocation();
+  const pathnameRef = useRef(pathname);
+  useLayoutEffect(() => {
+    pathnameRef.current = pathname;
+  }, [pathname]);
 
   // Dữ liệu gắn với userId để đổi tài khoản không lộ giỏ cũ dù một render.
   const [store, setStore] = useState({ userId: null, cart: null });
@@ -54,21 +61,25 @@ export function CartProvider({ children }) {
     setStore({ userId: userIdRef.current, cart, failed: false });
   }, []);
 
+  /** Đọc lại giỏ. Trả giỏ mới nhất đã nhận, hoặc `null` khi lỗi/bị thay thế bởi lần đọc khác. */
   const refresh = useCallback(async () => {
-    if (!userIdRef.current) return;
+    if (!userIdRef.current) return null;
     const forGeneration = generation.current;
     const seq = (requestSeq.current += 1);
     refreshController.current?.abort();
     const controller = new AbortController();
     refreshController.current = controller;
     try {
-      apply(await cartApi.getCart({ signal: controller.signal }), seq, forGeneration);
+      const cart = await cartApi.getCart({ signal: controller.signal });
+      apply(cart, seq, forGeneration);
+      return forGeneration === generation.current ? cart : null;
     } catch (error) {
-      if (error.code === 'CANCELED' || forGeneration !== generation.current) return;
+      if (error.code === 'CANCELED' || forGeneration !== generation.current) return null;
       // Lỗi tải không báo ở header (entry-points.md): chỉ ghi nhận để hiện icon không số.
       setStore((prev) =>
         prev.cart ? prev : { userId: userIdRef.current, cart: null, failed: true },
       );
+      return null;
     }
   }, [apply]);
 
@@ -87,7 +98,7 @@ export function CartProvider({ children }) {
   useEffect(() => {
     if (!userId) return undefined;
     const onVisible = () => {
-      if (document.visibilityState === 'visible') refresh();
+      if (document.visibilityState === 'visible' && pathnameRef.current !== '/checkout') refresh();
     };
     document.addEventListener('visibilitychange', onVisible);
     return () => document.removeEventListener('visibilitychange', onVisible);
@@ -143,6 +154,45 @@ export function CartProvider({ children }) {
     [apply, refresh, showNotice],
   );
 
+  /**
+   * Đổi số lượng tuyệt đối (`PATCH`) hoặc bỏ dòng (`DELETE`), khóa theo từng dòng cùng với `addItem`.
+   * Giỏ chỉ đổi theo response, không tự tính tổng, không cập nhật lạc quan. Trả `{ ok, cart? , code?, details? }`.
+   * Sau NOT_FOUND, giỏ ở server khác giỏ đang biết: đọc lại một lần và trả giỏ đó ở `cart`.
+   */
+  const mutateLine = useCallback(
+    async (productId, call) => {
+      if (!userIdRef.current || pendingRef.current.has(productId)) {
+        return { ok: false, skipped: true };
+      }
+      const forGeneration = generation.current;
+      pendingRef.current.add(productId);
+      setPendingIds(new Set(pendingRef.current));
+      const seq = (requestSeq.current += 1);
+      try {
+        const next = await call();
+        apply(next, seq, forGeneration);
+        return { ok: true, cart: next };
+      } catch (error) {
+        const outcome = { ok: false, code: error.code, details: error.details };
+        if (error.code === 'NOT_FOUND') outcome.cart = await refresh();
+        return outcome;
+      } finally {
+        pendingRef.current.delete(productId);
+        setPendingIds(new Set(pendingRef.current));
+      }
+    },
+    [apply, refresh],
+  );
+
+  const setQuantity = useCallback(
+    (productId, quantity) => mutateLine(productId, () => cartApi.setQuantity(productId, quantity)),
+    [mutateLine],
+  );
+  const removeItem = useCallback(
+    (productId) => mutateLine(productId, () => cartApi.removeItem(productId)),
+    [mutateLine],
+  );
+
   const cart = store.userId === userId ? store.cart : null;
   let status = 'idle';
   if (userId) {
@@ -151,8 +201,18 @@ export function CartProvider({ children }) {
   }
 
   const value = useMemo(
-    () => ({ cart, status, isAdding, addItem, refresh, notice: userId ? notice : null }),
-    [cart, status, isAdding, addItem, refresh, notice, userId],
+    () => ({
+      cart,
+      status,
+      isAdding,
+      isLineBusy: isAdding,
+      addItem,
+      setQuantity,
+      removeItem,
+      refresh,
+      notice: userId ? notice : null,
+    }),
+    [cart, status, isAdding, addItem, setQuantity, removeItem, refresh, notice, userId],
   );
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

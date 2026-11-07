@@ -10,6 +10,7 @@ import { buildTryonConfig } from '../../src/services/tryon/config.js';
 import { parseEnv } from '../../src/config/env.js';
 import { createFakeTryonRepository } from './fakeTryonRepository.js';
 import { createFakeCartRepository } from './fakeCartRepository.js';
+import { createFakeOrderRepository } from './fakeOrderRepository.js';
 
 export const TEST_ENV = Object.freeze({
   JWT_SECRET: 'test-secret-test-secret-test-secret-123',
@@ -400,12 +401,20 @@ const tryonEnvDefaults = () => {
  * @param {{
  *   processPhoto?: Function, processProductImage?: Function, logger?: object,
  *   tryon?: boolean, tryonDelayMs?: number,
+ *   orderRepositoryOverride?: object,
  * }} [options] `tryon: true` lắp phòng thử đồ với repository giả, adapter giả và đồng hồ điều khiển bằng tay.
  *   Worker KHÔNG tự chạy: test gọi `ctx.tryon.worker.tick()`.
  */
 export async function createTestApp(
   envOverrides = {},
-  { processPhoto, processProductImage, logger, tryon = false, tryonDelayMs = 0 } = {},
+  {
+    processPhoto,
+    processProductImage,
+    logger,
+    tryon = false,
+    tryonDelayMs = 0,
+    orderRepositoryOverride,
+  } = {},
 ) {
   const userRepository = createFakeUserRepository();
   const profileRepository = createFakeProfileRepository(userRepository);
@@ -428,6 +437,8 @@ export async function createTestApp(
     CART_MAX_QUANTITY: 10,
     CART_MAX_LINES: 30,
     CART_REQUESTS_PER_MIN: 1000,
+    ORDER_CREATES_PER_HOUR: 1000,
+    ORDER_READS_PER_MIN: 1000,
     ...envOverrides,
   };
   const errorLogger = logger ?? { error: () => {} };
@@ -437,6 +448,10 @@ export async function createTestApp(
     categoryRepository,
     limits: { maxQuantity: env.CART_MAX_QUANTITY, maxLines: env.CART_MAX_LINES },
   });
+
+  const orderRepository =
+    orderRepositoryOverride ??
+    createFakeOrderRepository({ userRepository, productRepository, cartRepository });
 
   let tryonOptions = {};
   let tryonCtx;
@@ -477,6 +492,7 @@ export async function createTestApp(
     categoryRepository,
     productRepository,
     cartRepository,
+    orderRepository,
     productImageStorage: createProductImageStorage({
       client: productSupabase,
       bucket: env.PRODUCT_IMAGE_BUCKET,
@@ -497,6 +513,7 @@ export async function createTestApp(
     categoryRepository,
     productRepository,
     cartRepository,
+    orderRepository,
     supabase,
     productSupabase,
     env,

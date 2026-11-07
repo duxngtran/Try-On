@@ -1,11 +1,24 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Check, Info, ShoppingBag } from 'lucide-react';
+import { Link } from 'react-router';
 import { Alert } from '../../components/Alert.jsx';
 import { Button } from '../../components/Button.jsx';
 import { useCountdown } from '../../hooks/useCountdown.js';
 import { STAGE_GONE_ID } from '../tryon/StageOverlay.jsx';
 import { describeInlineError } from './cartMessages.js';
 import { useCart } from './cartContext.js';
+
+/** Link "Xem giỏ hàng" (D-165): tới `/cart`, vùng chạm cao 44px (screens/add-to-cart.md). */
+function ViewCartLink({ className = '' }) {
+  return (
+    <Link
+      to="/cart"
+      className={`inline-flex h-11 items-center font-semibold text-accent-strong underline hover:text-ink ${className}`}
+    >
+      Xem giỏ hàng
+    </Link>
+  );
+}
 
 /**
  * Nút Thêm vào giỏ ở khối thông tin sản phẩm (screens/add-to-cart.md). Độc lập với trạng thái ảnh: không đọc, không
@@ -92,26 +105,33 @@ export function AddToCartButton({ product, stageGone = false }) {
 
       {((gone && !shownError && !stageGone) || quantity > 0 || atMax) && (
         <p
-          id={noteId}
           key={flash}
-          className={`inline-flex items-center gap-1.5 self-start rounded-sm text-small text-ink-muted ${
+          className={`inline-flex flex-wrap items-center gap-x-1.5 self-start rounded-sm text-small text-ink-muted ${
             flash > 0 ? 'motion-safe:animate-note-flash' : ''
           }`}
         >
-          {gone && !stageGone ? (
+          <span id={noteId} className="inline-flex items-center gap-1.5">
+            {gone && !stageGone ? (
+              <>
+                <Info size={16} aria-hidden="true" className="shrink-0 text-accent-strong" />
+                Sản phẩm này không còn bán.
+              </>
+            ) : atMax ? (
+              <>
+                <Info size={16} aria-hidden="true" className="shrink-0 text-accent-strong" />
+                Đã đạt tối đa {maxQuantity} món trong giỏ.
+              </>
+            ) : (
+              <>
+                <Check size={16} aria-hidden="true" className="shrink-0 text-success" />
+                Trong giỏ: {quantity}
+              </>
+            )}
+          </span>
+          {quantity > 0 && (
             <>
-              <Info size={16} aria-hidden="true" className="shrink-0 text-accent-strong" />
-              Sản phẩm này không còn bán.
-            </>
-          ) : atMax ? (
-            <>
-              <Info size={16} aria-hidden="true" className="shrink-0 text-accent-strong" />
-              Đã đạt tối đa {maxQuantity} món trong giỏ.
-            </>
-          ) : (
-            <>
-              <Check size={16} aria-hidden="true" className="shrink-0 text-success" />
-              Trong giỏ: {quantity}
+              <span aria-hidden="true">·</span>
+              <ViewCartLink />
             </>
           )}
         </p>
@@ -125,6 +145,9 @@ export function AddToCartButton({ product, stageGone = false }) {
           className="[&>div]:min-w-0"
         >
           <span id={alertId}>{shownError.text}</span>
+          {(shownError.code === 'CART_QUANTITY_LIMIT' || shownError.code === 'CART_FULL') && (
+            <ViewCartLink className="ml-2" />
+          )}
           {locked && (
             <span aria-hidden="true" className="mt-1 block text-ink-muted">
               Còn {countdown.remainingSeconds} giây

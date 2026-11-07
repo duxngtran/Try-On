@@ -85,24 +85,24 @@ Nâng `CART_REQUESTS_PER_MIN`, `ORDER_CREATES_PER_HOUR` cho server test, như c�
 
 | ID | Task | Phụ thuộc | Ước lượng | Definition of Done | TT |
 |---|---|---|---|---|---|
-| T-110 | Thêm 2 biến `ORDER_*`. Chép `design/db/008_create_orders.sql` sang `migrations/`, `npm run migrate` | T-109, Thiết kế DB | S | `get_advisors` sạch; anon bị chặn; `service_role` không `UPDATE`, `DELETE` được `orders` qua REST | [ ] |
-| T-111 | Giỏ: `PATCH /cart/items/:productId`, `DELETE /cart/items/:productId` | T-110 | S | US-08 AC-03, E1, E2, E3 | [ ] |
-| T-112 | `repositories/orderRepository.js`, `services/orderService.js`, `validation/orderSchemas.js`: chuẩn hóa và kiểm mục 6, gọi `place_order`, map `out_status`. **Làm sạch lỗi:** lỗi rpc được thay bằng `Error` chỉ có mã, trước khi tới `errorHandler` | T-110 | M | Test bảng case; AC-04; AC-16; lỗi 23514 giả lập có "Failing row contains" không xuất hiện trong log (AC-17) | [ ] |
-| T-113 | Controller, route `POST /orders`, `GET /orders`, `GET /orders/:id`, rate limit, `Cache-Control: no-store`. 201 khi `ok`, 200 khi `replayed`. Đọc đơn theo `id` + `user_id` | T-112 | M | Khớp `api.md`; AC-15; AC-19 | [ ] |
-| T-114 | Script `npm run verify:orders` chạy trên Supabase dev, chuyển từ `design/db/checks/concurrency-test.mjs`: đặt trùng, hai tab, thêm và sửa khi đang đặt, đổi giá và xóa khi đang đặt, giới hạn song song, tải hỗn hợp. Kịch bản đọc bằng rpc, chỉ dòng DB tổng hợp, tự dọn bằng `DATABASE_URL` vì `service_role` không xóa được đơn. Thêm lệnh vào `CLAUDE.md` | T-110 | M | 0 vi phạm, 0 deadlock qua PostgREST + Supavisor; cả hai thứ tự thắng đều xảy ra; dọn sạch; ghi kết quả vào `PROGRESS.md` | [ ] |
-| T-115 | Test BE tập trung rủi ro: AC-06, AC-08, AC-10 → AC-14, AC-18 (service + repository giả); log không có họ tên, số điện thoại, địa chỉ | T-113 | M | Pass | [ ] |
+| T-110 | Thêm 2 biến `ORDER_*`. Chép `design/db/008_create_orders.sql` sang `migrations/`, `npm run migrate` | T-109, Thiết kế DB | S | `get_advisors` sạch; anon bị chặn; `service_role` không `UPDATE`, `DELETE` được `orders` qua REST | [x] |
+| T-111 | Giỏ: `PATCH /cart/items/:productId`, `DELETE /cart/items/:productId` | T-110 | S | US-08 AC-03, E1, E2, E3 | [x] |
+| T-112 | `repositories/orderRepository.js`, `services/orderService.js`, `validation/orderSchemas.js`: chuẩn hóa và kiểm mục 6, gọi `place_order`, map `out_status`. **Làm sạch lỗi:** lỗi rpc được thay bằng `Error` chỉ có mã, trước khi tới `errorHandler` | T-110 | M | Test bảng case; AC-04; AC-16; lỗi 23514 giả lập có "Failing row contains" không xuất hiện trong log (AC-17) | [x] |
+| T-113 | Controller, route `POST /orders`, `GET /orders`, `GET /orders/:id`, rate limit, `Cache-Control: no-store`. 201 khi `ok`, 200 khi `replayed`. Đọc đơn theo `id` + `user_id` | T-112 | M | Khớp `api.md`; AC-15; AC-19 | [x] |
+| T-114 | Script `npm run verify:orders` chạy trên Supabase dev, chuyển từ `design/db/checks/concurrency-test.mjs`: đặt trùng, hai tab, thêm và sửa khi đang đặt, đổi giá và xóa khi đang đặt, giới hạn song song, tải hỗn hợp. Kịch bản đọc bằng rpc, chỉ dòng DB tổng hợp, tự dọn bằng `DATABASE_URL` vì `service_role` không xóa được đơn. Thêm lệnh vào `CLAUDE.md` | T-110 | M | 0 vi phạm, 0 deadlock qua PostgREST + Supavisor; cả hai thứ tự thắng đều xảy ra; dọn sạch; ghi kết quả vào `PROGRESS.md` | [x] |
+| T-115 | Test BE tập trung rủi ro: AC-06, AC-08, AC-10 → AC-14, AC-18 (service + repository giả); log không có họ tên, số điện thoại, địa chỉ | T-113 | M | Pass | [x] |
 
 **Frontend**
 
 | ID | Task | Phụ thuộc | Ước lượng | Definition of Done | TT |
 |---|---|---|---|---|---|
-| T-116 | Trang `/cart`: dòng, số lượng, bỏ, tổng từ API, "Giá đã đổi từ X", dòng ngừng bán, rỗng, lỗi. Bật link trên header. Admin về `/admin`. Lazy-load | T-111, Màn hình bước 4 | M | AC-01, AC-02, AC-03, AC-05, AC-08 trên UI | [ ] |
-| T-117 | Trang `/checkout`: tóm tắt, form 3 ô, khóa sinh một lần, giữ `fingerprint`, E4 → E13. Sinh UUID bằng `crypto.getRandomValues`, vì `crypto.randomUUID` không có trên HTTP thường khi thử bằng điện thoại qua LAN. Dữ liệu form chỉ trong bộ nhớ | T-113, T-116 | M | AC-06, AC-11, AC-12, AC-13; `sessionStorage`, `localStorage` không có dữ liệu form | [ ] |
-| T-118 | Trang `/orders`, `/orders/:id`: bản chụp, câu "Chưa thanh toán trực tuyến", phân trang (D-61) | T-113 | S | AC-09, AC-19 | [ ] |
-| T-119 | Test FE: `CART_CHANGED` giữ form và tải lại tóm tắt, thử lại cùng khóa, schema cùng bảng case với BE (D-21), không tự tính tổng | T-116 → T-118 | M | Pass | [ ] |
-| T-120 | API test `orders.collection.json`, thêm vào `run.js`: AC-03 → AC-06, AC-08 → AC-10, AC-12, AC-15, AC-16, AC-18, AC-19; 429 ở lượt server riêng | T-113 | L | `npm run test:postman` pass cả bộ; chạy lần 2 vẫn pass | [ ] |
-| T-121 | Trình duyệt thật 360, 768, 1280 px: thêm, sửa, đặt, hai tab, admin đổi giá giữa chừng, mất mạng rồi thử lại | T-116 → T-118 | S | Không lỗi console, không tràn ngang | [ ] |
-| T-122 | Review → user xác nhận → `/merge`, ghi `PROGRESS.md` | T-114, T-115, T-119 → T-121 | S | `main` có US-08, test pass sau merge | [ ] |
+| T-116 | Trang `/cart`: dòng, số lượng, bỏ, tổng từ API, "Giá đã đổi từ X", dòng ngừng bán, rỗng, lỗi. Bật link trên header. Admin về `/admin`. Lazy-load | T-111, Màn hình bước 4 | M | AC-01, AC-02, AC-03, AC-05, AC-08 trên UI | [x] |
+| T-117 | Trang `/checkout`: tóm tắt, form 3 ô, khóa sinh một lần, giữ `fingerprint`, E4 → E13. Sinh UUID bằng `crypto.getRandomValues`, vì `crypto.randomUUID` không có trên HTTP thường khi thử bằng điện thoại qua LAN. Dữ liệu form chỉ trong bộ nhớ | T-113, T-116 | M | AC-06, AC-11, AC-12, AC-13; `sessionStorage`, `localStorage` không có dữ liệu form | [x] |
+| T-118 | Trang `/orders`, `/orders/:id`: bản chụp, câu "Chưa thanh toán trực tuyến", phân trang (D-61) | T-113 | S | AC-09, AC-19 | [x] |
+| T-119 | Test FE: `CART_CHANGED` giữ form và tải lại tóm tắt, thử lại cùng khóa, schema cùng bảng case với BE (D-21), không tự tính tổng | T-116 → T-118 | M | Pass | [x] |
+| T-120 | API test `orders.collection.json`, thêm vào `run.js`: AC-03 → AC-06, AC-08 → AC-10, AC-12, AC-15, AC-16, AC-18, AC-19; 429 ở lượt server riêng | T-113 | L | `npm run test:postman` pass cả bộ; chạy lần 2 vẫn pass | [x] |
+| T-121 | Trình duyệt thật 360, 768, 1280 px: thêm, sửa, đặt, hai tab, admin đổi giá giữa chừng, mất mạng rồi thử lại | T-116 → T-118 | S | Không lỗi console, không tràn ngang | [x] |
+| T-122 | Review → user xác nhận → `/merge`, ghi `PROGRESS.md` | T-114, T-115, T-119 → T-121 | S | `main` có US-08, test pass sau merge | [x] |
 
 ### 5.3 US-09 — Admin xem đơn (branch `feature/US-09-admin-orders`, tạo sau T-122)
 
